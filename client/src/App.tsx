@@ -10,10 +10,17 @@ export default function App() {
   void categories;
 
   async function handleCheck() {
-    // TODO(Issue 4): set loading, call checkSystem(), then either
-    //   - success: store categories and show Online + the list, or
-    //   - error: show Offline + a useful message.
     setState("loading");
+    try {
+      const response = await checkSystem();
+      if (response && response.online) {
+        setState("success");
+      } else {
+        setState("error");
+      }
+    } catch (error) {
+      setState("error");
+    }
   }
 
   return (
@@ -22,11 +29,26 @@ export default function App() {
         TokTickIT <span className="text-success">IT Service Desk</span>
       </h1>
 
-      <button className="btn btn-success" onClick={handleCheck} disabled={state === "loading"}>
+      <button className="btn btn-success mb-4" onClick={handleCheck} disabled={state === "loading"}>
         {state === "loading" ? "Loading…" : "Check System"}
       </button>
 
-      {/* TODO(Issue 4): render loading / success (Online + categories) / error (Offline) states. */}
+      {state === "success" && (
+        <div className="card">
+          <div className="card-body">
+            <h5 className="card-title">System Status: Online</h5>
+          </div>
+        </div>
+      )}
+
+      {state === "error" && (
+        <div className="card text-white bg-danger">
+          <div className="card-body">
+            <h5 className="card-title">System Status: Offline</h5>
+            <p className="card-text mb-0">Unable to connect to TokTickIT API</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
