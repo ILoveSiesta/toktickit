@@ -14,6 +14,7 @@ export default function App() {
     try {
       const response = await checkSystem();
       if (response && response.online) {
+        setCategories(response.categories);
         setState("success");
       } else {
         setState("error");
@@ -37,6 +38,12 @@ export default function App() {
         <div className="card">
           <div className="card-body">
             <h5 className="card-title">System Status: Online</h5>
+            <h6 className="mt-4 mb-3">Supported Request Categories</h6>
+            <ol className="mb-0">
+              {categories.map((category) => (
+                <li key={category.id}>{category.name}</li>
+              ))}
+            </ol>
           </div>
         </div>
       )}

@@ -21,7 +21,11 @@ export async function checkSystem(): Promise<SystemStatus> {
     throw new Error("API is offline");
   }
   
-  // Note: /api/categories will be implemented in Issue 4.
-  // For now, return an empty array to satisfy the type.
-  return { online: true, categories: [] };
+  const categoriesRes = await fetch(`${API_URL}/api/categories`);
+  if (!categoriesRes.ok) {
+    throw new Error("Categories API is offline");
+  }
+  const categories = await categoriesRes.json();
+  
+  return { online: true, categories };
 }
