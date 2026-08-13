@@ -41,18 +41,22 @@ npm install
 npm run dev
 ```
 
-สำหรับทดสอบ backend
+สำหรับทดสอบ backend ใช้คำสั่ง
 ```bash
-cd server
-npm install
 npm test
 ```
+
 ### 5. การรัน Frontend (Client)
 เปิด terminal ใหม่
 ```bash
 cd client
 npm install
 npm run dev
+```
+
+สำหรับทดสอบ frontend ใช้คำสั่ง
+```bash
+npm test
 ```
 
 ### 6. เข้าใช้งาน

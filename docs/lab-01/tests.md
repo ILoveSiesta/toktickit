@@ -14,6 +14,8 @@ Paste your passing terminal output / screenshot below.
 
 ## npm test(server)
 
+PS D:\เรียน\CPE334-SoftEng\Me-TickTokIt\toktickit\server> npm test
+
 > toktickit-server@1.0.0 test
 > vitest run
 
@@ -29,6 +31,8 @@ Paste your passing terminal output / screenshot below.
    Duration  1.03s (transform 79ms, setup 0ms, collect 670ms, tests 199ms, environment 0ms, prepare 364ms)
 
 ## npm test (client)
+
+PS D:\เรียน\CPE334-SoftEng\Me-TickTokIt\toktickit\client> npm test
 
 > toktickit-client@1.0.0 test
 > vitest run
