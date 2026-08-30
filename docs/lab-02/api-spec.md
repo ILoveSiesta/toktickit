@@ -196,18 +196,21 @@
   * `X-Requester-Id`: `1` (Required)
 * **Query Parameters:**
 
-| Parameter | Type | Default | Description | Example |
+| Parameter | Type | Default | Constraints & Description | Example |
 | :--- | :--- | :--- | :--- | :--- |
 | `search` | String | - | ค้นหาจาก `ticketNumber` หรือ `summary` (Case-insensitive) | `?search=wifi` |
-| `categoryId` | Number | - | กรองตาม ID หมวดหมู่ | `?categoryId=4` |
+| `categoryId` | Number | - | กรองตาม ID หมวดหมู่ (ต้องเป็นจำนวนเต็มบวก) | `?categoryId=4` |
 | `requestedPriority` | String | - | กรองตามระดับความสำคัญ (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`) | `?requestedPriority=HIGH` |
-| `itPriority` | String | - | กรองตามระดับความสำคัญ IT | `?itPriority=MEDIUM` |
+| `itPriority` | String | - | กรองตามระดับความสำคัญ IT (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`) | `?itPriority=MEDIUM` |
 | `status` | String | - | กรองตามสถานะ (`NEW`, `OPEN`, `IN_PROGRESS`, `RESOLVED`, `CLOSED`) | `?status=NEW` |
-| `sortBy` | String | `createdAt` | ฟิลด์สำหรับจัดเรียง (`createdAt`, `ticketNumber`, `updatedAt`) | `?sortBy=createdAt` |
+| `sortBy` | String | `createdAt` | ฟิลด์สำหรับจัดเรียงหลัก (`createdAt`, `ticketNumber`, `updatedAt`) | `?sortBy=createdAt` |
 | `sortOrder` | String | `desc` | ลำดับการจัดเรียง (`asc`, `desc`) | `?sortOrder=desc` |
-| `page` | Number | `1` | หมายเลขหน้าที่ต้องการดึง | `?page=1` |
-| `limit` | Number | `8` | จำนวนรายการต่อหน้า | `?limit=8` |
+| `page` | Number | `1` | หมายเลขหน้าที่ต้องการดึง (ขั้นต่ำ `1`) | `?page=1` |
+| `limit` | Number | `8` | จำนวนรายการต่อหน้า (ขั้นต่ำ `1`, เพดานสูงสุดไม่เกิน `100`) | `?limit=8` |
 
+* **Sorting & Secondary Sorting Strategy:**
+  * **Primary Sort:** จัดเรียงตามฟิลด์ `sortBy` และทิศทาง `sortOrder` ที่ระบุ
+  * **Secondary Sort:** หากข้อมูลมีค่าฟิลด์หลักซ้ำกัน ระบบจะใช้ Secondary Sort เป็น `id DESC` (หรือ `createdAt DESC`) เสมอโดยอัตโนมัติ เพื่อรับประกันว่าผลลัพธ์ของการแบ่งหน้าจะมีความแน่นอน คงเส้นคงวา และไม่เกิดข้อมูลซ้ำข้ามหน้า (Deterministic Pagination)
 * **Response Status:** `200 OK`
 * **Response Body:**
 ```json
@@ -236,6 +239,24 @@
   }
 }
 ```
+* **Error Cases:**
+  * `400 Bad Request` (เมื่อส่งพารามิเตอร์ผิดเงื่อนไข เช่น `page < 1`, `limit < 1` หรือ `limit > 100`, `sortBy` นอกเหนือจากฟิลด์ที่กำหนด, หรือ `sortOrder` ที่ไม่ใช่ `asc`/`desc`):
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_QUERY_PARAMETER",
+    "message": "Invalid query parameter provided.",
+    "details": [
+      {
+        "parameter": "limit",
+        "message": "Limit must be a positive integer between 1 and 100."
+      }
+    ]
+  }
+}
+```
+  * `401 Unauthorized` (เมื่อไม่ได้ส่ง `X-Requester-Id`)
 
 ---
 

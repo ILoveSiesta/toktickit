@@ -264,6 +264,13 @@ model Attachment {
    - Active อย่างน้อย 4 คน (เช่น `Jennifer Anderson`, `Michael Brown`, `Sarah Johnson`, `David Lee`)
    - Inactive อย่างน้อย 1 คน (เช่น `Alex Inactive`) โดย Inactive จะไม่ปรากฏในหน้าคัดเลือก
 
+### 7.3. Schema Evolution for Lab 3 (Authentication & Workflow)
+โครงสร้างฐานข้อมูลใน Lab 2 ได้รับการออกแบบเชิงสถาปัตยกรรมให้สามารถรองรับการพัฒนาต่อยอด (Evolve) เข้าสู่ Lab 3 ได้อย่างราบรื่นโดยไม่ต้องรื้อถอนโครงสร้างเดิม (Zero Breaking Migration):
+1. **User Model Evolution:** โมเดล `RequesterUser` พร้อมที่จะถูก Refactor หรือ Migrate เข้าสู่ตาราง `User` ใน Lab 3 โดยการเพิ่มฟิลด์ `passwordHash`, `role` (Enum: `REQUESTER`, `IT_STAFF`, `ADMIN`), และ `avatarUrl` โดยที่ความสัมพันธ์ `requesterId` ในตาราง `Ticket` สามารถเชื่อมต่อเข้ากับ User ID ได้โดยตรง
+2. **IT Staff Workflow Readiness:** ตาราง `Ticket` ได้เตรียมฟิลด์ `ticketOwner` (พร้อมสำหรับผูก Foreign Key กับ IT Staff User ID) และ `itPriority` (พร้อมสำหรับการแก้ไขระดับความสำคัญโดยเจ้าหน้าที่) ไว้ล่วงหน้า
+3. **Ticket Lifecycle Transitions:** Enum `TicketStatus` ได้นิยามสถานะมาตรฐานไว้ครบถ้วน (`NEW`, `OPEN`, `IN_PROGRESS`, `RESOLVED`, `CLOSED`) ทำให้สามารถเพิ่ม State Transition Logic และ Resolution Verification ใน Lab 3 ได้ทันที
+4. **Collaboration & Activity Tracking:** โมเดล `Ticket` พร้อมสำหรับการเชื่อมโยงแบบ One-to-Many กับตารางใหม่ที่จะเพิ่มใน Lab 3 ได้แก่ `Comment` (สำหรับ Public Comments และ Internal Notes) และ `TicketActivityLog` (สำหรับบันทึกประวัติ Actions Taken)
+
 ---
 
 ## 8. REST API Contract
@@ -590,7 +597,8 @@ model Attachment {
 - [ ] **Soft Delete Integrity:** ทดสอบกลไก Soft Removal ของไฟล์แนบ สามารถเก็บ Metadata และบล็อกการดาวน์โหลดไฟล์ที่ถูกลบได้ 100%
 - [ ] **Ownership Security:** ตรวจสอบและมี Automated Tests ยืนยันว่า Requester ไม่สามารถเข้าถึงตั๋วหรือดาวน์โหลดไฟล์ของผู้อื่นได้
 - [ ] **Automated Tests:** ทุก Acceptance Criteria (AC-01 ถึง AC-17) ถูกเชื่อมโยงและผ่านการทดสอบครบถ้วนทุกระดับ (Unit, API, UI, E2E) โดยไม่มี Test ใดถูก Skip หรือ Comment ทิ้ง
-- [ ] **Documentation:** จัดทำเอกสาร `specification.md`, `tests.md`, `ui-spec.md`, `api-spec.md`, `reviewer.md`, และ `ai-use.md` ครบถ้วน
+- [ ] **README & Setup Documentation:** อัปเดตไฟล์ `README.md` ของโปรเจกต์ให้มีคำอธิบายการตั้งค่า Environment Variables, คำสั่งรัน Database Migration, ข้อมูล Seed, การเริ่มระบบ Server/Client และคำสั่งทดสอบครบถ้วนและเป็นปัจจุบัน
+- [ ] **Engineering Documentation:** จัดทำเอกสาร `specification.md`, `tests.md`, `ui-spec.md`, `api-spec.md`, `reviewer.md`, และ `ai-use.md` ครบถ้วน
 
 ---
 
@@ -601,3 +609,4 @@ model Attachment {
 3. **Soft Delete Representation:** ตาราง Attachment ใช้ฟิลด์ `isRemoved (Boolean)`, `removedAt (DateTime?)`, และ `removalReason (String?)` เพื่อคงประวัติการอัปโหลดไฟล์ไว้สำหรับการตรวจสอบ (Audit) ในอนาคต
 4. **Testing Context Storage:** ฝั่ง Frontend จัดเก็บ ID ของ Development Requester ใน `localStorage` และ React State เพื่อความสะดวกในการทดสอบรีเฟรชหน้าจอ และส่งผ่าน HTTP Header `X-Requester-Id` ในทุก Request
 5. **No IT Staff Actions in Lab 2:** ยึดตาม Scope ของ Lab 2 อย่างเคร่งครัด โดยส่วนของ IT Priority ให้ใส่ค่าเริ่มต้นเป็น `MEDIUM` และ Ticket Owner เป็น `null` สำหรับรอการพัฒนาฟีเจอร์ฝั่ง IT Staff ใน Lab ถัดไป
+6. **Schema Evolution & Extensibility Justification:** การออกแบบ Prisma Schema ใน Lab 2 คำนึงถึงการต่อยอด (Evolutionary Architecture) ใน Lab 3 โดยเตรียมฟิลด์สำหรับ IT Staff และ Life Cycle Transitions ไว้ล่วงหน้า ช่วยป้องกันปัญหา Breaking Changes และลดความซับซ้อนในการทำ Database Migration เมื่อเริ่มพัฒนา Sprint ถัดไป

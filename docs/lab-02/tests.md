@@ -53,6 +53,7 @@
 | **UI-08** | UI | FR-09, BR-04, AC-15 | Change Requester action | กดเปลี่ยนตัวตนแล้วโหลดข้อมูลใหม่ตามตัวตนที่เลือก | `client/src/tests/lab-02/AppHeader.test.tsx` | Planned |
 | **UI-09** | UI | BR-20, AC-17 | Post-creation attachment upload UI | แสดงฟอร์มแนบไฟล์เพิ่มใน Ticket Detail และอัปเดตรายการไฟล์ | `client/src/tests/lab-02/AttachmentSection.test.tsx` | Planned |
 | **UI-10** | UI | BR-06 | RequesterSelector Error & Empty | แสดงข้อความ Error ปลอดภัยเมื่อ API ล้มเหลว และแสดง Empty State | `client/src/tests/lab-02/RequesterSelector.test.tsx` | Planned |
+| **UI-11** | UI | FR-04, BR-13, AC-05 | Attachment upload failure behavior | แสดง Error ปลอดภัยเมื่อเครือข่าย/เซิร์ฟเวอร์ขัดข้อง และคงค่าฟอร์มเดิมไว้ | `client/src/tests/lab-02/AttachmentSection.test.tsx` | Planned |
 | **RESP-01** | Visual | AC-16 | Desktop Viewport ($\ge 992\text{px}$) | Layout 2 คอลัมน์ ตาราง My Tickets เต็มรูปแบบ | `e2e/lab-02/responsive-visual.spec.ts` | Planned |
 | **RESP-02** | Visual | AC-16 | Tablet Viewport ($768 - 991\text{px}$) | ปรับสเกล 2 คอลัมน์กระชับ ไม่เกิดแนวนอนเลื่อน | `e2e/lab-02/responsive-visual.spec.ts` | Planned |
 | **RESP-03** | Visual | AC-16 | Mobile Viewport ($< 768\text{px}$) | Layout แถวเดี่ยว ตารางเปลี่ยนเป็นการ์ด ปุ่ม $\ge 44\text{px}$ | `e2e/lab-02/responsive-visual.spec.ts` | Planned |
@@ -71,7 +72,7 @@
 | **AC-02** | Requester Context Persistence & Header | `UI-01`, `UI-08`, `E2E-01` | UI Component, E2E |
 | **AC-03** | Successful Ticket Creation | `UNIT-01`, `API-03`, `UI-02`, `E2E-01` | Unit, API, UI, E2E |
 | **AC-04** | Ticket Creation Validation Failure | `API-04`, `UI-03` | API, UI Component |
-| **AC-05** | Attachment Type & Size Validation | `UNIT-02`, `UNIT-03`, `API-05`, `UI-03` | Unit, API, UI Component |
+| **AC-05** | Attachment Type, Size & Upload Failure | `UNIT-02`, `UNIT-03`, `API-05`, `UI-03`, `UI-11` | Unit, API, UI Component |
 | **AC-06** | Maximum 5 Active Attachments Limit | `UNIT-02`, `UI-04` | Unit, UI Component |
 | **AC-07** | My Tickets Ownership Filter | `API-06`, `E2E-01` | API, E2E |
 | **AC-08** | My Tickets Search & Filter | `API-07`, `UI-05`, `E2E-01` | API, UI Component, E2E |
@@ -143,10 +144,10 @@ npx playwright test e2e/lab-02/ --ui
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Unit Tests** | 3 | - | - | - | Pending Execution |
 | **API Integration Tests** | 11 | - | - | - | Pending Execution |
-| **UI Component Tests** | 10 | - | - | - | Pending Execution |
+| **UI Component Tests** | 11 | - | - | - | Pending Execution |
 | **Responsive / Visual Tests** | 3 | - | - | - | Pending Execution |
 | **End-to-End Tests** | 2 | - | - | - | Pending Execution |
-| **Total** | **29** | - | - | - | **Pending Implementation** |
+| **Total** | **30** | - | - | - | **Pending Implementation** |
 
 ---
 

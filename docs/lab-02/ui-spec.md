@@ -78,9 +78,9 @@
 ### 3.2. Button Hierarchy & States
 
 ```
-+--------------------------------------------------------------------------------+
-|  [ Primary Action ]    [ Secondary Action ]    [ Destructive ]    [ Disabled ] |
-+--------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------------------+
+|  [ Primary Action ]    [ Secondary Action ]    [ Tertiary Ghost ]    [ Destructive ]    [ Disabled ] |
++-----------------------------------------------------------------------------------------------------+
 ```
 
 1. **Primary Button (เช่น Submit Ticket, Continue):**
@@ -88,17 +88,23 @@
    - Text: White (`#FFFFFF`), Weight `600`
    - Hover: Background Secondary Green (`#0B7A46`)
    - Active / Focus: Outline Ring `#00502D`
-2. **Secondary / Outline Button (เช่น Cancel, Clear Filters):**
+2. **Secondary / Outline Button (เช่น Cancel, Close Modal):**
    - Background: White (`#FFFFFF`)
    - Border: `1px solid #CBD5E1`
    - Text: `#1A2E26`
    - Hover: Background Pale Green (`#EAF6EF`), Border `#0B7A46`
-3. **Destructive Button (เช่น Remove Attachment):**
+3. **Tertiary / Ghost Button (เช่น Clear Filters, Back to My Tickets, Text Actions):**
+   - Background: Transparent (`transparent`)
+   - Border: None
+   - Text: Secondary Green (`#0B7A46`) หรือ Dark Charcoal-Green (`#1A2E26`), Weight `500`
+   - Hover: Background Pale Green (`#EAF6EF`), Text Primary Green (`#006B3C`), Border-radius `6px`
+   - Active / Focus: Outline Ring `#0B7A46/20`
+4. **Destructive Button (เช่น Confirm Removal, Delete):**
    - Background: White (`#FFFFFF`) หรือ `#FEE2E2`
    - Border: `1px solid #FCA5A5`
    - Text: Dark Red (`#DC2626`)
    - Hover: Background `#DC2626`, Text White (`#FFFFFF`)
-4. **Busy / Submitting Button State:**
+5. **Busy / Submitting Button State:**
    - Background: `#006B3C` (Opacity 0.7)
    - Status: `disabled`
    - Content: แสดงไอคอน Loading Spinner หมุนวนพร้อมข้อความ "Submitting..." หรือ "Processing..." เพื่อป้องกัน Double Click
@@ -177,12 +183,12 @@
 * **Ticket Info Card (Read-only):**
   * จัดกลุ่มแสดงข้อมูลทั้งหมดในกล่องพื้นหลัง Soft Gray-Green (`#F1F5F3`)
   * แสดง Ticket No., Created Date, Category, Related System, Requester Name, Requested Priority, IT Priority, Status, Summary, Description อย่างเป็นระเบียบ ห้ามมีช่อง Editable
-* **Attachments Section:**
-  * แสดงรายการไฟล์แนบที่ Active พร้อมไอคอนชนิดไฟล์, ชื่อไฟล์เดิม, ขนาดไฟล์, วันที่อัปโหลด
-  * ปุ่ม "Download" สำหรับดาวน์โหลดไฟล์
-  * ปุ่ม "Remove" (ถังขยะสีแดง) สำหรับ Soft Removal
-  * กล่องอัปโหลดไฟล์เพิ่มเติม (กรณี Active ยังไม่ครบ 5 ไฟล์)
-  * ส่วนแสดงรายการไฟล์ที่ถูก Soft-removed (แสดงเฉพาะ Metadata เช่น ชื่อไฟล์, เหตุผลที่ลบ, วันที่ลบ โดยปุ่มดาวน์โหลดถูกปิดถาวร)
+* **Attachments Section & UI States:**
+  1. **Active State:** ไฟล์ปกติที่พร้อมใช้งาน แสดงไอคอนชนิดไฟล์, ชื่อไฟล์เดิม, ขนาดไฟล์ (MB/KB), วันที่อัปโหลด พร้อมปุ่ม "Download" และปุ่ม "Remove" (ถังขยะ)
+  2. **Uploading State:** ขณะที่กำลังอัปโหลดไฟล์ แสดง Progress Bar / Spinner พร้อมข้อความบอกสถานะ เช่น *"Uploading 45%..."* โดยปุ่มดำเนินการอื่นจะถูก Disable ชั่วคราว
+  3. **Invalid State:** ไฟล์ที่ไม่ผ่านเกณฑ์ (ขนาดเกิน 5MB หรือนามสกุลไม่ใช่ JPG/PNG/WEBP/PDF) แสดงแถบขอบสีแดง (`#DC2626`) พร้อมข้อความแจ้งเตือนสีแดงใต้รายการไฟล์นั้นทันที
+  4. **Removed State (Soft-removed):** ไฟล์ที่ถูกลบแบบ Soft Removal แสดงแถบพื้นหลังสีเทาอ่อน (`#F8FAFC`), มีป้าย `[Removed]`, แสดง Metadata เช่น ชื่อไฟล์, เหตุผลที่ลบ (Removal Reason), วันที่ลบ โดยปุ่ม Download และ Preview จะถูกปิดกั้นถาวร (`disabled`)
+  5. **Unavailable State:** กรณีไฟล์ในพื้นที่จัดเก็บสูญหายหรือไม่สามารถเข้าถึงได้ แสดงไอคอนเตือนสีเทาพร้อมป้าย `[Unavailable]` และปิดปุ่มดาวน์โหลด
 * **Soft Removal Confirmation Modal:**
   * กล่อง Pop-up Modal ยืนยันการลบไฟล์
   * บังคับกรอกช่อง "Reason for removal" (Required)
@@ -218,3 +224,17 @@
 2. **Keyboard Navigation:** ทุกปุ่ม Dropdown และช่องกรอกข้อมูลสามารถใช้งานผ่านปุ่ม `Tab`, `Enter`, และ `Spacebar` ได้ พร้อมแสดง Focus Ring ชัดเจนเสมอ
 3. **Form Accessibility:** ทุก Input ต้องมี `<label>` ผูกกับ `id` ของฟิลด์อย่างถูกต้อง และมี `aria-required="true"` สำหรับฟิลด์ที่บังคับ
 4. **Icon Controls:** ปุ่มที่มีเฉพาะไอคอน (เช่น ปุ่มลบไฟล์) ต้องมี `aria-label` และ Tooltip อธิบายหน้าที่ของปุ่มเสมอ
+
+---
+
+## 7. Screenshot Paths Reference
+
+สำหรับการบันทึกภาพหลักฐานการทดสอบ UI ตามข้อกำหนดการส่งมอบงาน (Submission Artifacts):
+
+* **Create Ticket Screenshots:** `artifacts/lab-02/screenshots/create-ticket/`
+  * ภาพหน้าจอ Initial State, Validation Failure, Busy Submitting State, Success State, และ Invalid Attachment State
+* **My Tickets Screenshots:** `artifacts/lab-02/screenshots/my-tickets/`
+  * ภาพหน้าจอ Desktop Table, Search & Filtered, Multi-Requester Isolation, Pagination, Empty State, และ No-Results State
+* **Ticket Detail & Attachments Screenshots:** `artifacts/lab-02/screenshots/ticket-detail/`
+  * ภาพหน้าจอ Read-only Info Card, Download Active File, Post-Creation Upload, Soft Removal Modal with Reason, และ Blocked Removed Download State
+* **Responsive Layouts Screenshots:** `artifacts/lab-02/screenshots/` (Desktop, Tablet, Mobile)
