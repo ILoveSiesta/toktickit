@@ -153,10 +153,11 @@
   * ชื่อหน้า "My Tickets" พร้อมจำนวนตั๋วทั้งหมด
   * ปุ่ม "+ Create Ticket" สีเขียวมุมขวาบน
   * ช่อง Search Box ค้นหาหมายเลขตั๋วหรือ Summary
-  * ตัวกรอง Dropdown: Category, Requested Priority, Status
-  * ปุ่ม "Clear Filters"
+  * ตัวกรอง Dropdown: Category, Requested Priority, IT Priority, และ Current Status
+  * ปุ่ม "Clear Filters" สำหรับล้างค่าค้นหาและตัวกรองทั้งหมด
 * **ตารางแสดงผลบน Desktop (Table Layout):**
-  * คอลัมน์: `Ticket No.` | `Created Date` | `Summary` | `Category` | `Requested Priority` | `Current Status` | `Last Updated`
+  * คอลัมน์: `Ticket No.` | `Created Date` | `Summary` | `Category` | `Requested Priority` | `IT Priority` | `Current Status` | `Last Updated`
+  * **Interactive Table Headers (Sorting):** ผู้ใช้สามารถคลิกที่หัวตาราง (Table Headers ได้แก่ `Ticket No.`, `Created Date`, และ `Last Updated`) เพื่อสลับการจัดเรียงข้อมูล (สลับระหว่าง Ascending `asc` และ Descending `desc`) ได้ โดยมีไอคอนลูกศรชี้ขึ้น/ลง (`▲`/`▼`) กำกับสถานะการจัดเรียงคอลัมน์ที่กำลังใช้งาน
   * เมื่อนำเมาส์ไปชี้ที่แถว (Row Hover) พื้นหลังจะเปลี่ยนเป็น Pale Green (`#EAF6EF`)
   * คลิกที่แถวหรือหมายเลขตั๋วเพื่อเปิดหน้า Ticket Detail
 * **การแสดงผลบน Mobile (Card Layout):**

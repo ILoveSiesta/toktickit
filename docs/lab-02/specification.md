@@ -278,10 +278,25 @@ model Attachment {
 * **Response Status:** `200 OK`
 * **Response Body:**
 ```json
-[
-  { "id": 1, "name": "Jennifer Anderson", "email": "jennifer@toktick.it", "department": "Marketing" },
-  { "id": 2, "name": "Michael Brown", "email": "michael@toktick.it", "department": "Finance" }
-]
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "Jennifer Anderson",
+      "email": "jennifer@toktick.it",
+      "department": "Marketing",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Michael Brown",
+      "email": "michael@toktick.it",
+      "department": "Finance",
+      "isActive": true
+    }
+  ]
+}
 ```
 
 #### 2. `GET /api/categories` และ `GET /api/related-systems`
@@ -289,12 +304,30 @@ model Attachment {
 * **Response Status:** `200 OK`
 * **Response Body (Categories):**
 ```json
-[
-  { "id": 1, "name": "Account and Access" },
-  { "id": 2, "name": "Hardware" },
-  { "id": 3, "name": "Software" },
-  { "id": 4, "name": "Network" }
-]
+{
+  "success": true,
+  "data": [
+    { "id": 1, "name": "Account and Access" },
+    { "id": 2, "name": "Hardware" },
+    { "id": 3, "name": "Software" },
+    { "id": 4, "name": "Network" }
+  ]
+}
+```
+* **Response Body (Related Systems):**
+```json
+{
+  "success": true,
+  "data": [
+    { "id": 1, "name": "Email" },
+    { "id": 2, "name": "Campus Wi-Fi" },
+    { "id": 3, "name": "VPN" },
+    { "id": 4, "name": "LEB2 App" },
+    { "id": 5, "name": "Grade Submission App" },
+    { "id": 6, "name": "Printer" },
+    { "id": 7, "name": "Corporate Laptop" }
+  ]
+}
 ```
 
 #### 3. `POST /api/tickets`
@@ -311,20 +344,32 @@ model Attachment {
 * **Response Body:**
 ```json
 {
-  "id": 101,
-  "ticketNumber": "TKT-2026-000101",
-  "summary": "Cannot connect to VPN",
-  "description": "Getting authentication timeout error since morning.",
-  "requestedPriority": "HIGH",
-  "itPriority": "MEDIUM",
-  "currentStatus": "NEW",
-  "ticketDate": "2026-08-30T00:00:00.000Z",
-  "requesterId": 1,
-  "categoryId": 4,
-  "relatedSystemId": 3,
-  "attachments": [
-    { "id": 1, "originalFileName": "vpn_error.png", "fileSize": 1048576, "fileType": "image/png" }
-  ]
+  "success": true,
+  "data": {
+    "id": 101,
+    "ticketNumber": "TKT-2026-000101",
+    "summary": "Cannot connect to VPN",
+    "description": "Getting authentication timeout error since morning.",
+    "requestedPriority": "HIGH",
+    "itPriority": "MEDIUM",
+    "currentStatus": "NEW",
+    "ticketOwner": null,
+    "ticketDate": "2026-08-30T00:00:00.000Z",
+    "requesterId": 1,
+    "categoryId": 4,
+    "relatedSystemId": 3,
+    "createdAt": "2026-08-30T00:00:00.000Z",
+    "attachments": [
+      {
+        "id": 1,
+        "originalFileName": "vpn_error.png",
+        "fileSize": 1048576,
+        "fileType": "image/png",
+        "isRemoved": false,
+        "uploadedAt": "2026-08-30T00:00:00.000Z"
+      }
+    ]
+  }
 }
 ```
 * **Error Statuses:** `400 Bad Request` (Validation error), `404 Not Found` (Category/System invalid)
@@ -346,12 +391,14 @@ model Attachment {
 * **Response Body:**
 ```json
 {
+  "success": true,
   "data": [
     {
       "id": 101,
       "ticketNumber": "TKT-2026-000101",
       "summary": "Cannot connect to VPN",
       "categoryName": "Network",
+      "relatedSystemName": "VPN",
       "requestedPriority": "HIGH",
       "itPriority": "MEDIUM",
       "currentStatus": "NEW",
@@ -376,28 +423,35 @@ model Attachment {
 * **Response Body:**
 ```json
 {
-  "id": 101,
-  "ticketNumber": "TKT-2026-000101",
-  "summary": "Cannot connect to VPN",
-  "description": "Getting authentication timeout error since morning.",
-  "category": { "id": 4, "name": "Network" },
-  "relatedSystem": { "id": 3, "name": "VPN" },
-  "requester": { "id": 1, "name": "Jennifer Anderson", "email": "jennifer@toktick.it" },
-  "requestedPriority": "HIGH",
-  "itPriority": "MEDIUM",
-  "currentStatus": "NEW",
-  "ticketOwner": null,
-  "ticketDate": "2026-08-30T00:00:00.000Z",
-  "attachments": [
-    {
-      "id": 1,
-      "originalFileName": "vpn_error.png",
-      "fileSize": 1048576,
-      "fileType": "image/png",
-      "isRemoved": false,
-      "uploadedAt": "2026-08-30T00:00:00.000Z"
-    }
-  ]
+  "success": true,
+  "data": {
+    "id": 101,
+    "ticketNumber": "TKT-2026-000101",
+    "summary": "Cannot connect to VPN",
+    "description": "Getting authentication timeout error since morning.",
+    "category": { "id": 4, "name": "Network" },
+    "relatedSystem": { "id": 3, "name": "VPN" },
+    "requester": { "id": 1, "name": "Jennifer Anderson", "email": "jennifer@toktick.it", "department": "Marketing" },
+    "requestedPriority": "HIGH",
+    "itPriority": "MEDIUM",
+    "currentStatus": "NEW",
+    "ticketOwner": null,
+    "ticketDate": "2026-08-30T00:00:00.000Z",
+    "createdAt": "2026-08-30T00:00:00.000Z",
+    "updatedAt": "2026-08-30T00:00:00.000Z",
+    "attachments": [
+      {
+        "id": 1,
+        "originalFileName": "vpn_error.png",
+        "fileSize": 1048576,
+        "fileType": "image/png",
+        "isRemoved": false,
+        "removedAt": null,
+        "removalReason": null,
+        "uploadedAt": "2026-08-30T00:00:00.000Z"
+      }
+    ]
+  }
 }
 ```
 * **Error Statuses:** `403 Forbidden` (Requester ไม่ใช่เจ้าของตั๋ว), `404 Not Found` (ไม่พบตั๋ว)
@@ -407,6 +461,22 @@ model Attachment {
 * **Headers:** `X-Requester-Id: 1`
 * **Request:** Multipart files (สูงสุดไม่เกินโควตา 5 Active files)
 * **Response Status:** `201 Created`
+* **Response Body:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 2,
+      "originalFileName": "error_log.pdf",
+      "fileSize": 1048576,
+      "fileType": "application/pdf",
+      "isRemoved": false,
+      "uploadedAt": "2026-08-30T00:10:00.000Z"
+    }
+  ]
+}
+```
 * **Error Statuses:** `400 Bad Request` (เกิน 5 Active files หรือขนาด/ประเภทผิด), `403 Forbidden`
 
 #### 7. `GET /api/attachments/:id/download`
@@ -420,7 +490,20 @@ model Attachment {
 * **Headers:** `X-Requester-Id: 1`
 * **Request Body:** `{ "removalReason": "Uploaded wrong document by mistake" }`
 * **Response Status:** `200 OK`
-* **Response Body:** `{ "message": "Attachment removed successfully", "id": 1, "isRemoved": true }`
+* **Response Body:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "ticketId": 101,
+    "originalFileName": "vpn_error.png",
+    "isRemoved": true,
+    "removedAt": "2026-08-30T00:15:00.000Z",
+    "removalReason": "Uploaded wrong document by mistake"
+  }
+}
+```
 * **Error Statuses:** `400 Bad Request` (ไม่มี removalReason), `403 Forbidden` (ไม่ใช่เจ้าของ), `404 Not Found`
 
 ---
@@ -491,6 +574,10 @@ model Attachment {
   * **Given** หน้าจอเปิดบนขนาด Mobile ($< 768\text{px}$)
   * **When** ตรวจสอบหน้า Create Ticket และ My Tickets
   * **Then** Layout เรียงต่อกันในแนวตั้ง ไม่มี Horizontal Scrollbar หลุด และขนาดปุ่มสัมผัสได้ง่าย ($\ge 44\text{px}$)
+* **AC-17 (Post-Creation Attachment Addition):**
+  * **Given** ผู้ใช้เปิดดูตั๋วของตนเองในหน้า Ticket Detail ที่มีไฟล์แนบ Active ยังไม่ครบ 5 ไฟล์
+  * **When** ผู้ใช้เลือกไฟล์แนบเพิ่ม (เช่น PDF ขนาด 1 MB) และกดยืนยันอัปโหลด
+  * **Then** ระบบอัปโหลดไฟล์แนบเข้าสู่ตั๋วใบเดิมสำเร็จ (`POST /api/tickets/:id/attachments`), หน้ารายละเอียดอัปเดตแสดงรายการไฟล์ใหม่ และโควตาไฟล์แนบ Active ถูกคำนวณใหม่ตามจริง
 
 ---
 
@@ -502,7 +589,7 @@ model Attachment {
 - [ ] **Responsive Design:** ผ่านการตรวจสอบทั้ง 3 Viewports (Desktop $\ge 992\text{px}$, Tablet $768-991\text{px}$, Mobile $< 768\text{px}$) ไม่มีการตกขอบ ตัวหนังสือทับซ้อน หรือปุ่มหลุดจอ
 - [ ] **Soft Delete Integrity:** ทดสอบกลไก Soft Removal ของไฟล์แนบ สามารถเก็บ Metadata และบล็อกการดาวน์โหลดไฟล์ที่ถูกลบได้ 100%
 - [ ] **Ownership Security:** ตรวจสอบและมี Automated Tests ยืนยันว่า Requester ไม่สามารถเข้าถึงตั๋วหรือดาวน์โหลดไฟล์ของผู้อื่นได้
-- [ ] **Automated Tests:** ทุก Acceptance Criteria (AC-01 ถึง AC-16) ถูกเชื่อมโยงและผ่านการทดสอบครบถ้วนทุกระดับ (Unit, API, UI, E2E) โดยไม่มี Test ใดถูก Skip หรือ Comment ทิ้ง
+- [ ] **Automated Tests:** ทุก Acceptance Criteria (AC-01 ถึง AC-17) ถูกเชื่อมโยงและผ่านการทดสอบครบถ้วนทุกระดับ (Unit, API, UI, E2E) โดยไม่มี Test ใดถูก Skip หรือ Comment ทิ้ง
 - [ ] **Documentation:** จัดทำเอกสาร `specification.md`, `tests.md`, `ui-spec.md`, `api-spec.md`, `reviewer.md`, และ `ai-use.md` ครบถ้วน
 
 ---
