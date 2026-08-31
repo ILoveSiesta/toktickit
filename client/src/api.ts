@@ -1,31 +1,42 @@
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+import { RequesterUser, Category, RelatedSystem, ApiResponse } from "./types/index.js";
 
-export interface Category {
-  id: number;
-  name: string;
+const rawUrl = import.meta.env.VITE_API_URL || "/api";
+const cleanUrl = rawUrl.replace(/\/$/, "");
+const API_BASE = cleanUrl.endsWith("/api") ? cleanUrl : `${cleanUrl}/api`;
+
+
+export async function fetchRequesters(): Promise<RequesterUser[]> {
+  const res = await fetch(`${API_BASE}/requesters`);
+  if (!res.ok) {
+    throw new Error(`Failed to load requesters (HTTP ${res.status})`);
+  }
+  const json: ApiResponse<RequesterUser[]> = await res.json();
+  if (!json.success || !json.data) {
+    throw new Error(json.error?.message || "Failed to load requesters");
+  }
+  return json.data;
 }
 
-export interface SystemStatus {
-  online: boolean;
-  categories: Category[];
+export async function fetchCategories(): Promise<Category[]> {
+  const res = await fetch(`${API_BASE}/categories`);
+  if (!res.ok) {
+    throw new Error(`Failed to load categories (HTTP ${res.status})`);
+  }
+  const json: ApiResponse<Category[]> = await res.json();
+  if (!json.success || !json.data) {
+    throw new Error(json.error?.message || "Failed to load categories");
+  }
+  return json.data;
 }
 
-// Issue 2 + Issue 4 — call the backend.
-// Steps: fetch `${API_URL}/api/health`; if not ok, throw.
-//        then fetch `${API_URL}/api/categories`; if not ok, throw.
-//        return { online: true, categories }.
-// Throwing on failure lets the UI show a single Offline/error state.
-export async function checkSystem(): Promise<SystemStatus> {
-  const healthRes = await fetch(`${API_URL}/api/health`);
-  if (!healthRes.ok) {
-    throw new Error("API is offline");
+export async function fetchRelatedSystems(): Promise<RelatedSystem[]> {
+  const res = await fetch(`${API_BASE}/related-systems`);
+  if (!res.ok) {
+    throw new Error(`Failed to load related systems (HTTP ${res.status})`);
   }
-  
-  const categoriesRes = await fetch(`${API_URL}/api/categories`);
-  if (!categoriesRes.ok) {
-    throw new Error("Categories API is offline");
+  const json: ApiResponse<RelatedSystem[]> = await res.json();
+  if (!json.success || !json.data) {
+    throw new Error(json.error?.message || "Failed to load related systems");
   }
-  const categories = await categoriesRes.json();
-  
-  return { online: true, categories };
+  return json.data;
 }

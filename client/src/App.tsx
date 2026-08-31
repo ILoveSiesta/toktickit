@@ -1,61 +1,71 @@
-import { useState } from "react";
-import { checkSystem, Category } from "./api.js";
+import React, { useState } from "react";
+import { RequesterProvider, useRequester } from "./context/RequesterContext.js";
+import { AppHeader } from "./components/AppHeader.js";
+import { RequesterSelector } from "./components/RequesterSelector.js";
+import "./theme.css";
 
-// UI states you must handle for Issue 4: idle, loading, success, error.
-type UiState = "idle" | "loading" | "success" | "error";
+function MainApp() {
+  const { currentRequester, clearRequester } = useRequester();
+  const [activeTab, setActiveTab] = useState<"my-tickets" | "create-ticket">("my-tickets");
+  const [showSelectorModal, setShowSelectorModal] = useState<boolean>(false);
 
-export default function App() {
-  const [state, setState] = useState<UiState>("idle");
-  const [categories, setCategories] = useState<Category[]>([]);
-  void categories;
-
-  async function handleCheck() {
-    setState("loading");
-    try {
-      const response = await checkSystem();
-      if (response && response.online) {
-        setCategories(response.categories);
-        setState("success");
-      } else {
-        setState("error");
-      }
-    } catch (error) {
-      setState("error");
-    }
+  // If no requester selected or explicitly changing, show selector
+  if (!currentRequester || showSelectorModal) {
+    return (
+      <div>
+        <AppHeader
+          currentTab={activeTab}
+          onSelectTab={setActiveTab}
+          onChangeRequester={() => setShowSelectorModal(true)}
+        />
+        <RequesterSelector
+          onSuccess={() => {
+            setShowSelectorModal(false);
+          }}
+        />
+      </div>
+    );
   }
 
   return (
-    <div className="container py-5" style={{ maxWidth: 640 }}>
-      <h1 className="h3 mb-4">
-        TokTickIT <span className="text-success">IT Service Desk</span>
-      </h1>
+    <div>
+      <AppHeader
+        currentTab={activeTab}
+        onSelectTab={setActiveTab}
+        onChangeRequester={() => setShowSelectorModal(true)}
+      />
 
-      <button className="btn btn-success mb-4" onClick={handleCheck} disabled={state === "loading"}>
-        {state === "loading" ? "Loading…" : "Check System"}
-      </button>
+      <main className="zen-container" style={{ padding: "var(--space-xl) var(--space-base)" }}>
+        <div className="zen-card" style={{ textAlign: "center", padding: "var(--space-2xl) var(--space-lg)" }}>
+          <div style={{ fontSize: "2rem", marginBottom: "var(--space-md)" }}>
+            🌿 <strong>TokTickIT Service Desk</strong>
+          </div>
+          <h2 className="zen-title" style={{ fontSize: "1.25rem" }}>
+            Welcome, {currentRequester.name}!
+          </h2>
+          <p className="zen-text-muted" style={{ maxWidth: 600, margin: "0 auto var(--space-lg) auto" }}>
+            Development Requester Context is active: <strong>{currentRequester.email}</strong> ({currentRequester.department || "General User"}).
+            You are ready for Issue 3 (Ticket Creation) and Issue 4 (My Tickets & Ticket Details).
+          </p>
 
-      {state === "success" && (
-        <div className="card">
-          <div className="card-body">
-            <h5 className="card-title">System Status: Online</h5>
-            <h6 className="mt-4 mb-3">Supported Request Categories</h6>
-            <ol className="mb-0">
-              {categories.map((category) => (
-                <li key={category.id}>{category.name}</li>
-              ))}
-            </ol>
+          <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-md)" }}>
+            <button
+              onClick={() => setShowSelectorModal(true)}
+              className="zen-btn zen-btn-secondary"
+            >
+              Change Requester
+            </button>
           </div>
         </div>
-      )}
-
-      {state === "error" && (
-        <div className="card text-white bg-danger">
-          <div className="card-body">
-            <h5 className="card-title">System Status: Offline</h5>
-            <p className="card-text mb-0">Unable to connect to TokTickIT API</p>
-          </div>
-        </div>
-      )}
+      </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <RequesterProvider>
+      <MainApp />
+    </RequesterProvider>
   );
 }

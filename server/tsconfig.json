@@ -7,7 +7,14 @@
     "strict": true,
     "outDir": "dist",
     "skipLibCheck": true,
-    "types": ["node"]
+    "noEmit": true,
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "prisma", "tests"]
+  "include": [
+    "src",
+    "prisma",
+    "tests"
+  ]
 }
