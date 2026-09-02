@@ -111,6 +111,25 @@
 
 ---
 
+### 3.3. Global Server Connection Error Warning Banner
+แถบแจ้งเตือนระดับแอปพลิเคชัน (App-level Global Error Banner) ที่จะปรากฏขึ้นโดยอัตโนมัติตรงด้านบนสุดของทุกหน้าจอ (ใต้ App Header หรือเหนือเนื้อหาหลัก) เมื่อ Client ไม่สามารถเชื่อมต่อกับ Server ได้ หรือ API ตอบกลับด้วย `500+ Internal Server Error`:
+
+```
++----------------------------------------------------------------------------------------------------+
+| ⚠️  Cannot connect to server. Please ensure the backend is running at http://localhost:3000.  [✕] |
++----------------------------------------------------------------------------------------------------+
+```
+
+* **Position:** ติดด้านบนสุดใต้ Header (Full-width หรือ Container width)
+* **Background:** Soft Red / Error Tint (`#FEE2E2` หรือ `#DC2626`)
+* **Border:** `1px solid #FCA5A5`
+* **Text Color:** Dark Red (`#991B1B` หรือ `#FFFFFF`), Weight `600`, Font Size `13px`
+* **Icon:** ไอคอนเตือน (`⚠️` หรือ Connection Lost Icon) นำหน้าข้อความ
+* **Dismiss Button:** ปุ่มกากบาท `[✕]` เพื่อให้ผู้ใช้สามารถกดปิดการแจ้งเตือนชั่วคราวได้
+* **Role / Accessibility:** `role="alert"` พร้อม `aria-live="assertive"`
+
+---
+
 ## 4. Screen Layouts & Structural Blueprint
 
 ### 4.1. Application Shell & Header
