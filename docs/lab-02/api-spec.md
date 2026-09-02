@@ -64,6 +64,12 @@
 | **`404 Not Found`** | Not Found | ไม่พบข้อมูลตั๋ว, ไม่พบหมวดหมู่, หรือไฟล์แนบถูก Soft-removed ไปแล้ว |
 | **`500 Internal Server Error`**| Internal Server Error | เกิดข้อผิดพลาดที่ไม่คาดคิดในระบบหลังบ้าน (Safe error response) |
 
+### 3.4. Standard Errors & Server Connection Failures
+เมื่อเกิดปัญหาการเชื่อมต่อไปยัง Backend หรือ Backend ตอบกลับด้วย `500+ Internal Server Error`:
+* **Network Disconnection / Offline:** Client ได้รับ `NetworkError` หรือ `ERR_CONNECTION_REFUSED`
+* **Server 500+ Failure:** Backend ตอบกลับ HTTP Status `500`, `502`, `503`, หรือ `504` พร้อม JSON ปลอดภัย `{ "error": "Internal Server Error" }`
+* **Client Behavior:** ระบบส่วนกลาง (Global Error Layer) จะแสดงผล **Global Error Warning Banner** สีแดงที่ด้านบนสุดของทุกหน้าจอ เพื่อแจ้งให้ผู้ใช้ทราบสถานะและแนะนำให้ตรวจสอบการเชื่อมต่อ
+
 ---
 
 ## 4. API Endpoints Specification
@@ -76,25 +82,22 @@
 * **Response Status:** `200 OK`
 * **Response Body:**
 ```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "Jennifer Anderson",
-      "email": "jennifer@toktick.it",
-      "department": "Marketing",
-      "isActive": true
-    },
-    {
-      "id": 2,
-      "name": "Michael Brown",
-      "email": "michael@toktick.it",
-      "department": "Finance",
-      "isActive": true
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "name": "Jennifer Anderson",
+    "email": "jennifer@toktick.it",
+    "department": "Marketing",
+    "isActive": true
+  },
+  {
+    "id": 2,
+    "name": "Michael Brown",
+    "email": "michael@toktick.it",
+    "department": "Finance",
+    "isActive": true
+  }
+]
 ```
 
 ---
@@ -102,19 +105,16 @@
 ### 4.2. Reference Master Data Endpoints
 
 #### `GET /api/categories`
-* **หน้าที่:** ดึงรายชื่อหมวดหมู่ตั๋ว (Categories) ที่มีสถานะ Active
+* **หน้าที่:** ดึงรายชื่อหมวดหมู่ตั๋ว (Categories) ที่มีสถานะ Active (โครงสร้างเดิมตาม Lab 1)
 * **Response Status:** `200 OK`
 * **Response Body:**
 ```json
-{
-  "success": true,
-  "data": [
-    { "id": 1, "name": "Account and Access" },
-    { "id": 2, "name": "Hardware" },
-    { "id": 3, "name": "Software" },
-    { "id": 4, "name": "Network" }
-  ]
-}
+[
+  { "id": 1, "name": "Account and Access" },
+  { "id": 2, "name": "Hardware" },
+  { "id": 3, "name": "Software" },
+  { "id": 4, "name": "Network" }
+]
 ```
 
 #### `GET /api/related-systems`
@@ -122,18 +122,15 @@
 * **Response Status:** `200 OK`
 * **Response Body:**
 ```json
-{
-  "success": true,
-  "data": [
-    { "id": 1, "name": "Email" },
-    { "id": 2, "name": "Campus Wi-Fi" },
-    { "id": 3, "name": "VPN" },
-    { "id": 4, "name": "LEB2 App" },
-    { "id": 5, "name": "Grade Submission App" },
-    { "id": 6, "name": "Printer" },
-    { "id": 7, "name": "Corporate Laptop" }
-  ]
-}
+[
+  { "id": 1, "name": "Email" },
+  { "id": 2, "name": "Campus Wi-Fi" },
+  { "id": 3, "name": "VPN" },
+  { "id": 4, "name": "LEB2 App" },
+  { "id": 5, "name": "Grade Submission App" },
+  { "id": 6, "name": "Printer" },
+  { "id": 7, "name": "Corporate Laptop" }
+]
 ```
 
 ---

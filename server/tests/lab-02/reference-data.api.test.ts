@@ -7,12 +7,10 @@ describe("API-02: Reference Data Endpoints", () => {
     const res = await request(app).get("/api/categories");
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("success", true);
-    expect(res.body).toHaveProperty("data");
-    expect(Array.isArray(res.body.data)).toBe(true);
-    expect(res.body.data.length).toBeGreaterThanOrEqual(4);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBeGreaterThanOrEqual(4);
 
-    const categoryNames = res.body.data.map((c: { name: string }) => c.name);
+    const categoryNames = res.body.map((c: { name: string }) => c.name);
     expect(categoryNames).toContain("Account and Access");
     expect(categoryNames).toContain("Hardware");
     expect(categoryNames).toContain("Software");
@@ -23,12 +21,10 @@ describe("API-02: Reference Data Endpoints", () => {
     const res = await request(app).get("/api/related-systems");
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("success", true);
-    expect(res.body).toHaveProperty("data");
-    expect(Array.isArray(res.body.data)).toBe(true);
-    expect(res.body.data.length).toBeGreaterThanOrEqual(6);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBeGreaterThanOrEqual(6);
 
-    const systemNames = res.body.data.map((s: { name: string }) => s.name);
+    const systemNames = res.body.map((s: { name: string }) => s.name);
     expect(systemNames).toContain("Email");
     expect(systemNames).toContain("Campus Wi-Fi");
     expect(systemNames).toContain("VPN");

@@ -115,6 +115,7 @@
   * **Empty State:** กรณีผู้ใช้ยังไม่เคยสร้างตั๋วเลย ระบบต้องแสดงข้อความแนะนำพร้อมปุ่มทางลัด "Create Ticket"
   * **No-Results State:** กรณีค้นหา/กรองแล้วไม่พบตั๋วที่ตรงเงื่อนไข ระบบต้องแสดงข้อความแจ้งไม่พบผลลัพธ์ พร้อมปุ่ม "Clear Filters"
 * **BR-26 (Read-only Ticket Detail):** ข้อมูลส่วนหัวและเนื้อหาของตั๋วในหน้า Ticket Detail (หมายเลขตั๋ว, หมวดหมู่, วันที่, สถานะ, Summary, Description ฯลฯ) จะต้องเป็นแบบ **อ่านอย่างเดียว (Read-only)** ไม่สามารถแก้ไขได้
+* **BR-27 (Global Server Connection Error Warning):** หาก Client ไม่สามารถเชื่อมต่อกับ Server ได้ (Network Error / Connection Refused) หรือ API ส่งคืนข้อผิดพลาดระดับ `500+ Internal Server Error` ระบบจะต้องแสดงข้อความแจ้งเตือนระดับส่วนกลาง (Global Error Warning Banner / Notification) ให้ผู้ใช้งานเห็นอย่างชัดเจนในทุกหน้าจอ พร้อมทั้งแนะนำให้ตรวจสอบการเชื่อมต่อ
 
 ---
 

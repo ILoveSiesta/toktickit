@@ -54,6 +54,7 @@
 | **UI-09** | UI | BR-20, AC-17 | Post-creation attachment upload UI | แสดงฟอร์มแนบไฟล์เพิ่มใน Ticket Detail และอัปเดตรายการไฟล์ | `client/src/tests/lab-02/AttachmentSection.test.tsx` | Planned |
 | **UI-10** | UI | BR-06 | RequesterSelector Error & Empty | แสดงข้อความ Error ปลอดภัยเมื่อ API ล้มเหลว และแสดง Empty State | `client/src/tests/lab-02/RequesterSelector.test.tsx` | Planned |
 | **UI-11** | UI | FR-04, BR-13, AC-05 | Attachment upload failure behavior | แสดง Error ปลอดภัยเมื่อเครือข่าย/เซิร์ฟเวอร์ขัดข้อง และคงค่าฟอร์มเดิมไว้ | `client/src/tests/lab-02/AttachmentSection.test.tsx` | Planned |
+| **UI-12** | UI | BR-27 | Global Server Connection Error Banner | แสดง Banner สีแดงแจ้งเตือนเมื่อไม่สามารถเชื่อมต่อ Server หรือได้ 500+ | `client/src/tests/lab-02/GlobalErrorBanner.test.tsx` | Planned |
 | **RESP-01** | Visual | AC-16 | Desktop Viewport ($\ge 992\text{px}$) | Layout 2 คอลัมน์ ตาราง My Tickets เต็มรูปแบบ | `e2e/lab-02/responsive-visual.spec.ts` | Planned |
 | **RESP-02** | Visual | AC-16 | Tablet Viewport ($768 - 991\text{px}$) | ปรับสเกล 2 คอลัมน์กระชับ ไม่เกิดแนวนอนเลื่อน | `e2e/lab-02/responsive-visual.spec.ts` | Planned |
 | **RESP-03** | Visual | AC-16 | Mobile Viewport ($< 768\text{px}$) | Layout แถวเดี่ยว ตารางเปลี่ยนเป็นการ์ด ปุ่ม $\ge 44\text{px}$ | `e2e/lab-02/responsive-visual.spec.ts` | Planned |
@@ -85,6 +86,7 @@
 | **AC-15** | Requester Switching Data Isolation | `UI-08`, `E2E-02` | UI Component, E2E |
 | **AC-16** | Responsive UI Adaptability | `RESP-01`, `RESP-02`, `RESP-03` | Visual / Responsive |
 | **AC-17** | Post-Creation Attachment Addition | `API-13`, `UI-09`, `E2E-02` | API, UI Component, E2E |
+| **BR-27** | Global Server Connection Error Warning | `UI-12` | UI Component |
 
 ---
 
@@ -144,10 +146,10 @@ npx playwright test e2e/lab-02/ --ui
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Unit Tests** | 3 | - | - | - | Pending Execution |
 | **API Integration Tests** | 11 | - | - | - | Pending Execution |
-| **UI Component Tests** | 11 | - | - | - | Pending Execution |
+| **UI Component Tests** | 12 | - | - | - | Pending Execution |
 | **Responsive / Visual Tests** | 3 | - | - | - | Pending Execution |
 | **End-to-End Tests** | 2 | - | - | - | Pending Execution |
-| **Total** | **30** | - | - | - | **Pending Implementation** |
+| **Total** | **31** | - | - | - | **Pending Implementation** |
 
 ---
 
