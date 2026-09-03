@@ -237,3 +237,24 @@ body {
 @keyframes zen-spin {
   to { transform: rotate(360deg); }
 }
+
+/* Responsive Table vs Card Layout (BR-16 / UI Spec) */
+.zen-table-responsive-desktop {
+  display: block;
+}
+
+.zen-card-responsive-mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .zen-table-responsive-desktop {
+    display: none !important;
+  }
+  .zen-card-responsive-mobile {
+    display: flex !important;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+}
+

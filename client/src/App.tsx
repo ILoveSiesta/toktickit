@@ -1,24 +1,66 @@
 import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation } from "react-router-dom";
 import { RequesterProvider, useRequester } from "./context/RequesterContext.js";
 import { GlobalErrorProvider } from "./context/GlobalErrorContext.js";
 import { AppHeader } from "./components/AppHeader.js";
 import { RequesterSelector } from "./components/RequesterSelector.js";
 import { CreateTicket } from "./components/CreateTicket.js";
+import { MyTickets } from "./components/MyTickets.js";
+import { RequesterTicketDetail } from "./components/RequesterTicketDetail.js";
 import { GlobalErrorBanner } from "./components/GlobalErrorBanner.js";
 import "./theme.css";
 
+function TicketDetailWrapper() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const ticketId = Number(id);
+
+  if (isNaN(ticketId)) {
+    return (
+      <div className="zen-container" style={{ padding: "var(--space-xl) var(--space-base)" }}>
+        <button
+          type="button"
+          onClick={() => navigate("/tickets")}
+          className="zen-btn zen-btn-secondary"
+          style={{ marginBottom: "var(--space-md)" }}
+        >
+          ← Back to My Tickets
+        </button>
+        <div className="zen-alert-error" role="alert">
+          Invalid ticket ID.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <RequesterTicketDetail
+      ticketId={ticketId}
+      onBack={() => navigate("/tickets")}
+    />
+  );
+}
+
 function MainApp() {
   const { currentRequester } = useRequester();
-  const [activeTab, setActiveTab] = useState<"my-tickets" | "create-ticket">("create-ticket");
   const [showSelectorModal, setShowSelectorModal] = useState<boolean>(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentTab = location.pathname.includes("create")
+    ? "create-ticket"
+    : "my-tickets";
 
   // If no requester selected or explicitly changing, show selector
   if (!currentRequester || showSelectorModal) {
     return (
       <div>
         <AppHeader
-          currentTab={activeTab}
-          onSelectTab={setActiveTab}
+          currentTab={currentTab}
+          onSelectTab={(tab) => {
+            if (tab === "create-ticket") navigate("/tickets/create");
+            else navigate("/tickets");
+          }}
           onChangeRequester={() => setShowSelectorModal(true)}
         />
         <GlobalErrorBanner />
@@ -34,53 +76,64 @@ function MainApp() {
   return (
     <div>
       <AppHeader
-        currentTab={activeTab}
-        onSelectTab={setActiveTab}
+        currentTab={currentTab}
+        onSelectTab={(tab) => {
+          if (tab === "create-ticket") navigate("/tickets/create");
+          else navigate("/tickets");
+        }}
         onChangeRequester={() => setShowSelectorModal(true)}
       />
       <GlobalErrorBanner />
 
       <main>
-        {activeTab === "create-ticket" ? (
-          <CreateTicket
-            onTicketCreated={() => {
-              // Stay on success or navigate if needed
-            }}
-            onCancel={() => {
-              setActiveTab("my-tickets");
-            }}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <MyTickets
+                onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+                onNavigateCreate={() => navigate("/tickets/create")}
+              />
+            }
           />
-        ) : (
-          <div className="zen-container" style={{ padding: "var(--space-xl) var(--space-base)" }}>
-            <div className="zen-card" style={{ textAlign: "center", padding: "var(--space-2xl) var(--space-lg)" }}>
-              <div style={{ fontSize: "2rem", marginBottom: "var(--space-md)" }}>
-                🌿 <strong>TokTickIT Service Desk</strong>
-              </div>
-              <h2 className="zen-title" style={{ fontSize: "1.25rem" }}>
-                Welcome, {currentRequester.name}!
-              </h2>
-              <p className="zen-text-muted" style={{ maxWidth: 600, margin: "0 auto var(--space-lg) auto" }}>
-                Development Requester Context is active: <strong>{currentRequester.email}</strong> ({currentRequester.department || "General User"}).
-                Click <strong>+ Create Ticket</strong> above to submit a new IT support request.
-              </p>
-
-              <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-md)" }}>
-                <button
-                  onClick={() => setActiveTab("create-ticket")}
-                  className="zen-btn zen-btn-primary"
-                >
-                  + Create New Ticket
-                </button>
-                <button
-                  onClick={() => setShowSelectorModal(true)}
-                  className="zen-btn zen-btn-secondary"
-                >
-                  Change Requester
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+          <Route
+            path="/tickets"
+            element={
+              <MyTickets
+                onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+                onNavigateCreate={() => navigate("/tickets/create")}
+              />
+            }
+          />
+          <Route
+            path="/tickets/create"
+            element={
+              <CreateTicket
+                onTicketCreated={() => navigate("/tickets")}
+                onCancel={() => navigate("/tickets")}
+              />
+            }
+          />
+          <Route
+            path="/create-ticket"
+            element={
+              <CreateTicket
+                onTicketCreated={() => navigate("/tickets")}
+                onCancel={() => navigate("/tickets")}
+              />
+            }
+          />
+          <Route path="/tickets/:id" element={<TicketDetailWrapper />} />
+          <Route
+            path="*"
+            element={
+              <MyTickets
+                onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+                onNavigateCreate={() => navigate("/tickets/create")}
+              />
+            }
+          />
+        </Routes>
       </main>
     </div>
   );
@@ -88,10 +141,12 @@ function MainApp() {
 
 export default function App() {
   return (
-    <GlobalErrorProvider>
-      <RequesterProvider>
-        <MainApp />
-      </RequesterProvider>
-    </GlobalErrorProvider>
+    <BrowserRouter>
+      <GlobalErrorProvider>
+        <RequesterProvider>
+          <MainApp />
+        </RequesterProvider>
+      </GlobalErrorProvider>
+    </BrowserRouter>
   );
 }
