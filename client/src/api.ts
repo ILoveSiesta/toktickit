@@ -105,4 +105,162 @@ export async function createTicket(formData: FormData, requesterId: number): Pro
   return json;
 }
 
+export async function fetchTickets(
+  params: {
+    search?: string;
+    categoryId?: string;
+    requestedPriority?: string;
+    itPriority?: string;
+    currentStatus?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    page?: number;
+    limit?: number;
+  },
+  requesterId: number
+): Promise<{
+  items: any[];
+  totalCount: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}> {
+  const query = new URLSearchParams();
+  if (params.search) query.set("search", params.search);
+  if (params.categoryId) query.set("categoryId", params.categoryId);
+  if (params.requestedPriority) query.set("requestedPriority", params.requestedPriority);
+  if (params.itPriority) query.set("itPriority", params.itPriority);
+  if (params.currentStatus) query.set("currentStatus", params.currentStatus);
+  if (params.sortBy) query.set("sortBy", params.sortBy);
+  if (params.sortOrder) query.set("sortOrder", params.sortOrder);
+  if (params.page) query.set("page", String(params.page));
+  if (params.limit) query.set("limit", String(params.limit));
+
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets?${query.toString()}`, {
+    headers: {
+      "X-Requester-Id": String(requesterId),
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to load tickets (HTTP ${res.status})`);
+  }
+
+  const json = await res.json();
+  if (!json.success) {
+    throw new Error(json.error?.message || "Failed to load tickets");
+  }
+
+  const items = Array.isArray(json.data) ? json.data : (json.data?.items || []);
+  const pagination = json.pagination || {};
+
+  return {
+    items,
+    totalCount: pagination.total ?? json.data?.totalCount ?? items.length,
+    page: pagination.page ?? json.data?.page ?? 1,
+    limit: pagination.limit ?? json.data?.limit ?? 8,
+    totalPages: pagination.totalPages ?? json.data?.totalPages ?? 1,
+  };
+}
+
+export async function fetchTicketDetail(ticketId: number, requesterId: number): Promise<any> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}`, {
+    headers: {
+      "X-Requester-Id": String(requesterId),
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to load ticket details (HTTP ${res.status})`);
+  }
+
+  const json = await res.json();
+  if (!json.success || !json.data) {
+    throw new Error(json.error?.message || "Failed to load ticket details");
+  }
+
+  return json.data;
+}
+
+export async function uploadTicketAttachments(
+  ticketId: number,
+  files: File[],
+  requesterId: number
+): Promise<any[]> {
+  const formData = new FormData();
+  files.forEach((f) => formData.append("files", f));
+
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/attachments`, {
+    method: "POST",
+    headers: {
+      "X-Requester-Id": String(requesterId),
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const json = await res.json().catch(() => ({}));
+    throw new Error(json.error?.message || `Failed to upload attachments (HTTP ${res.status})`);
+  }
+
+  const json = await res.json();
+  return json.data;
+}
+
+export async function removeAttachment(
+  attachmentId: number,
+  removalReason: string,
+  requesterId: number
+): Promise<any> {
+  const res = await fetchWithInterceptor(`${API_BASE}/attachments/${attachmentId}/remove`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requester-Id": String(requesterId),
+    },
+    body: JSON.stringify({ removalReason }),
+  });
+
+  if (!res.ok) {
+    const json = await res.json().catch(() => ({}));
+    throw new Error(json.error?.message || `Failed to remove attachment (HTTP ${res.status})`);
+  }
+
+  const json = await res.json();
+  return json.data;
+}
+
+export async function downloadAttachment(attachmentId: number, requesterId: number, fileName: string) {
+  const res = await fetchWithInterceptor(`${API_BASE}/attachments/${attachmentId}/download`, {
+    headers: {
+      "X-Requester-Id": String(requesterId),
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to download attachment (HTTP ${res.status})`);
+  }
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
+
+
+export interface SystemStatus {
+  online: boolean;
+  categories: Category[];
+}
+
+export async function checkSystem(): Promise<SystemStatus> {
+  return { online: true, categories: [] };
+}
+
+
 
