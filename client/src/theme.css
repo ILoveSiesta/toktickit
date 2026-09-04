@@ -44,10 +44,17 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* Reset & Global Styles */
-body {
+html, body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   font-family: var(--font-family);
   background-color: var(--color-page-bg);
   color: var(--color-text-primary);

@@ -109,7 +109,6 @@ function MainApp() {
             path="/tickets/create"
             element={
               <CreateTicket
-                onTicketCreated={() => navigate("/tickets")}
                 onCancel={() => navigate("/tickets")}
               />
             }
@@ -118,7 +117,6 @@ function MainApp() {
             path="/create-ticket"
             element={
               <CreateTicket
-                onTicketCreated={() => navigate("/tickets")}
                 onCancel={() => navigate("/tickets")}
               />
             }

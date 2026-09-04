@@ -26,11 +26,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     <header
       style={{
         backgroundColor: "var(--color-primary-green)",
-        height: 56,
+        minHeight: 56,
         display: "flex",
         alignItems: "center",
         color: "#FFFFFF",
         boxShadow: "var(--shadow-sm)",
+        padding: "6px 0",
       }}
     >
       <div
@@ -39,24 +40,26 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexWrap: "wrap",
+          gap: "var(--space-xs) var(--space-md)",
         }}
       >
         {/* Left: Brand & Nav */}
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-lg)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)" }}>
             <span style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.5px" }}>
               TokTickIT
             </span>
           </div>
 
-          <nav style={{ display: "flex", gap: "var(--space-sm)" }}>
+          <nav style={{ display: "flex", gap: "var(--space-xs)" }}>
             <button
               onClick={() => onSelectTab && onSelectTab("my-tickets")}
               style={{
                 background: currentTab === "my-tickets" ? "var(--color-secondary-green)" : "transparent",
                 color: "#FFFFFF",
                 border: "none",
-                padding: "6px 12px",
+                padding: "6px 10px",
                 borderRadius: "var(--radius-sm)",
                 fontWeight: 500,
                 fontSize: "var(--font-size-body)",
@@ -71,7 +74,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 background: currentTab === "create-ticket" ? "var(--color-secondary-green)" : "transparent",
                 color: "#FFFFFF",
                 border: "none",
-                padding: "6px 12px",
+                padding: "6px 10px",
                 borderRadius: "var(--radius-sm)",
                 fontWeight: 500,
                 fontSize: "var(--font-size-body)",
@@ -84,14 +87,14 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         </div>
 
         {/* Right: Requester info & Change Action */}
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-md)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)", flexWrap: "wrap" }}>
           {currentRequester ? (
-            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)", flexWrap: "wrap" }}>
               <span
                 style={{
-                  fontSize: "var(--font-size-sm)",
+                  fontSize: "var(--font-size-xs)",
                   background: "rgba(255, 255, 255, 0.15)",
-                  padding: "4px 10px",
+                  padding: "3px 8px",
                   borderRadius: "16px",
                   fontWeight: 500,
                 }}
@@ -105,7 +108,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 style={{
                   color: "#FFFFFF",
                   fontSize: "var(--font-size-xs)",
-                  padding: "4px 8px",
+                  padding: "3px 6px",
                 }}
                 data-testid="change-requester-btn"
               >

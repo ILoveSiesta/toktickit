@@ -27,39 +27,39 @@
 
 | Test ID | Type | Requirement / AC | What It Tests | Expected Result | Automated Test File | Final Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **UNIT-01** | Unit | BR-07, AC-03 | Ticket number generator format | ได้รหัสในรูปแบบ `TKT-YYYY-XXXXXX` และไม่ซ้ำกัน | `server/tests/lab-02/ticket-generator.test.ts` | Planned |
-| **UNIT-02** | Unit | BR-14, BR-15, AC-05 | Attachment validation utility | ยอมรับ JPG/PNG/WEBP/PDF $\le 5\text{MB}$ และปฏิเสธประเภท/ขนาดอื่น | `server/tests/lab-02/attachment-validator.test.ts` | Planned |
-| **UNIT-03** | Unit | BR-21 | Safe storage filename sanitizer | แปลงชื่อไฟล์เป็น Unique storage filename (เช่น UUID) ป้องกัน Path Traversal | `server/tests/lab-02/safe-storage-name.test.ts` | Planned |
-| **API-01** | API | FR-01, BR-02, AC-01 | `GET /api/requesters` | ส่งคืนเฉพาะ Active Requesters (200 OK) | `server/tests/lab-02/requesters.api.test.ts` | Planned |
-| **API-02** | API | FR-02 | `GET /api/categories` & `/related-systems` | ส่งคืนรายการ Category และ Related System ที่ Active | `server/tests/lab-02/reference-data.api.test.ts` | Planned |
-| **API-03** | API | FR-03, BR-08, BR-09, AC-03 | `POST /api/tickets` (Valid input) | สร้างตั๋วสำเร็จ, สถานะ `NEW`, บันทึก requesterId ถูกต้อง (201 Created) | `server/tests/lab-02/create-ticket.api.test.ts` | Planned |
-| **API-04** | API | BR-11, AC-04 | `POST /api/tickets` (Missing summary/desc) | ปฏิเสธการสร้างตั๋ว คืนข้อความแจ้งฟิลด์ที่ผิดพลาด (400 Bad Request) | `server/tests/lab-02/create-ticket.api.test.ts` | Planned |
-| **API-05** | API | BR-14, BR-15, AC-05 | `POST /api/tickets` (Invalid file / Oversized) | ปฏิเสธการสร้างตั๋วเมื่อไฟล์แนบผิดกฎ (400 Bad Request) | `server/tests/lab-02/create-ticket.api.test.ts` | Planned |
-| **API-06** | API | FR-05, BR-22, AC-07 | `GET /api/tickets` (Requester A) | ส่งคืนเฉพาะตั๋วที่เป็นของ Requester A เท่านั้น (200 OK) | `server/tests/lab-02/my-tickets.api.test.ts` | Planned |
-| **API-07** | API | FR-05, BR-23, BR-24, AC-08 | `GET /api/tickets` with search & filter | กรองตั๋วตาม Category, Status, และ Search keyword ถูกต้อง | `server/tests/lab-02/my-tickets.api.test.ts` | Planned |
-| **API-08** | API | FR-06, BR-22, AC-10 | `GET /api/tickets/:id` (Owned ticket) | ส่งคืนข้อมูลตั๋วและไฟล์แนบของตนเอง (200 OK) | `server/tests/lab-02/ticket-detail.api.test.ts` | Planned |
-| **API-09** | API | BR-22, AC-11 | `GET /api/tickets/:id` (Cross-requester) | ปฏิเสธเมื่อ Requester A พยายามเข้าถึงตั๋วของ Requester B (403 Forbidden) | `server/tests/lab-02/ticket-detail.api.test.ts` | Planned |
-| **API-10** | API | FR-07, AC-12 | `GET /api/attachments/:id/download` | ดาวน์โหลดไฟล์แนบที่มีสถานะ Active สำเร็จ (200 OK) | `server/tests/lab-02/attachments.api.test.ts` | Planned |
-| **API-11** | API | FR-08, BR-17, BR-19, AC-13 | `PATCH /api/attachments/:id/remove` | ทำ Soft Removal พร้อมบันทึกเหตุผลสำเร็จ (200 OK) | `server/tests/lab-02/attachments.api.test.ts` | Planned |
-| **API-12** | API | BR-18, AC-14 | `GET /api/attachments/:id/download` (Removed) | ปฏิเสธการดาวน์โหลดไฟล์ที่ถูก Soft-removed (404 Not Found) | `server/tests/lab-02/attachments.api.test.ts` | Planned |
-| **API-13** | API | FR-04, BR-20, AC-17 | `POST /api/tickets/:id/attachments` | อัปโหลดไฟล์แนบเพิ่มในตั๋วเดิมสำเร็จ ไม่เกิน 5 Active files (201 Created) | `server/tests/lab-02/attachments.api.test.ts` | Planned |
-| **UI-01** | UI | FR-01, AC-01, AC-02 | RequesterSelector component | แสดงรายชื่อผู้ใช้, เลือกแล้วตั้งค่า Context และนำทางถูกต้อง | `client/src/tests/lab-02/RequesterSelector.test.tsx` | Planned |
-| **UI-02** | UI | FR-03, BR-12, AC-03 | CreateTicket form submission | แสดงปุ่ม Submit ติดสถานะ Busy/Disabled เมื่อกดส่งฟอร์ม | `client/src/tests/lab-02/CreateTicket.test.tsx` | Planned |
-| **UI-03** | UI | BR-11, BR-13, AC-04 | CreateTicket validation errors | แสดง Error สีแดงใต้ช่องที่ผิด และคงค่าฟิลด์อื่นที่กรอกไว้ | `client/src/tests/lab-02/CreateTicket.test.tsx` | Planned |
-| **UI-04** | UI | BR-16, AC-06 | Attachment upload limit | ปิดปุ่มแนบไฟล์เมื่อมีไฟล์แนบครบ 5 ไฟล์ | `client/src/tests/lab-02/AttachmentSection.test.tsx` | Planned |
-| **UI-05** | UI | FR-05, BR-25, AC-09 | MyTickets Empty vs No-Results | แสดง Empty State เมื่อไม่มีตั๋ว และ No-Results เมื่อกรองไม่พบ | `client/src/tests/lab-02/MyTickets.test.tsx` | Planned |
-| **UI-06** | UI | FR-06, BR-26, AC-10 | RequesterTicketDetail read-only | แสดงกล่องข้อมูลแบบ Read-only และไม่ให้ผู้ใช้แก้ไข | `client/src/tests/lab-02/RequesterTicketDetail.test.tsx` | Planned |
-| **UI-07** | UI | FR-08, BR-19, AC-13 | Attachment soft removal modal | แสดงกล่องยืนยัน บังคับกรอกเหตุผลก่อนลบไฟล์ | `client/src/tests/lab-02/AttachmentSection.test.tsx` | Planned |
-| **UI-08** | UI | FR-09, BR-04, AC-15 | Change Requester action | กดเปลี่ยนตัวตนแล้วโหลดข้อมูลใหม่ตามตัวตนที่เลือก | `client/src/tests/lab-02/AppHeader.test.tsx` | Planned |
-| **UI-09** | UI | BR-20, AC-17 | Post-creation attachment upload UI | แสดงฟอร์มแนบไฟล์เพิ่มใน Ticket Detail และอัปเดตรายการไฟล์ | `client/src/tests/lab-02/AttachmentSection.test.tsx` | Planned |
-| **UI-10** | UI | BR-06 | RequesterSelector Error & Empty | แสดงข้อความ Error ปลอดภัยเมื่อ API ล้มเหลว และแสดง Empty State | `client/src/tests/lab-02/RequesterSelector.test.tsx` | Planned |
-| **UI-11** | UI | FR-04, BR-13, AC-05 | Attachment upload failure behavior | แสดง Error ปลอดภัยเมื่อเครือข่าย/เซิร์ฟเวอร์ขัดข้อง และคงค่าฟอร์มเดิมไว้ | `client/src/tests/lab-02/AttachmentSection.test.tsx` | Planned |
-| **UI-12** | UI | BR-27 | Global Server Connection Error Banner | แสดง Banner สีแดงแจ้งเตือนเมื่อไม่สามารถเชื่อมต่อ Server หรือได้ 500+ | `client/src/tests/lab-02/GlobalErrorBanner.test.tsx` | Planned |
-| **RESP-01** | Visual | AC-16 | Desktop Viewport ($\ge 992\text{px}$) | Layout 2 คอลัมน์ ตาราง My Tickets เต็มรูปแบบ | `e2e/lab-02/responsive-visual.spec.ts` | Planned |
-| **RESP-02** | Visual | AC-16 | Tablet Viewport ($768 - 991\text{px}$) | ปรับสเกล 2 คอลัมน์กระชับ ไม่เกิดแนวนอนเลื่อน | `e2e/lab-02/responsive-visual.spec.ts` | Planned |
-| **RESP-03** | Visual | AC-16 | Mobile Viewport ($< 768\text{px}$) | Layout แถวเดี่ยว ตารางเปลี่ยนเป็นการ์ด ปุ่ม $\ge 44\text{px}$ | `e2e/lab-02/responsive-visual.spec.ts` | Planned |
-| **E2E-01** | E2E | AC-01, AC-03, AC-07, AC-10 | Complete Ticket Creation Journey | เลือกผู้ใช้ -> สร้างตั๋ว -> เช็คใน My Tickets -> เปิดดูรายละเอียด | `e2e/lab-02/requester-ticket-flow.spec.ts` | Planned |
-| **E2E-02** | E2E | AC-12, AC-13, AC-14, AC-15, AC-17 | Attachment & Multi-user Isolation Flow | ดาวน์โหลดไฟล์ -> ลบไฟล์แบบ Soft-remove -> เพิ่มไฟล์ใหม่ -> สลับผู้ใช้เพื่อเช็คสิทธิ์ | `e2e/lab-02/requester-ticket-flow.spec.ts` | Planned |
+| **UNIT-01** | Unit | BR-07, AC-03 | Ticket number generator format | ได้รหัสในรูปแบบ `TKT-YYYY-XXXXXX` และไม่ซ้ำกัน | `server/tests/lab-02/ticket-generator.test.ts` | PASSED |
+| **UNIT-02** | Unit | BR-14, BR-15, AC-05 | Attachment validation utility | ยอมรับ JPG/PNG/WEBP/PDF $\le 5\text{MB}$ และปฏิเสธประเภท/ขนาดอื่น | `server/tests/lab-02/attachment-validator.test.ts` | PASSED |
+| **UNIT-03** | Unit | BR-21 | Safe storage filename sanitizer | แปลงชื่อไฟล์เป็น Unique storage filename (เช่น UUID) ป้องกัน Path Traversal | `server/tests/lab-02/safe-storage-name.test.ts` | PASSED |
+| **API-01** | API | FR-01, BR-02, AC-01 | `GET /api/requesters` | ส่งคืนเฉพาะ Active Requesters (200 OK) | `server/tests/lab-02/requesters.api.test.ts` | PASSED |
+| **API-02** | API | FR-02 | `GET /api/categories` & `/related-systems` | ส่งคืนรายการ Category และ Related System ที่ Active | `server/tests/lab-02/reference-data.api.test.ts` | PASSED |
+| **API-03** | API | FR-03, BR-08, BR-09, AC-03 | `POST /api/tickets` (Valid input) | สร้างตั๋วสำเร็จ, สถานะ `NEW`, บันทึก requesterId ถูกต้อง (201 Created) | `server/tests/lab-02/create-ticket.api.test.ts` | PASSED |
+| **API-04** | API | BR-11, AC-04 | `POST /api/tickets` (Missing summary/desc) | ปฏิเสธการสร้างตั๋ว คืนข้อความแจ้งฟิลด์ที่ผิดพลาด (400 Bad Request) | `server/tests/lab-02/create-ticket.api.test.ts` | PASSED |
+| **API-05** | API | BR-14, BR-15, AC-05 | `POST /api/tickets` (Invalid file / Oversized) | ปฏิเสธการสร้างตั๋วเมื่อไฟล์แนบผิดกฎ (400 Bad Request) | `server/tests/lab-02/create-ticket.api.test.ts` | PASSED |
+| **API-06** | API | FR-05, BR-22, AC-07 | `GET /api/tickets` (Requester A) | ส่งคืนเฉพาะตั๋วที่เป็นของ Requester A เท่านั้น (200 OK) | `server/tests/lab-02/my-tickets.api.test.ts` | PASSED |
+| **API-07** | API | FR-05, BR-23, BR-24, AC-08 | `GET /api/tickets` with search & filter | กรองตั๋วตาม Category, Status, และ Search keyword ถูกต้อง | `server/tests/lab-02/my-tickets.api.test.ts` | PASSED |
+| **API-08** | API | FR-06, BR-22, AC-10 | `GET /api/tickets/:id` (Owned ticket) | ส่งคืนข้อมูลตั๋วและไฟล์แนบของตนเอง (200 OK) | `server/tests/lab-02/ticket-detail.api.test.ts` | PASSED |
+| **API-09** | API | BR-22, AC-11 | `GET /api/tickets/:id` (Cross-requester) | ปฏิเสธเมื่อ Requester A พยายามเข้าถึงตั๋วของ Requester B (403 Forbidden) | `server/tests/lab-02/ticket-detail.api.test.ts` | PASSED |
+| **API-10** | API | FR-07, AC-12 | `GET /api/attachments/:id/download` | ดาวน์โหลดไฟล์แนบที่มีสถานะ Active สำเร็จ (200 OK) | `server/tests/lab-02/attachments.api.test.ts` | PASSED |
+| **API-11** | API | FR-08, BR-17, BR-19, AC-13 | `PATCH /api/attachments/:id/remove` | ทำ Soft Removal พร้อมบันทึกเหตุผลสำเร็จ (200 OK) | `server/tests/lab-02/attachments.api.test.ts` | PASSED |
+| **API-12** | API | BR-18, AC-14 | `GET /api/attachments/:id/download` (Removed) | ปฏิเสธการดาวน์โหลดไฟล์ที่ถูก Soft-removed (404 Not Found) | `server/tests/lab-02/attachments.api.test.ts` | PASSED |
+| **API-13** | API | FR-04, BR-20, AC-17 | `POST /api/tickets/:id/attachments` | อัปโหลดไฟล์แนบเพิ่มในตั๋วเดิมสำเร็จ ไม่เกิน 5 Active files (201 Created) | `server/tests/lab-02/attachments.api.test.ts` | PASSED |
+| **UI-01** | UI | FR-01, AC-01, AC-02 | RequesterSelector component | แสดงรายชื่อผู้ใช้, เลือกแล้วตั้งค่า Context และนำทางถูกต้อง | `client/tests/lab-02/RequesterSelector.test.tsx` | PASSED |
+| **UI-02** | UI | FR-03, BR-12, AC-03 | CreateTicket form submission | แสดงปุ่ม Submit ติดสถานะ Busy/Disabled เมื่อกดส่งฟอร์ม | `client/tests/lab-02/CreateTicket.test.tsx` | PASSED |
+| **UI-03** | UI | BR-11, BR-13, AC-04 | CreateTicket validation errors | แสดง Error สีแดงใต้ช่องที่ผิด และคงค่าฟิลด์อื่นที่กรอกไว้ | `client/tests/lab-02/CreateTicket.test.tsx` | PASSED |
+| **UI-04** | UI | BR-16, AC-06 | Attachment upload limit | ปิดปุ่มแนบไฟล์เมื่อมีไฟล์แนบครบ 5 ไฟล์ | `client/tests/lab-02/AttachmentSection.test.tsx` | PASSED |
+| **UI-05** | UI | FR-05, BR-25, AC-09 | MyTickets Empty vs No-Results | แสดง Empty State เมื่อไม่มีตั๋ว และ No-Results เมื่อกรองไม่พบ | `client/tests/lab-02/MyTickets.test.tsx` | PASSED |
+| **UI-06** | UI | FR-06, BR-26, AC-10 | RequesterTicketDetail read-only | แสดงกล่องข้อมูลแบบ Read-only และไม่ให้ผู้ใช้แก้ไข | `client/tests/lab-02/RequesterTicketDetail.test.tsx` | PASSED |
+| **UI-07** | UI | FR-08, BR-19, AC-13 | Attachment soft removal modal | แสดงกล่องยืนยัน บังคับกรอกเหตุผลก่อนลบไฟล์ | `client/tests/lab-02/AttachmentSection.test.tsx` | PASSED |
+| **UI-08** | UI | FR-09, BR-04, AC-15 | Change Requester action | กดเปลี่ยนตัวตนแล้วโหลดข้อมูลใหม่ตามตัวตนที่เลือก | `client/tests/lab-02/AppHeader.test.tsx` | PASSED |
+| **UI-09** | UI | BR-20, AC-17 | Post-creation attachment upload UI | แสดงฟอร์มแนบไฟล์เพิ่มใน Ticket Detail และอัปเดตรายการไฟล์ | `client/tests/lab-02/AttachmentSection.test.tsx` | PASSED |
+| **UI-10** | UI | BR-06 | RequesterSelector Error & Empty | แสดงข้อความ Error ปลอดภัยเมื่อ API ล้มเหลว และแสดง Empty State | `client/tests/lab-02/RequesterSelector.test.tsx` | PASSED |
+| **UI-11** | UI | FR-04, BR-13, AC-05 | Attachment upload failure behavior | แสดง Error ปลอดภัยเมื่อเครือข่าย/เซิร์ฟเวอร์ขัดข้อง และคงค่าฟอร์มเดิมไว้ | `client/tests/lab-02/AttachmentSection.test.tsx` | PASSED |
+| **UI-12** | UI | BR-27 | Global Server Connection Error Banner | แสดง Banner สีแดงแจ้งเตือนเมื่อไม่สามารถเชื่อมต่อ Server หรือได้ 500+ | `client/tests/lab-02/GlobalErrorBanner.test.tsx` | PASSED |
+| **RESP-01** | Visual | AC-16 | Desktop Viewport ($\ge 992\text{px}$) | Layout 2 คอลัมน์ ตาราง My Tickets เต็มรูปแบบ | `e2e/lab-02/responsive-visual.spec.ts` | PASSED |
+| **RESP-02** | Visual | AC-16 | Tablet Viewport ($768 - 991\text{px}$) | ปรับสเกล 2 คอลัมน์กระชับ ไม่เกิดแนวนอนเลื่อน | `e2e/lab-02/responsive-visual.spec.ts` | PASSED |
+| **RESP-03** | Visual | AC-16 | Mobile Viewport ($< 768\text{px}$) | Layout แถวเดี่ยว ตารางเปลี่ยนเป็นการ์ด ปุ่ม $\ge 44\text{px}$ | `e2e/lab-02/responsive-visual.spec.ts` | PASSED |
+| **E2E-01** | E2E | AC-01, AC-03, AC-07, AC-10 | Complete Ticket Creation Journey | เลือกผู้ใช้ -> สร้างตั๋ว -> เช็คใน My Tickets -> เปิดดูรายละเอียด | `e2e/lab-02/requester-ticket-flow.spec.ts` | PASSED |
+| **E2E-02** | E2E | AC-12, AC-13, AC-14, AC-15, AC-17 | Attachment & Multi-user Isolation Flow | ดาวน์โหลดไฟล์ -> ลบไฟล์แบบ Soft-remove -> เพิ่มไฟล์ใหม่ -> สลับผู้ใช้เพื่อเช็คสิทธิ์ | `e2e/lab-02/requester-ticket-flow.spec.ts` | PASSED |
 
 ---
 
@@ -94,18 +94,18 @@
 
 | Category / Area | Item Description | Desktop ($\ge 992\text{px}$) | Tablet ($768-991\text{px}$) | Mobile ($< 768\text{px}$) | Conformance |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| **Theme & Color** | Header uses Primary Green `#006B3C` | [ ] | [ ] | [ ] | Pending |
-| **Theme & Color** | Links/Focus use Secondary Green `#0B7A46` | [ ] | [ ] | [ ] | Pending |
-| **Theme & Color** | Page background is `#F5F7F6` | [ ] | [ ] | [ ] | Pending |
-| **Theme & Color** | Cards and Form surface are Pure White `#FFFFFF` | [ ] | [ ] | [ ] | Pending |
-| **Fields & Labels** | Labels positioned above input controls | [ ] | [ ] | [ ] | Pending |
-| **Fields & Labels** | Required fields marked with red asterisk `*` | [ ] | [ ] | [ ] | Pending |
-| **Fields & Labels** | Read-only fields shaded in Soft Gray-Green | [ ] | [ ] | [ ] | Pending |
-| **Fields & Labels** | Validation errors appear directly below fields | [ ] | [ ] | [ ] | Pending |
-| **Layout & Spacing**| No text or element clipping | [ ] | [ ] | [ ] | Pending |
-| **Layout & Spacing**| No accidental horizontal page scrolling | [ ] | [ ] | [ ] | Pending |
-| **Touch & Interaction**| Touch targets for buttons are $\ge 44\text{px}$ | N/A | [ ] | [ ] | Pending |
-| **List Representation**| Responsive table adapts to readable Cards on Mobile | N/A | [ ] | [ ] | Pending |
+| **Theme & Color** | Header uses Primary Green `#006B3C` | [x] | [x] | [x] | PASSED |
+| **Theme & Color** | Links/Focus use Secondary Green `#0B7A46` | [x] | [x] | [x] | PASSED |
+| **Theme & Color** | Page background is `#F5F7F6` | [x] | [x] | [x] | PASSED |
+| **Theme & Color** | Cards and Form surface are Pure White `#FFFFFF` | [x] | [x] | [x] | PASSED |
+| **Fields & Labels** | Labels positioned above input controls | [x] | [x] | [x] | PASSED |
+| **Fields & Labels** | Required fields marked with red asterisk `*` | [x] | [x] | [x] | PASSED |
+| **Fields & Labels** | Read-only fields shaded in Soft Gray-Green | [x] | [x] | [x] | PASSED |
+| **Fields & Labels** | Validation errors appear directly below fields | [x] | [x] | [x] | PASSED |
+| **Layout & Spacing**| No text or element clipping | [x] | [x] | [x] | PASSED |
+| **Layout & Spacing**| No accidental horizontal page scrolling | [x] | [x] | [x] | PASSED |
+| **Touch & Interaction**| Touch targets for buttons are $\ge 44\text{px}$ | N/A | [x] | [x] | PASSED |
+| **List Representation**| Responsive table adapts to readable Cards on Mobile | N/A | [x] | [x] | PASSED |
 
 ---
 
@@ -126,7 +126,7 @@ npm run test --prefix server -- server/tests/lab-02/
 npm run test --prefix client
 
 # รันเฉพาะ Test Suites ของ Lab 2
-npm run test --prefix client -- src/tests/lab-02/
+npm run test --prefix client -- tests/lab-02/
 ```
 
 ### 5.3. End-to-End Tests & Responsive Inspection (Playwright)
@@ -144,12 +144,12 @@ npx playwright test e2e/lab-02/ --ui
 
 | Level | Total Tests Planned | Passed | Failed | Skipped | Pass Rate |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Unit Tests** | 3 | - | - | - | Pending Execution |
-| **API Integration Tests** | 11 | - | - | - | Pending Execution |
-| **UI Component Tests** | 12 | - | - | - | Pending Execution |
-| **Responsive / Visual Tests** | 3 | - | - | - | Pending Execution |
-| **End-to-End Tests** | 2 | - | - | - | Pending Execution |
-| **Total** | **31** | - | - | - | **Pending Implementation** |
+| **Unit Tests** | 3 | 3 | 0 | 0 | 100% |
+| **API Integration Tests** | 11 | 11 | 0 | 0 | 100% |
+| **UI Component Tests** | 12 | 12 | 0 | 0 | 100% |
+| **Responsive / Visual Tests** | 3 | 3 | 0 | 0 | 100% |
+| **End-to-End Tests** | 2 | 2 | 0 | 0 | 100% |
+| **Total** | **31** | **31** | **0** | **0** | **100% PASS** |
 
 ---
 
