@@ -114,14 +114,6 @@ function MainApp() {
               />
             }
           />
-          <Route
-            path="/create-ticket"
-            element={
-              <CreateTicket
-                onCancel={() => navigate("/tickets")}
-              />
-            }
-          />
           <Route path="/tickets/:id" element={<TicketDetailWrapper />} />
           <Route
             path="*"

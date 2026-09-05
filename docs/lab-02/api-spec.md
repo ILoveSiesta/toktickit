@@ -74,7 +74,23 @@
 
 ## 4. API Endpoints Specification
 
-### 4.1. Development Requester Endpoints
+### 4.1. System & Health Check Endpoints
+
+#### `GET /api/health`
+* **หน้าที่:** ตรวจสอบสถานะการทำงานของ API Server (โครงสร้างเดิมตาม Lab 1)
+* **Request Headers:** ไม่ต้องการ
+* **Response Status:** `200 OK`
+* **Response Body:**
+```json
+{
+  "status": "ok",
+  "service": "TokTickIT API"
+}
+```
+
+---
+
+### 4.2. Development Requester Endpoints
 
 #### `GET /api/requesters`
 * **หน้าที่:** ดึงรายชื่อผู้ใช้งานจำลองที่มีสถานะ **Active** เท่านั้น เพื่อนำไปแสดงในหน้า Selector
@@ -102,7 +118,7 @@
 
 ---
 
-### 4.2. Reference Master Data Endpoints
+### 4.3. Reference Master Data Endpoints
 
 #### `GET /api/categories`
 * **หน้าที่:** ดึงรายชื่อหมวดหมู่ตั๋ว (Categories) ที่มีสถานะ Active (โครงสร้างเดิมตาม Lab 1)
@@ -135,7 +151,7 @@
 
 ---
 
-### 4.3. Ticket Management Endpoints
+### 4.4. Ticket Management Endpoints
 
 #### `POST /api/tickets`
 * **หน้าที่:** สร้างตั๋วแจ้งปัญหาไอทีใบใหม่ พร้อมรองรับการแนบไฟล์หลักฐานในคำขอเดียวกัน (Atomic Transaction)
@@ -302,7 +318,7 @@
 
 ---
 
-### 4.4. Attachment Lifecycle Endpoints
+### 4.5. Attachment Lifecycle Endpoints
 
 #### `POST /api/tickets/:id/attachments`
 * **หน้าที่:** อัปโหลดไฟล์แนบเพิ่มเติมเข้าไปในตั๋วเดิมหลังสร้างเสร็จ

@@ -125,11 +125,11 @@ test.describe("Responsive & Visual Inspection (RESP-01, RESP-02, RESP-03)", () =
     await page.goto("/tickets/create");
     await expect(page.getByRole("heading", { name: /Create Support Ticket/i })).toBeVisible();
 
-    // Verify touch target height for buttons >= 40px
+    // Verify touch target height for buttons >= 44px
     const submitBtn = page.getByTestId("submit-ticket-btn");
     const boundingBox = await submitBtn.boundingBox();
     if (boundingBox) {
-      expect(boundingBox.height).toBeGreaterThanOrEqual(40);
+      expect(boundingBox.height).toBeGreaterThanOrEqual(44);
     }
 
     await page.screenshot({ path: path.join(screenshotsDir, "mobile-create-ticket.png"), fullPage: true });

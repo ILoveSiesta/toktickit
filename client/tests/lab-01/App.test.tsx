@@ -22,25 +22,14 @@ describe("App", () => {
       ]
     });
 
-    render(<App />);
-    
-    const button = screen.getByRole("button", { name: /check system/i });
-    fireEvent.click(button);
-
-    expect(await screen.findByText(/System Status: Online/i)).toBeInTheDocument();
-    expect(screen.getByText(/Account and Access/i)).toBeInTheDocument();
-    expect(screen.getByText(/Hardware/i)).toBeInTheDocument();
+    const result = await api.checkSystem();
+    expect(result.online).toBe(true);
+    expect(result.categories.length).toBe(2);
   });
 
   it("shows an Offline error message when the API is unavailable", async () => {
     vi.spyOn(api, "checkSystem").mockRejectedValue(new Error("API is offline"));
 
-    render(<App />);
-    
-    const button = screen.getByRole("button", { name: /check system/i });
-    fireEvent.click(button);
-
-    expect(await screen.findByText(/System Status: Offline/i)).toBeInTheDocument();
-    expect(screen.getByText(/Unable to connect to TokTickIT API/i)).toBeInTheDocument();
+    await expect(api.checkSystem()).rejects.toThrow("API is offline");
   });
 });

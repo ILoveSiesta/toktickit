@@ -282,7 +282,6 @@ app.post(
               select: {
                 id: true,
                 originalFileName: true,
-                storageFileName: true,
                 fileSize: true,
                 fileType: true,
                 isRemoved: true,
@@ -302,7 +301,6 @@ app.post(
               select: {
                 id: true,
                 originalFileName: true,
-                storageFileName: true,
                 fileSize: true,
                 fileType: true,
                 isRemoved: true,
@@ -443,20 +441,23 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       prisma.ticket.count({ where }),
       prisma.ticket.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          ticketNumber: true,
+          summary: true,
+          description: true,
+          requesterId: true,
+          categoryId: true,
+          relatedSystemId: true,
+          requestedPriority: true,
+          itPriority: true,
+          currentStatus: true,
+          ticketOwner: true,
+          ticketDate: true,
+          createdAt: true,
+          updatedAt: true,
           category: { select: { id: true, name: true } },
           relatedSystem: { select: { id: true, name: true } },
-          attachments: {
-            select: {
-              id: true,
-              originalFileName: true,
-              storageFileName: true,
-              fileSize: true,
-              fileType: true,
-              isRemoved: true,
-              uploadedAt: true,
-            },
-          },
         },
         orderBy,
         skip,
@@ -465,9 +466,24 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
     ]);
 
     const formattedItems = items.map((t) => ({
-      ...t,
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      summary: t.summary,
+      description: t.description,
+      requesterId: t.requesterId,
+      categoryId: t.categoryId,
+      relatedSystemId: t.relatedSystemId,
+      category: t.category,
       categoryName: t.category?.name || null,
+      relatedSystem: t.relatedSystem,
       relatedSystemName: t.relatedSystem?.name || null,
+      requestedPriority: t.requestedPriority,
+      itPriority: t.itPriority,
+      currentStatus: t.currentStatus,
+      ticketOwner: t.ticketOwner,
+      ticketDate: t.ticketDate,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
     }));
 
     const totalPages = Math.ceil(totalCount / limitNum);
@@ -526,7 +542,6 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
           select: {
             id: true,
             originalFileName: true,
-            storageFileName: true,
             fileSize: true,
             fileType: true,
             isRemoved: true,
@@ -662,7 +677,6 @@ app.post(
           select: {
             id: true,
             originalFileName: true,
-            storageFileName: true,
             fileSize: true,
             fileType: true,
             isRemoved: true,
@@ -810,7 +824,6 @@ app.patch("/api/attachments/:id/remove", async (req: Request, res: Response) => 
         id: true,
         ticketId: true,
         originalFileName: true,
-        storageFileName: true,
         fileSize: true,
         fileType: true,
         isRemoved: true,

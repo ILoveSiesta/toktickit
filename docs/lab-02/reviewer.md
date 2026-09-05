@@ -1,4 +1,4 @@
-# Lab 1 — Peer Review Record  (fill this in)
+# Lab 2 — Peer Review Record  (fill this in)
 
 **Author:** นายวัทธิกร ศรีประดับทอง — 67070501073 — GitHub: @ILoveSiesta
 **Peer reviewer:** นายพชร มัสมี — 67070501066 — GitHub: @phet526
@@ -10,5 +10,5 @@
 |  https://github.com/ILoveSiesta/toktickit/pull/16  | feature/2-requester-context | Approve |
 |  https://github.com/ILoveSiesta/toktickit/pull/17  | feature/3-ticket-creation | Approve |
 |  https://github.com/ILoveSiesta/toktickit/pull/18  | feature/4-ticket-management | Approve |
-
+|  https://github.com/ILoveSiesta/toktickit/pull/19  | feature/5-e2e-testing | Approve |
 

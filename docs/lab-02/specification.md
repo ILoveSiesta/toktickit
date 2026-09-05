@@ -281,61 +281,63 @@ model Attachment {
 
 ### 8.2. Endpoint Specifications
 
+#### 0. `GET /api/health`
+* **คำอธิบาย:** ตรวจสอบสถานะการทำงานของ API Server (โครงสร้างเดิมตาม Lab 1)
+* **Response Status:** `200 OK`
+* **Response Body:**
+```json
+{
+  "status": "ok",
+  "service": "TokTickIT API"
+}
+```
+
 #### 1. `GET /api/requesters`
 * **คำอธิบาย:** ดึงรายชื่อผู้ใช้จำลองที่ Active สำหรับหน้า Selector
 * **Response Status:** `200 OK`
 * **Response Body:**
 ```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "Jennifer Anderson",
-      "email": "jennifer@toktick.it",
-      "department": "Marketing",
-      "isActive": true
-    },
-    {
-      "id": 2,
-      "name": "Michael Brown",
-      "email": "michael@toktick.it",
-      "department": "Finance",
-      "isActive": true
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "name": "Jennifer Anderson",
+    "email": "jennifer@toktick.it",
+    "department": "Marketing",
+    "isActive": true
+  },
+  {
+    "id": 2,
+    "name": "Michael Brown",
+    "email": "michael@toktick.it",
+    "department": "Finance",
+    "isActive": true
+  }
+]
 ```
 
 #### 2. `GET /api/categories` และ `GET /api/related-systems`
-* **คำอธิบาย:** ดึงหมวดหมู่และระบบที่เกี่ยวข้องที่ Active
+* **คำอธิบาย:** ดึงหมวดหมู่ (โครงสร้างเดิมตาม Lab 1) และระบบที่เกี่ยวข้องที่ Active
 * **Response Status:** `200 OK`
 * **Response Body (Categories):**
 ```json
-{
-  "success": true,
-  "data": [
-    { "id": 1, "name": "Account and Access" },
-    { "id": 2, "name": "Hardware" },
-    { "id": 3, "name": "Software" },
-    { "id": 4, "name": "Network" }
-  ]
-}
+[
+  { "id": 1, "name": "Account and Access" },
+  { "id": 2, "name": "Hardware" },
+  { "id": 3, "name": "Software" },
+  { "id": 4, "name": "Network" }
+]
 ```
 * **Response Body (Related Systems):**
 ```json
-{
-  "success": true,
-  "data": [
-    { "id": 1, "name": "Email" },
-    { "id": 2, "name": "Campus Wi-Fi" },
-    { "id": 3, "name": "VPN" },
-    { "id": 4, "name": "LEB2 App" },
-    { "id": 5, "name": "Grade Submission App" },
-    { "id": 6, "name": "Printer" },
-    { "id": 7, "name": "Corporate Laptop" }
-  ]
-}
+[
+  { "id": 1, "name": "Email" },
+  { "id": 2, "name": "Campus Wi-Fi" },
+  { "id": 3, "name": "VPN" },
+  { "id": 4, "name": "LEB2 App" },
+  { "id": 5, "name": "Grade Submission App" },
+  { "id": 6, "name": "Printer" },
+  { "id": 7, "name": "Corporate Laptop" }
+]
 ```
 
 #### 3. `POST /api/tickets`

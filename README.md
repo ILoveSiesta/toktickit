@@ -17,10 +17,7 @@ TokTickIT เป็นระบบจัดการและรับเรื�
 ## Setup Instructions
 
 ### 1. Database Setup (PostgreSQL)
-เริ่มต้นรัน PostgreSQL container ผ่าน Docker หรือใช้ PostgreSQL instance ในเครื่องของคุณ:
-```bash
-docker run --name toktickit-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=toktickit -p 5432:5432 -d postgres:16-alpine
-```
+เริ่มต้นรัน PostgreSQL container ผ่าน Docker หรือใช้ PostgreSQL instance ในเครื่องของคุณ
 
 ### Environment Variables Configuration (`.env`)
 
@@ -34,7 +31,9 @@ docker run --name toktickit-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_D
 รันคำสั่ง Migration และ Seed ข้อมูลตั้งต้นสำหรับ Lab 2 (Categories, Related Systems, Development Requesters ทั้ง Active และ Inactive):
 ```bash
 # ติดตั้ง Dependencies และรัน Prisma Migration & Seed
+npm install
 npm install --prefix server
+npm install --prefix client
 npm run prisma:migrate --prefix server
 npm run prisma:seed --prefix server
 ```
@@ -65,25 +64,10 @@ npm run dev --prefix client
 
 ### 1. Run Unit & Component Tests
 ```bash
-# รัน Unit Tests และ API Tests ของ Server ทั้งหมด
-npm run test --prefix server
-
-# รัน Component & UI Tests ของ Client ทั้งหมด
-npm run test --prefix client
-
-# หรือรันทั้ง Server และ Client พร้อมกันจาก Root
 npm test
 ```
-**หมายเหตุ:** เทสต์ของ Lab 1 (tests/lab-01/App.test.tsx) จะแสดงผล Failed 2 ข้อ เนื่องจากหน้าจอของ Lab 2 ได้ถูกพัฒนาเป็นระบบ Ticketing Portal จึงไม่มีปุ่ม Check System เก่าแล้ว
 
 ### 2. Run End-to-End & Responsive Visual Tests (Playwright)
 ```bash
-# รัน E2E Tests และถ่ายภาพ Responsive Screenshots ทั้งหมด
 npm run test:e2e
-
-# รัน E2E Tests พร้อมเปิด Playwright Interactive UI
-npm run test:e2e:ui
-
-# รันการทดสอบทั้งหมดของระบบแบบครบวงจร (Server + Client + Playwright E2E)
-npm run test:all
 ```
