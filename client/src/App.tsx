@@ -67,6 +67,7 @@ function MainApp() {
         <RequesterSelector
           onSuccess={() => {
             setShowSelectorModal(false);
+            navigate("/tickets");
           }}
         />
       </div>
@@ -109,16 +110,6 @@ function MainApp() {
             path="/tickets/create"
             element={
               <CreateTicket
-                onTicketCreated={() => navigate("/tickets")}
-                onCancel={() => navigate("/tickets")}
-              />
-            }
-          />
-          <Route
-            path="/create-ticket"
-            element={
-              <CreateTicket
-                onTicketCreated={() => navigate("/tickets")}
                 onCancel={() => navigate("/tickets")}
               />
             }

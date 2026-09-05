@@ -502,6 +502,7 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
                   </div>
 
                   <span
+                    data-testid="removed-badge"
                     style={{
                       fontSize: "0.75rem",
                       fontWeight: 600,
@@ -511,7 +512,7 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
                       borderRadius: "4px",
                     }}
                   >
-                    Removed (Unavailable)
+                    [Removed]
                   </span>
                 </div>
               ))}

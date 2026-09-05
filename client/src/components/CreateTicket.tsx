@@ -221,6 +221,45 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onTicketCreated, onC
         )}
 
         <form onSubmit={handleSubmit}>
+          {/* Read-only System Metadata Box per UI-Spec 4.3 */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "var(--space-md)",
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border-neutral)",
+              borderRadius: "var(--radius-md)",
+              padding: "var(--space-md)",
+              marginBottom: "var(--space-xl)",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
+                Ticket Number
+              </div>
+              <div style={{ fontSize: "var(--font-size-sm)", color: "var(--color-text-muted)", fontFamily: "monospace", marginTop: "2px" }} data-testid="generated-ticket-number">
+                [Generated on Submission]
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
+                Ticket Date
+              </div>
+              <div style={{ fontSize: "var(--font-size-sm)", color: "var(--color-text-main)", marginTop: "2px" }} data-testid="ticket-date-readonly">
+                {new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })} (Today)
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
+                Requester
+              </div>
+              <div style={{ fontSize: "var(--font-size-sm)", color: "var(--color-primary-green)", fontWeight: 600, marginTop: "2px" }} data-testid="requester-name-readonly">
+                {currentRequester?.name || "Somchai"} ({currentRequester?.department || "IT Support"})
+              </div>
+            </div>
+          </div>
+
           {/* 2-Column Responsive Layout */}
           <div
             style={{

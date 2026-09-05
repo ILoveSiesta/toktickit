@@ -99,7 +99,7 @@ app.get("/api/related-systems", async (_req: Request, res: Response) => {
 // POST /api/tickets - Create a new support ticket
 app.post(
   "/api/tickets",
-  upload.array("files", 10),
+  upload.array("files", 5),
   async (req: Request, res: Response) => {
     try {
       const prisma = getPrisma();
@@ -282,7 +282,6 @@ app.post(
               select: {
                 id: true,
                 originalFileName: true,
-                storageFileName: true,
                 fileSize: true,
                 fileType: true,
                 isRemoved: true,
@@ -302,7 +301,6 @@ app.post(
               select: {
                 id: true,
                 originalFileName: true,
-                storageFileName: true,
                 fileSize: true,
                 fileType: true,
                 isRemoved: true,
@@ -355,12 +353,43 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       categoryId,
       requestedPriority,
       itPriority,
+      status,
       currentStatus,
       sortBy = "createdAt",
       sortOrder = "desc",
       page = "1",
       limit = "8",
     } = req.query;
+
+    if (req.query.page !== undefined) {
+      const parsedPage = parseInt(String(page), 10);
+      if (isNaN(parsedPage) || parsedPage < 1) {
+        return res.status(400).json({
+          success: false,
+          error: { code: "INVALID_QUERY_PARAMETER", message: "Page must be a positive integer >= 1" },
+        });
+      }
+    }
+
+    if (req.query.limit !== undefined) {
+      const parsedLimit = parseInt(String(limit), 10);
+      if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 100) {
+        return res.status(400).json({
+          success: false,
+          error: { code: "INVALID_QUERY_PARAMETER", message: "Limit must be between 1 and 100" },
+        });
+      }
+    }
+
+    if (req.query.sortOrder !== undefined) {
+      const orderLower = String(sortOrder).toLowerCase();
+      if (orderLower !== "asc" && orderLower !== "desc") {
+        return res.status(400).json({
+          success: false,
+          error: { code: "INVALID_QUERY_PARAMETER", message: "SortOrder must be 'asc' or 'desc'" },
+        });
+      }
+    }
 
     const pageNum = Math.max(1, parseInt(String(page), 10) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(String(limit), 10) || 8));
@@ -393,8 +422,9 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       where.itPriority = itPriority.toUpperCase() as PriorityLevel;
     }
 
-    if (currentStatus && typeof currentStatus === "string") {
-      where.currentStatus = currentStatus.toUpperCase() as any;
+    const statusFilter = (status || currentStatus) as string | undefined;
+    if (statusFilter && typeof statusFilter === "string") {
+      where.currentStatus = statusFilter.toUpperCase() as any;
     }
 
     // Build Order By with Secondary Sort for Deterministic Pagination
@@ -411,20 +441,23 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       prisma.ticket.count({ where }),
       prisma.ticket.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          ticketNumber: true,
+          summary: true,
+          description: true,
+          requesterId: true,
+          categoryId: true,
+          relatedSystemId: true,
+          requestedPriority: true,
+          itPriority: true,
+          currentStatus: true,
+          ticketOwner: true,
+          ticketDate: true,
+          createdAt: true,
+          updatedAt: true,
           category: { select: { id: true, name: true } },
           relatedSystem: { select: { id: true, name: true } },
-          attachments: {
-            select: {
-              id: true,
-              originalFileName: true,
-              storageFileName: true,
-              fileSize: true,
-              fileType: true,
-              isRemoved: true,
-              uploadedAt: true,
-            },
-          },
         },
         orderBy,
         skip,
@@ -432,11 +465,32 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       }),
     ]);
 
+    const formattedItems = items.map((t) => ({
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      summary: t.summary,
+      description: t.description,
+      requesterId: t.requesterId,
+      categoryId: t.categoryId,
+      relatedSystemId: t.relatedSystemId,
+      category: t.category,
+      categoryName: t.category?.name || null,
+      relatedSystem: t.relatedSystem,
+      relatedSystemName: t.relatedSystem?.name || null,
+      requestedPriority: t.requestedPriority,
+      itPriority: t.itPriority,
+      currentStatus: t.currentStatus,
+      ticketOwner: t.ticketOwner,
+      ticketDate: t.ticketDate,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+    }));
+
     const totalPages = Math.ceil(totalCount / limitNum);
 
     return res.status(200).json({
       success: true,
-      data: items,
+      data: formattedItems,
       pagination: {
         total: totalCount,
         page: pageNum,
@@ -488,7 +542,6 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
           select: {
             id: true,
             originalFileName: true,
-            storageFileName: true,
             fileSize: true,
             fileType: true,
             isRemoved: true,
@@ -624,7 +677,6 @@ app.post(
           select: {
             id: true,
             originalFileName: true,
-            storageFileName: true,
             fileSize: true,
             fileType: true,
             isRemoved: true,
@@ -730,12 +782,12 @@ app.patch("/api/attachments/:id/remove", async (req: Request, res: Response) => 
     }
 
     const trimmedReason = typeof removalReason === "string" ? removalReason.trim() : "";
-    if (!trimmedReason || trimmedReason.length < 3) {
+    if (!trimmedReason || trimmedReason.length < 3 || trimmedReason.length > 500) {
       return res.status(400).json({
         success: false,
         error: {
           code: "REASON_REQUIRED",
-          message: "A removal reason of at least 3 characters is mandatory when removing an attachment.",
+          message: "A removal reason of 3 to 500 characters is mandatory when removing an attachment.",
         },
       });
     }
@@ -772,7 +824,6 @@ app.patch("/api/attachments/:id/remove", async (req: Request, res: Response) => 
         id: true,
         ticketId: true,
         originalFileName: true,
-        storageFileName: true,
         fileSize: true,
         fileType: true,
         isRemoved: true,

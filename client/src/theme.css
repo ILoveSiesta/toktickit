@@ -20,12 +20,18 @@
 
   /* Typography */
   --font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-size-h1: 1.5rem;    /* 24px */
-  --font-size-h2: 1.125rem;  /* 18px */
-  --font-size-h3: 1.0rem;    /* 16px */
-  --font-size-body: 0.875rem; /* 14px */
-  --font-size-sm: 0.8125rem; /* 13px */
-  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-h1: 1.5rem;
+  /* 24px */
+  --font-size-h2: 1.125rem;
+  /* 18px */
+  --font-size-h3: 1.0rem;
+  /* 16px */
+  --font-size-body: 0.875rem;
+  /* 14px */
+  --font-size-sm: 0.8125rem;
+  /* 13px */
+  --font-size-xs: 0.75rem;
+  /* 12px */
 
   /* Spacing */
   --space-xs: 4px;
@@ -44,7 +50,14 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 /* Reset & Global Styles */
+html,
 body {
   margin: 0;
   padding: 0;
@@ -52,6 +65,8 @@ body {
   background-color: var(--color-page-bg);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* Container */
@@ -70,6 +85,8 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: var(--space-lg);
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 /* Typography Classes */
@@ -113,7 +130,9 @@ body {
   margin-left: 2px;
 }
 
-.zen-select, .zen-input, .zen-textarea {
+.zen-select,
+.zen-input,
+.zen-textarea {
   width: 100%;
   padding: var(--space-sm) var(--space-md);
   font-size: var(--font-size-body);
@@ -127,7 +146,9 @@ body {
   min-height: 40px;
 }
 
-.zen-select:focus, .zen-input:focus, .zen-textarea:focus {
+.zen-select:focus,
+.zen-input:focus,
+.zen-textarea:focus {
   outline: none;
   border-color: var(--color-secondary-green);
   box-shadow: 0 0 0 3px rgba(11, 122, 70, 0.2);
@@ -153,7 +174,7 @@ body {
   text-decoration: none;
   border: 1px solid transparent;
   transition: all 0.15s ease;
-  min-height: 40px;
+  min-height: 44px;
   box-sizing: border-box;
 }
 
@@ -191,7 +212,8 @@ body {
   color: var(--color-primary-green);
 }
 
-.zen-btn:disabled, .zen-btn-disabled {
+.zen-btn:disabled,
+.zen-btn-disabled {
   background-color: #F1F5F9 !important;
   color: #94A3B8 !important;
   border-color: #E2E8F0 !important;
@@ -235,7 +257,9 @@ body {
 }
 
 @keyframes zen-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Table vs Card Layout (BR-16 / UI Spec) */
@@ -248,13 +272,21 @@ body {
 }
 
 @media (max-width: 767px) {
+  .zen-container {
+    padding: 0 var(--space-sm);
+  }
+
+  .zen-card {
+    padding: var(--space-md);
+  }
+
   .zen-table-responsive-desktop {
     display: none !important;
   }
+
   .zen-card-responsive-mobile {
     display: flex !important;
     flex-direction: column;
     gap: var(--space-md);
   }
 }
-
