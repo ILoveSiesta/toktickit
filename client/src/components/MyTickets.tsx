@@ -338,7 +338,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigate
             <h3 className="zen-title" style={{ fontSize: "1.125rem", marginBottom: "var(--space-xs)" }}>
               You haven't submitted any tickets yet
             </h3>
-            <p className="zen-text-muted" style={{ marginBottom: "var(--space-lg)", maxWidth: 480, margin: "0 auto var(--space-lg) auto" }}>
+            <p className="zen-text-muted" style={{ maxWidth: 480, margin: "0 auto var(--space-lg) auto" }}>
               Need IT assistance with hardware, software, network, or account access? Submit your first request today.
             </p>
             <button type="button" onClick={onNavigateCreate} className="zen-btn zen-btn-primary">

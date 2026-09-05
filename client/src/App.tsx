@@ -67,6 +67,7 @@ function MainApp() {
         <RequesterSelector
           onSuccess={() => {
             setShowSelectorModal(false);
+            navigate("/tickets");
           }}
         />
       </div>

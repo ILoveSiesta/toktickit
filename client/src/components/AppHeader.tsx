@@ -31,7 +31,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         alignItems: "center",
         color: "#FFFFFF",
         boxShadow: "var(--shadow-sm)",
-        padding: "6px 0",
+        padding: "var(--space-xs) 0",
       }}
     >
       <div
@@ -41,18 +41,18 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          gap: "var(--space-xs) var(--space-md)",
+          gap: "var(--space-sm)",
         }}
       >
         {/* Left: Brand & Nav */}
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-md)", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)" }}>
             <span style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.5px" }}>
               TokTickIT
             </span>
           </div>
 
-          <nav style={{ display: "flex", gap: "var(--space-xs)" }}>
+          <nav style={{ display: "flex", gap: "var(--space-xs)", flexWrap: "wrap" }}>
             <button
               onClick={() => onSelectTab && onSelectTab("my-tickets")}
               style={{
@@ -94,11 +94,16 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 style={{
                   fontSize: "var(--font-size-xs)",
                   background: "rgba(255, 255, 255, 0.15)",
-                  padding: "3px 8px",
+                  padding: "4px 8px",
                   borderRadius: "16px",
                   fontWeight: 500,
+                  maxWidth: "180px",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
                 data-testid="requester-name-display"
+                title={currentRequester.name}
               >
                 👤 {currentRequester.name}
               </span>
@@ -108,7 +113,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 style={{
                   color: "#FFFFFF",
                   fontSize: "var(--font-size-xs)",
-                  padding: "3px 6px",
+                  padding: "4px 6px",
+                  minHeight: "32px",
                 }}
                 data-testid="change-requester-btn"
               >

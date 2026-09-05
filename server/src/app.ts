@@ -99,7 +99,7 @@ app.get("/api/related-systems", async (_req: Request, res: Response) => {
 // POST /api/tickets - Create a new support ticket
 app.post(
   "/api/tickets",
-  upload.array("files", 10),
+  upload.array("files", 5),
   async (req: Request, res: Response) => {
     try {
       const prisma = getPrisma();
@@ -355,12 +355,43 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       categoryId,
       requestedPriority,
       itPriority,
+      status,
       currentStatus,
       sortBy = "createdAt",
       sortOrder = "desc",
       page = "1",
       limit = "8",
     } = req.query;
+
+    if (req.query.page !== undefined) {
+      const parsedPage = parseInt(String(page), 10);
+      if (isNaN(parsedPage) || parsedPage < 1) {
+        return res.status(400).json({
+          success: false,
+          error: { code: "INVALID_QUERY_PARAMETER", message: "Page must be a positive integer >= 1" },
+        });
+      }
+    }
+
+    if (req.query.limit !== undefined) {
+      const parsedLimit = parseInt(String(limit), 10);
+      if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 100) {
+        return res.status(400).json({
+          success: false,
+          error: { code: "INVALID_QUERY_PARAMETER", message: "Limit must be between 1 and 100" },
+        });
+      }
+    }
+
+    if (req.query.sortOrder !== undefined) {
+      const orderLower = String(sortOrder).toLowerCase();
+      if (orderLower !== "asc" && orderLower !== "desc") {
+        return res.status(400).json({
+          success: false,
+          error: { code: "INVALID_QUERY_PARAMETER", message: "SortOrder must be 'asc' or 'desc'" },
+        });
+      }
+    }
 
     const pageNum = Math.max(1, parseInt(String(page), 10) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(String(limit), 10) || 8));
@@ -393,8 +424,9 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       where.itPriority = itPriority.toUpperCase() as PriorityLevel;
     }
 
-    if (currentStatus && typeof currentStatus === "string") {
-      where.currentStatus = currentStatus.toUpperCase() as any;
+    const statusFilter = (status || currentStatus) as string | undefined;
+    if (statusFilter && typeof statusFilter === "string") {
+      where.currentStatus = statusFilter.toUpperCase() as any;
     }
 
     // Build Order By with Secondary Sort for Deterministic Pagination
@@ -432,11 +464,17 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       }),
     ]);
 
+    const formattedItems = items.map((t) => ({
+      ...t,
+      categoryName: t.category?.name || null,
+      relatedSystemName: t.relatedSystem?.name || null,
+    }));
+
     const totalPages = Math.ceil(totalCount / limitNum);
 
     return res.status(200).json({
       success: true,
-      data: items,
+      data: formattedItems,
       pagination: {
         total: totalCount,
         page: pageNum,
@@ -730,12 +768,12 @@ app.patch("/api/attachments/:id/remove", async (req: Request, res: Response) => 
     }
 
     const trimmedReason = typeof removalReason === "string" ? removalReason.trim() : "";
-    if (!trimmedReason || trimmedReason.length < 3) {
+    if (!trimmedReason || trimmedReason.length < 3 || trimmedReason.length > 500) {
       return res.status(400).json({
         success: false,
         error: {
           code: "REASON_REQUIRED",
-          message: "A removal reason of at least 3 characters is mandatory when removing an attachment.",
+          message: "A removal reason of 3 to 500 characters is mandatory when removing an attachment.",
         },
       });
     }
