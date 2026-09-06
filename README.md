@@ -1,63 +1,73 @@
-# TokTickIT
+# TokTickIT - IT Service Ticketing System
+
+**Lab 2: Requester Ticketing MVP with UI Foundation & Zen Green Theme**
+
+TokTickIT เป็นระบบจัดการและรับเรื่องแจ้งปัญหาบริการเทคโนโลยีสารสนเทศ (IT Service Desk) สำหรับองค์กร พัฒนาโดยมุ่งเน้นสถาปัตยกรรมที่สะอาด ปลอดภัย และยึดหลัก **Zen Green Design Language**
+
+---
 
 ## Prerequisites
-- Node.js
-- Docker Desktop (for PostgreSQL)
+
+- **Node.js:** v18 หรือใหม่กว่า (แนะนำ Node.js LTS)
+- **Docker Desktop:** สำหรับรันฐานข้อมูล PostgreSQL
+- **Git**
+
+---
 
 ## Setup Instructions
 
-### 1. Database Setup
-สร้างฐานข้อมูล PostgreSQL ของคุณ
+### 1. Database Setup (PostgreSQL)
+เริ่มต้นรัน PostgreSQL container ผ่าน Docker หรือใช้ PostgreSQL instance ในเครื่องของคุณ
 
-### 2. สร้าง .env
-client
-- ก็อปปี้ไฟล์ .env.example แล้วเปลี่ยนชื่อเป็น .env
+### Environment Variables Configuration (`.env`)
 
-server
-- ก็อปปี้ไฟล์ .env.example แล้วเปลี่ยนชื่อเป็น .env
-- แล้วแก้ค่า DATABASE_URL ให้เป็นของคุณ
+#### Server Configuration
+สร้างไฟล์ `server/.env` โดยคัดลอกและปรับแก้จากไฟล์ `server/.env.example` (ห้าม Commit ไฟล์ .env ขึ้น Git เด็ดขาด)
 
-### 3. เตรียมฐานข้อมูล (Database Migration & Seeding)
-เปิด terminal ใหม่ เข้าไปที่โฟลเดอร์ server
+#### Client Configuration
+สร้างไฟล์ `client/.env` โดยคัดลอกและปรับแก้จากไฟล์ `client/.env.example`
+
+### Database Migration & Idempotent Seeding
+รันคำสั่ง Migration และ Seed ข้อมูลตั้งต้นสำหรับ Lab 2 (Categories, Related Systems, Development Requesters ทั้ง Active และ Inactive):
 ```bash
-cd server
+# ติดตั้ง Dependencies และรัน Prisma Migration & Seed
 npm install
-npx prisma migrate dev
-npx prisma db seed
+npm install --prefix server
+npm install --prefix client
+npm run prisma:migrate --prefix server
+npm run prisma:seed --prefix server
 ```
-*(จะทำการสร้างตาราง Category และใส่ข้อมูลเริ่มต้น 4 รายการ)*
 
-สามารถดูข้อมูลได้โดย
+*(สามารถเปิดตรวจสอบข้อมูลในฐานข้อมูลได้ด้วยคำสั่ง `npx prisma studio --schema server/prisma/schema.prisma`)*
+
+---
+
+## Running the Application
+
+### Start Backend Server (Port 3000)
 ```bash
-npx prisma studio
+npm run dev --prefix server
 ```
-แล้วจะเข้าหน้าเว็บให้ทันที
+*API Base URL: `http://localhost:3000/api`*
 
-### 4. การรัน Backend (Server)
-เปิด terminal ใหม่
+### Start Frontend Client (Port 5173)
 ```bash
-cd server
-npm install
-npm run dev
+npm run dev --prefix client
 ```
+*Web Application URL: `http://localhost:5173`*
 
-สำหรับทดสอบ backend ใช้คำสั่ง
+---
+
+## Testing Suites
+
+โปรเจกต์รองรับการทดสอบครบ 5 ระดับ (Unit, API Integration, UI Component, Responsive Visual, และ E2E):
+
+### 1. Run Unit & Component Tests
 ```bash
 npm test
 ```
 
-### 5. การรัน Frontend (Client)
-เปิด terminal ใหม่
+### 2. Run End-to-End & Responsive Visual Tests (Playwright)
 ```bash
-cd client
-npm install
-npm run dev
+npm run test:e2e
 ```
-
-สำหรับทดสอบ frontend ใช้คำสั่ง
-```bash
-npm test
-```
-
-### 6. เข้าใช้งาน
-เข้าใช้งานผ่าน http://localhost:5173/

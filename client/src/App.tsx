@@ -1,61 +1,143 @@
-import { useState } from "react";
-import { checkSystem, Category } from "./api.js";
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation } from "react-router-dom";
+import { RequesterProvider, useRequester } from "./context/RequesterContext.js";
+import { GlobalErrorProvider } from "./context/GlobalErrorContext.js";
+import { AppHeader } from "./components/AppHeader.js";
+import { RequesterSelector } from "./components/RequesterSelector.js";
+import { CreateTicket } from "./components/CreateTicket.js";
+import { MyTickets } from "./components/MyTickets.js";
+import { RequesterTicketDetail } from "./components/RequesterTicketDetail.js";
+import { GlobalErrorBanner } from "./components/GlobalErrorBanner.js";
+import "./theme.css";
 
-// UI states you must handle for Issue 4: idle, loading, success, error.
-type UiState = "idle" | "loading" | "success" | "error";
+function TicketDetailWrapper() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const ticketId = Number(id);
 
-export default function App() {
-  const [state, setState] = useState<UiState>("idle");
-  const [categories, setCategories] = useState<Category[]>([]);
-  void categories;
-
-  async function handleCheck() {
-    setState("loading");
-    try {
-      const response = await checkSystem();
-      if (response && response.online) {
-        setCategories(response.categories);
-        setState("success");
-      } else {
-        setState("error");
-      }
-    } catch (error) {
-      setState("error");
-    }
+  if (isNaN(ticketId)) {
+    return (
+      <div className="zen-container" style={{ padding: "var(--space-xl) var(--space-base)" }}>
+        <button
+          type="button"
+          onClick={() => navigate("/tickets")}
+          className="zen-btn zen-btn-secondary"
+          style={{ marginBottom: "var(--space-md)" }}
+        >
+          ← Back to My Tickets
+        </button>
+        <div className="zen-alert-error" role="alert">
+          Invalid ticket ID.
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container py-5" style={{ maxWidth: 640 }}>
-      <h1 className="h3 mb-4">
-        TokTickIT <span className="text-success">IT Service Desk</span>
-      </h1>
+    <RequesterTicketDetail
+      ticketId={ticketId}
+      onBack={() => navigate("/tickets")}
+    />
+  );
+}
 
-      <button className="btn btn-success mb-4" onClick={handleCheck} disabled={state === "loading"}>
-        {state === "loading" ? "Loading…" : "Check System"}
-      </button>
+function MainApp() {
+  const { currentRequester } = useRequester();
+  const [showSelectorModal, setShowSelectorModal] = useState<boolean>(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-      {state === "success" && (
-        <div className="card">
-          <div className="card-body">
-            <h5 className="card-title">System Status: Online</h5>
-            <h6 className="mt-4 mb-3">Supported Request Categories</h6>
-            <ol className="mb-0">
-              {categories.map((category) => (
-                <li key={category.id}>{category.name}</li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      )}
+  const currentTab = location.pathname.includes("create")
+    ? "create-ticket"
+    : "my-tickets";
 
-      {state === "error" && (
-        <div className="card text-white bg-danger">
-          <div className="card-body">
-            <h5 className="card-title">System Status: Offline</h5>
-            <p className="card-text mb-0">Unable to connect to TokTickIT API</p>
-          </div>
-        </div>
-      )}
+  // If no requester selected or explicitly changing, show selector
+  if (!currentRequester || showSelectorModal) {
+    return (
+      <div>
+        <AppHeader
+          currentTab={currentTab}
+          onSelectTab={(tab) => {
+            if (tab === "create-ticket") navigate("/tickets/create");
+            else navigate("/tickets");
+          }}
+          onChangeRequester={() => setShowSelectorModal(true)}
+        />
+        <GlobalErrorBanner />
+        <RequesterSelector
+          onSuccess={() => {
+            setShowSelectorModal(false);
+            navigate("/tickets");
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <AppHeader
+        currentTab={currentTab}
+        onSelectTab={(tab) => {
+          if (tab === "create-ticket") navigate("/tickets/create");
+          else navigate("/tickets");
+        }}
+        onChangeRequester={() => setShowSelectorModal(true)}
+      />
+      <GlobalErrorBanner />
+
+      <main>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <MyTickets
+                onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+                onNavigateCreate={() => navigate("/tickets/create")}
+              />
+            }
+          />
+          <Route
+            path="/tickets"
+            element={
+              <MyTickets
+                onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+                onNavigateCreate={() => navigate("/tickets/create")}
+              />
+            }
+          />
+          <Route
+            path="/tickets/create"
+            element={
+              <CreateTicket
+                onCancel={() => navigate("/tickets")}
+              />
+            }
+          />
+          <Route path="/tickets/:id" element={<TicketDetailWrapper />} />
+          <Route
+            path="*"
+            element={
+              <MyTickets
+                onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+                onNavigateCreate={() => navigate("/tickets/create")}
+              />
+            }
+          />
+        </Routes>
+      </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <GlobalErrorProvider>
+        <RequesterProvider>
+          <MainApp />
+        </RequesterProvider>
+      </GlobalErrorProvider>
+    </BrowserRouter>
   );
 }

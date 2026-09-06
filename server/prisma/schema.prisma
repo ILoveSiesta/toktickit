@@ -1,5 +1,5 @@
-// Prisma schema — datasource and generator are pre-wired.
-// Your DATABASE_URL lives in server/.env (copy it from .env.example).
+// Prisma schema for TokTickIT Lab 2
+// Your DATABASE_URL lives in server/.env
 
 generator client {
   provider = "prisma-client-js"
@@ -10,18 +10,101 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ---------------------------------------------------------------------------
-// Issue 3 — Create and seed IT request categories
-// Define a Category model with:
-//   id        Int      @id @default(autoincrement())
-//   name      String   @unique
-//   createdAt DateTime @default(now())
-// Then run:  npx prisma migrate dev --name init
-// TODO(Issue 3): add the Category model below.
-// ---------------------------------------------------------------------------
+enum PriorityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TicketStatus {
+  NEW
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model RequesterUser {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  department String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tickets Ticket[]
+
+  @@map("requester_users")
+}
 
 model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+
+  tickets Ticket[]
+
+  @@map("categories")
+}
+
+model RelatedSystem {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  tickets Ticket[]
+
+  @@map("related_systems")
+}
+
+model Ticket {
+  id                Int            @id @default(autoincrement())
+  ticketNumber      String         @unique
+  summary           String
+  description       String
+  requestedPriority PriorityLevel
+  itPriority        PriorityLevel? @default(MEDIUM)
+  currentStatus     TicketStatus   @default(NEW)
+  ticketOwner       String?
+  ticketDate        DateTime       @default(now())
+
+  requesterId Int
+  requester   RequesterUser @relation(fields: [requesterId], references: [id])
+
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  relatedSystemId Int
+  relatedSystem   RelatedSystem @relation(fields: [relatedSystemId], references: [id])
+
+  attachments Attachment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([requesterId, createdAt(sort: Desc)])
+  @@index([currentStatus])
+  @@map("tickets")
+}
+
+model Attachment {
+  id               Int       @id @default(autoincrement())
+  ticketId         Int
+  ticket           Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  originalFileName String
+  storageFileName  String
+  fileSize         Int
+  fileType         String
+  storagePath      String
+  isRemoved        Boolean   @default(false)
+  removedAt        DateTime?
+  removalReason    String?
+  uploadedAt       DateTime  @default(now())
+
+  @@index([ticketId, isRemoved])
+  @@map("attachments")
 }
