@@ -34,7 +34,7 @@ TokTickIT เป็นระบบจัดการและรับเรื�
 npm install
 npm install --prefix server
 npm install --prefix client
-npm run prisma:migrate --prefix server
+npm run prisma:deploy --prefix server
 npm run prisma:seed --prefix server
 ```
 

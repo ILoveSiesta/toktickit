@@ -1,24 +1,66 @@
 import React from "react";
+import { useAuth } from "../context/AuthContext.js";
 import { useRequester } from "../context/RequesterContext.js";
 
 interface AppHeaderProps {
-  currentTab?: "my-tickets" | "create-ticket";
-  onSelectTab?: (tab: "my-tickets" | "create-ticket") => void;
+  currentTab?: "my-tickets" | "create-ticket" | "queue" | "admin-users";
+  onSelectTab?: (tab: "my-tickets" | "create-ticket" | "queue" | "admin-users") => void;
   onChangeRequester?: () => void;
+  onLogout?: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
   currentTab = "my-tickets",
   onSelectTab,
   onChangeRequester,
+  onLogout,
 }) => {
-  const { currentRequester, clearRequester } = useRequester();
+  const { user, logout } = useAuth();
+  let requesterContext: any = null;
+  try {
+    requesterContext = useRequester();
+  } catch {}
+
+  const handleLogout = async () => {
+    if (onLogout) {
+      onLogout();
+    } else {
+      await logout();
+    }
+  };
 
   const handleChangeRequester = () => {
     if (onChangeRequester) {
       onChangeRequester();
     } else {
-      clearRequester();
+      requesterContext?.clearRequester();
+    }
+  };
+
+  const displayName = user?.name || requesterContext?.currentRequester?.name;
+  const userRole = user?.role || "REQUESTER";
+
+  const getRoleBadgeStyle = (role: string) => {
+    switch (role) {
+      case "IT_STAFF":
+        return {
+          backgroundColor: "#DCFCE7",
+          color: "#15803D",
+          border: "1px solid #86EFAC",
+        };
+      case "ADMINISTRATOR":
+        return {
+          backgroundColor: "#EDE9FE",
+          color: "#6D28D9",
+          border: "1px solid #DDD6FE",
+        };
+      case "REQUESTER":
+      default:
+        return {
+          backgroundColor: "#E0F2FE",
+          color: "#0369A1",
+          border: "1px solid #BAE6FD",
+        };
     }
   };
 
@@ -44,7 +86,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           gap: "var(--space-sm)",
         }}
       >
-        {/* Left: Brand & Nav */}
+        {/* Left: Brand & Role-Based Navigation */}
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-md)", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)" }}>
             <span style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.5px" }}>
@@ -53,43 +95,106 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </div>
 
           <nav style={{ display: "flex", gap: "var(--space-xs)", flexWrap: "wrap" }}>
-            <button
-              onClick={() => onSelectTab && onSelectTab("my-tickets")}
-              style={{
-                background: currentTab === "my-tickets" ? "var(--color-secondary-green)" : "transparent",
-                color: "#FFFFFF",
-                border: "none",
-                padding: "6px 10px",
-                borderRadius: "var(--radius-sm)",
-                fontWeight: 500,
-                fontSize: "var(--font-size-body)",
-                cursor: "pointer",
-              }}
-            >
-              My Tickets
-            </button>
-            <button
-              onClick={() => onSelectTab && onSelectTab("create-ticket")}
-              style={{
-                background: currentTab === "create-ticket" ? "var(--color-secondary-green)" : "transparent",
-                color: "#FFFFFF",
-                border: "none",
-                padding: "6px 10px",
-                borderRadius: "var(--radius-sm)",
-                fontWeight: 500,
-                fontSize: "var(--font-size-body)",
-                cursor: "pointer",
-              }}
-            >
-              + Create Ticket
-            </button>
+            {userRole === "REQUESTER" && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => onSelectTab && onSelectTab("my-tickets")}
+                  style={{
+                    background: currentTab === "my-tickets" ? "var(--color-secondary-green)" : "transparent",
+                    color: "#FFFFFF",
+                    border: "none",
+                    padding: "6px 10px",
+                    borderRadius: "var(--radius-sm)",
+                    fontWeight: 500,
+                    fontSize: "var(--font-size-body)",
+                    cursor: "pointer",
+                  }}
+                >
+                  My Tickets
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSelectTab && onSelectTab("create-ticket")}
+                  style={{
+                    background: currentTab === "create-ticket" ? "var(--color-secondary-green)" : "transparent",
+                    color: "#FFFFFF",
+                    border: "none",
+                    padding: "6px 10px",
+                    borderRadius: "var(--radius-sm)",
+                    fontWeight: 500,
+                    fontSize: "var(--font-size-body)",
+                    cursor: "pointer",
+                  }}
+                >
+                  + Create Ticket
+                </button>
+              </>
+            )}
+
+            {userRole === "IT_STAFF" && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => onSelectTab && onSelectTab("queue")}
+                  style={{
+                    background: currentTab === "queue" ? "var(--color-secondary-green)" : "transparent",
+                    color: "#FFFFFF",
+                    border: "none",
+                    padding: "6px 10px",
+                    borderRadius: "var(--radius-sm)",
+                    fontWeight: 500,
+                    fontSize: "var(--font-size-body)",
+                    cursor: "pointer",
+                  }}
+                >
+                  📋 My Queue
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSelectTab && onSelectTab("create-ticket")}
+                  style={{
+                    background: currentTab === "create-ticket" ? "var(--color-secondary-green)" : "transparent",
+                    color: "#FFFFFF",
+                    border: "none",
+                    padding: "6px 10px",
+                    borderRadius: "var(--radius-sm)",
+                    fontWeight: 500,
+                    fontSize: "var(--font-size-body)",
+                    cursor: "pointer",
+                  }}
+                >
+                  + Create Ticket
+                </button>
+              </>
+            )}
+
+            {userRole === "ADMINISTRATOR" && (
+              <button
+                type="button"
+                onClick={() => onSelectTab && onSelectTab("admin-users")}
+                style={{
+                  background: currentTab === "admin-users" ? "var(--color-secondary-green)" : "transparent",
+                  color: "#FFFFFF",
+                  border: "none",
+                  padding: "6px 10px",
+                  borderRadius: "var(--radius-sm)",
+                  fontWeight: 500,
+                  fontSize: "var(--font-size-body)",
+                  cursor: "pointer",
+                }}
+              >
+                ⚙️ User Management
+              </button>
+            )}
           </nav>
         </div>
 
-        {/* Right: Requester info & Change Action */}
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)", flexWrap: "wrap" }}>
-          {currentRequester ? (
+        {/* Right: User identity, Role badge, and Actions */}
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", flexWrap: "wrap" }}>
+          {displayName ? (
             <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)", flexWrap: "wrap" }}>
+              {/* User Name */}
               <span
                 style={{
                   fontSize: "var(--font-size-xs)",
@@ -102,28 +207,71 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                 }}
-                data-testid="requester-name-display"
-                title={currentRequester.name}
+                data-testid="user-name-display"
+                data-test-requester={displayName}
+                id="header-user-display"
+                title={displayName}
               >
-                👤 {currentRequester.name}
+                👤 <span data-testid="requester-name-display">{displayName}</span>
               </span>
+
+              {/* Role Badge */}
+              <span
+                data-testid="user-role-badge"
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  ...getRoleBadgeStyle(userRole),
+                }}
+              >
+                {userRole.replace("_", " ")}
+              </span>
+
+              {/* Change Requester button - only rendered if onChangeRequester prop is provided (e.g. in Lab 2 tests) */}
+              {onChangeRequester && (
+                <button
+                  type="button"
+                  onClick={handleChangeRequester}
+                  className="zen-btn zen-btn-secondary"
+                  style={{
+                    color: "#FFFFFF",
+                    borderColor: "rgba(255, 255, 255, 0.3)",
+                    background: "rgba(255, 255, 255, 0.1)",
+                    fontSize: "var(--font-size-xs)",
+                    padding: "4px 8px",
+                    minHeight: "30px",
+                  }}
+                  data-testid="change-requester-btn"
+                >
+                  Change Requester
+                </button>
+              )}
+
+              {/* Logout Button */}
               <button
-                onClick={handleChangeRequester}
-                className="zen-btn zen-btn-tertiary"
+                type="button"
+                onClick={handleLogout}
+                className="zen-btn zen-btn-secondary"
                 style={{
                   color: "#FFFFFF",
+                  borderColor: "rgba(255, 255, 255, 0.3)",
+                  background: "rgba(255, 255, 255, 0.1)",
                   fontSize: "var(--font-size-xs)",
-                  padding: "4px 6px",
-                  minHeight: "32px",
+                  padding: "4px 8px",
+                  minHeight: "30px",
                 }}
-                data-testid="change-requester-btn"
+                data-testid="logout-btn"
               >
-                Change Requester
+                Sign Out
               </button>
             </div>
           ) : (
             <span style={{ fontSize: "var(--font-size-xs)", opacity: 0.8 }}>
-              No requester selected
+              Not signed in
             </span>
           )}
         </div>

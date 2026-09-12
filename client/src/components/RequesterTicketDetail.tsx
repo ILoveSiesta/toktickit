@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useAuth } from "../context/AuthContext.js";
 import { useRequester } from "../context/RequesterContext.js";
 import { fetchTicketDetail, uploadTicketAttachments, removeAttachment, downloadAttachment } from "../api.js";
 
@@ -8,7 +9,15 @@ interface RequesterTicketDetailProps {
 }
 
 export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ticketId, onBack }) => {
-  const { currentRequester } = useRequester();
+  const { user } = useAuth();
+  let requesterContext: any = null;
+  try {
+    requesterContext = useRequester();
+  } catch {}
+
+  const currentRequester = useMemo(() => {
+    return (user ? { id: user.id, name: user.name, email: user.email, isActive: true } : null) || requesterContext?.currentRequester;
+  }, [user?.id, user?.name, user?.email, requesterContext?.currentRequester]);
 
   const [ticket, setTicket] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -25,19 +34,24 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
   const [uploadLoading, setUploadLoading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  const requesterId = currentRequester?.id;
+
   const loadTicket = useCallback(async () => {
-    if (!currentRequester) return;
+    if (!requesterId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchTicketDetail(ticketId, currentRequester.id);
+      const data = await fetchTicketDetail(ticketId, requesterId);
       setTicket(data);
     } catch (err: any) {
       setError(err.message || "Failed to load ticket details");
     } finally {
       setLoading(false);
     }
-  }, [ticketId, currentRequester]);
+  }, [ticketId, requesterId]);
 
   useEffect(() => {
     loadTicket();

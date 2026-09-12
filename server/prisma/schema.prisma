@@ -1,4 +1,4 @@
-// Prisma schema for TokTickIT Lab 2
+// Prisma schema for TokTickIT Lab 3
 // Your DATABASE_URL lives in server/.env
 
 generator client {
@@ -8,6 +8,12 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  REQUESTER
+  IT_STAFF
+  ADMINISTRATOR
 }
 
 enum PriorityLevel {
@@ -21,22 +27,31 @@ enum TicketStatus {
   NEW
   OPEN
   IN_PROGRESS
+  WAITING_FOR_REQUESTER
   RESOLVED
   CLOSED
+  REOPENED
+  CANCELLED
 }
 
-model RequesterUser {
-  id         Int      @id @default(autoincrement())
-  name       String
-  email      String   @unique
-  department String?
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model User {
+  id                 Int       @id @default(autoincrement())
+  email              String    @unique
+  passwordHash       String
+  name               String
+  role               Role      @default(REQUESTER)
+  department         String?
+  isActive           Boolean   @default(true)
+  mustChangePassword Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  tickets Ticket[]
+  submittedTickets Ticket[]       @relation("TicketRequester")
+  assignedTickets  Ticket[]       @relation("TicketOwner")
+  comments         Comment[]
+  internalNotes    InternalNote[]
 
-  @@map("requester_users")
+  @@map("users")
 }
 
 model Category {
@@ -69,11 +84,14 @@ model Ticket {
   requestedPriority PriorityLevel
   itPriority        PriorityLevel? @default(MEDIUM)
   currentStatus     TicketStatus   @default(NEW)
-  ticketOwner       String?
   ticketDate        DateTime       @default(now())
+  resolvedIndicated Boolean        @default(false)
 
   requesterId Int
-  requester   RequesterUser @relation(fields: [requesterId], references: [id])
+  requester   User @relation("TicketRequester", fields: [requesterId], references: [id])
+
+  ticketOwnerId Int?
+  ticketOwner   User? @relation("TicketOwner", fields: [ticketOwnerId], references: [id])
 
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
@@ -81,13 +99,17 @@ model Ticket {
   relatedSystemId Int
   relatedSystem   RelatedSystem @relation(fields: [relatedSystemId], references: [id])
 
-  attachments Attachment[]
+  attachments   Attachment[]
+  comments      Comment[]
+  internalNotes InternalNote[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([requesterId, createdAt(sort: Desc)])
   @@index([currentStatus])
+  @@index([itPriority])
+  @@index([ticketOwnerId])
   @@map("tickets")
 }
 
@@ -107,4 +129,30 @@ model Attachment {
 
   @@index([ticketId, isRemoved])
   @@map("attachments")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([ticketId, createdAt(sort: Asc)])
+  @@map("comments")
+}
+
+model InternalNote {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([ticketId, createdAt(sort: Asc)])
+  @@map("internal_notes")
 }

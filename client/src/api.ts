@@ -1,10 +1,30 @@
-import { RequesterUser, Category, RelatedSystem, ApiResponse } from "./types/index.js";
+import { RequesterUser, Category, RelatedSystem, ApiResponse, AuthUser } from "./types/index.js";
 
 const rawUrl = import.meta.env.VITE_API_URL || "/api";
 const cleanUrl = rawUrl.replace(/\/$/, "");
 const API_BASE = cleanUrl.endsWith("/api") ? cleanUrl : `${cleanUrl}/api`;
 
 export const GLOBAL_SERVER_ERROR_EVENT = "toktickit:global-server-error";
+
+export function getAuthToken(): string | null {
+  try {
+    return localStorage.getItem("toktickit_auth_token");
+  } catch {
+    return null;
+  }
+}
+
+export function setAuthToken(token: string | null) {
+  try {
+    if (token) {
+      localStorage.setItem("toktickit_auth_token", token);
+    } else {
+      localStorage.removeItem("toktickit_auth_token");
+    }
+  } catch (e) {
+    console.error("Failed to set auth token", e);
+  }
+}
 
 /**
  * Dispatches a global server error event for App-level handling (BR-27)
@@ -24,7 +44,21 @@ export function emitGlobalServerError(message: string) {
  */
 async function fetchWithInterceptor(url: string, options?: RequestInit): Promise<Response> {
   try {
-    const res = await fetch(url, options);
+    const headers = new Headers(options?.headers || {});
+    const token = getAuthToken();
+    if (token && !headers.has("Authorization")) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    const mergedOptions = { ...options, headers };
+    const res = await fetch(url, mergedOptions);
+
+    if (res.status === 401 && !url.includes("/api/auth/login")) {
+      setAuthToken(null);
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        window.dispatchEvent(new CustomEvent("toktickit:unauthorized"));
+      }
+    }
 
     if (res.status >= 500) {
       emitGlobalServerError(
@@ -261,6 +295,69 @@ export interface SystemStatus {
 export async function checkSystem(): Promise<SystemStatus> {
   return { online: true, categories: [] };
 }
+
+export async function loginApi(credentials: {
+  email: string;
+  password: string;
+}): Promise<{ token: string; user: AuthUser }> {
+  const res = await fetchWithInterceptor(`${API_BASE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(credentials),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || "Invalid email or password.";
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function logoutApi(): Promise<void> {
+  try {
+    await fetchWithInterceptor(`${API_BASE}/auth/logout`, {
+      method: "POST",
+    });
+  } finally {
+    setAuthToken(null);
+  }
+}
+
+export async function getMeApi(): Promise<AuthUser> {
+  const res = await fetchWithInterceptor(`${API_BASE}/auth/me`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    throw new Error(data?.error?.message || "Failed to get user profile");
+  }
+  return data.data;
+}
+
+export async function changePasswordApi(payload: {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}): Promise<{ token: string; message: string }> {
+  const res = await fetchWithInterceptor(`${API_BASE}/auth/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || "Failed to change password.";
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.details = data?.error?.details;
+    throw err;
+  }
+  return data.data;
+}
+
 
 
 

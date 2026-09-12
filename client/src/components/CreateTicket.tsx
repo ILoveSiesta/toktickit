@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { fetchCategories, fetchRelatedSystems, createTicket } from "../api.js";
 import { Category, RelatedSystem } from "../types/index.js";
+import { useAuth } from "../context/AuthContext.js";
 import { useRequester } from "../context/RequesterContext.js";
 import { AttachmentSection } from "./AttachmentSection.js";
 
@@ -10,7 +11,15 @@ interface CreateTicketProps {
 }
 
 export const CreateTicket: React.FC<CreateTicketProps> = ({ onTicketCreated, onCancel }) => {
-  const { currentRequester } = useRequester();
+  const { user } = useAuth();
+  let requesterContext: any = null;
+  try {
+    requesterContext = useRequester();
+  } catch {}
+
+  const currentRequester = useMemo(() => {
+    return (user ? { id: user.id, name: user.name, email: user.email, isActive: true } : null) || requesterContext?.currentRequester;
+  }, [user?.id, user?.name, user?.email, requesterContext?.currentRequester]);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [relatedSystems, setRelatedSystems] = useState<RelatedSystem[]>([]);
