@@ -44,8 +44,13 @@ BEGIN
     FROM "requester_users"
     ON CONFLICT ("id") DO NOTHING;
 
-    PERFORM setval('users_id_seq', (SELECT COALESCE(MAX(id), 1) FROM users));
     DROP TABLE "requester_users";
+  END IF;
+
+  IF (SELECT COUNT(*) FROM users) > 0 THEN
+    PERFORM setval('users_id_seq', (SELECT MAX(id) FROM users));
+  ELSE
+    PERFORM setval('users_id_seq', 1, false);
   END IF;
 END $$;
 

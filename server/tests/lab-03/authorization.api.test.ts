@@ -4,6 +4,7 @@ import { app } from "../../src/app.js";
 
 describe("Lab 3 Authorization & RBAC API Tests (API-07 & API-09)", () => {
   let requesterToken: string;
+  let requesterId: number;
   let staffToken: string;
   let adminToken: string;
 
@@ -13,6 +14,7 @@ describe("Lab 3 Authorization & RBAC API Tests (API-07 & API-09)", () => {
       .post("/api/auth/login")
       .send({ email: "jennifer@toktick.it", password: "TokTickIT2026!" });
     requesterToken = reqLogin.body.data.token;
+    requesterId = reqLogin.body.data.user.id;
 
     // 2. Obtain IT Staff token (Alex Thompson)
     const staffLogin = await request(app)
@@ -29,24 +31,25 @@ describe("Lab 3 Authorization & RBAC API Tests (API-07 & API-09)", () => {
 
   // API-07: Direct Requester ID spoofing prevention
   it("API-07: ignores client-supplied requesterId and strictly applies token identity", async () => {
-    // Requester 1 (Jennifer) sends request with spoofed header and body pretending to be Requester 2 (Michael)
+    // Requester (Jennifer) sends request with spoofed header and body pretending to be another requester
+    const spoofedId = requesterId === 1 ? 2 : 1;
     const res = await request(app)
       .post("/api/tickets")
       .set("Authorization", `Bearer ${requesterToken}`)
-      .set("X-Requester-Id", "2") // Spoofed header
+      .set("X-Requester-Id", String(spoofedId)) // Spoofed header
       .field("summary", "Anti-spoofing verification ticket")
       .field("description", "Testing that token identity strictly overrides client-supplied requesterId.")
       .field("categoryId", "1")
       .field("relatedSystemId", "1")
       .field("requestedPriority", "MEDIUM")
-      .field("requesterId", "2"); // Spoofed field
+      .field("requesterId", String(spoofedId)); // Spoofed field
 
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
 
-    // The created ticket's requesterId must match Jennifer (token owner), NOT 2
-    expect(res.body.data.requesterId).toBe(1);
-    expect(res.body.data.requesterId).not.toBe(2);
+    // The created ticket's requesterId must match Jennifer (token owner), NOT spoofedId
+    expect(res.body.data.requesterId).toBe(requesterId);
+    expect(res.body.data.requesterId).not.toBe(spoofedId);
   });
 
   // API-09: Non-Admin requests Admin APIs
