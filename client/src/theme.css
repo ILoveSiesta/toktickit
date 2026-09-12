@@ -265,6 +265,45 @@ body {
 /* Responsive Table vs Card Layout (BR-16 / UI Spec) */
 .zen-table-responsive-desktop {
   display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.zen-table {
+  width: 100%;
+  min-width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  background-color: var(--color-surface);
+}
+
+.zen-table th {
+  background-color: #F8FAFC;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-neutral);
+  white-space: nowrap;
+}
+
+.zen-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border-neutral);
+  font-size: var(--font-size-body);
+  vertical-align: middle;
+}
+
+.zen-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.zen-table tbody tr:hover {
+  background-color: var(--color-pale-green);
+}
+
+.zen-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .zen-card-responsive-mobile {
