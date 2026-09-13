@@ -9,6 +9,7 @@ import { validateAttachment } from "./utils/attachmentValidator.js";
 import { generateSafeStorageFileName } from "./utils/safeStorageName.js";
 import { PriorityLevel, Role } from "@prisma/client";
 import { authRouter } from "./routes/auth.js";
+import { staffRouter } from "./routes/staff.js";
 import { authenticate, requireRole, enforcePasswordChanged } from "./middleware/auth.js";
 import { verifyToken } from "./utils/jwt.js";
 
@@ -41,6 +42,9 @@ app.get("/api/health", (_req: Request, res: Response) => {
 
 // Authentication Routes (Lab 3 Issue 2)
 app.use("/api/auth", authRouter);
+
+// Staff Workspace Routes (Lab 3 Issue 3)
+app.use("/api/staff", staffRouter);
 
 // Administrator Routes (Protected with RBAC & BR-02 password change enforcement)
 app.get("/api/admin/users", authenticate, enforcePasswordChanged, requireRole(Role.ADMINISTRATOR), async (_req: Request, res: Response) => {

@@ -1,4 +1,12 @@
-import { RequesterUser, Category, RelatedSystem, ApiResponse, AuthUser } from "./types/index.js";
+import {
+  RequesterUser,
+  Category,
+  RelatedSystem,
+  ApiResponse,
+  AuthUser,
+  StaffQueueQueryParams,
+  StaffQueueResponse,
+} from "./types/index.js";
 
 const rawUrl = import.meta.env.VITE_API_URL || "/api";
 const cleanUrl = rawUrl.replace(/\/$/, "");
@@ -358,6 +366,44 @@ export async function changePasswordApi(payload: {
   return data.data;
 }
 
+export async function fetchStaffTicketQueue(
+  params: StaffQueueQueryParams = {}
+): Promise<StaffQueueResponse> {
+  const query = new URLSearchParams();
+  if (params.search) query.set("search", params.search);
+  if (params.category !== undefined && params.category !== "") query.set("category", String(params.category));
+  if (params.status) query.set("status", params.status);
+  if (params.requestedPriority) query.set("requestedPriority", params.requestedPriority);
+  if (params.itPriority) query.set("itPriority", params.itPriority);
+  if (params.assigned) query.set("assigned", params.assigned);
+  if (params.sortBy) query.set("sortBy", params.sortBy);
+  if (params.sortOrder) query.set("sortOrder", params.sortOrder);
+  if (params.page) query.set("page", String(params.page));
+  if (params.limit) query.set("limit", String(params.limit));
 
+  const queryString = query.toString();
+  const url = `${API_BASE}/staff/tickets${queryString ? `?${queryString}` : ""}`;
 
+  const res = await fetchWithInterceptor(url);
+  const data = await res.json().catch(() => ({}));
 
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to fetch staff queue (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+
+  return {
+    items: data.data || [],
+    pagination: data.pagination || {
+      page: params.page || 1,
+      limit: params.limit || 10,
+      totalItems: data.data?.length || 0,
+      totalPages: 1,
+      hasNext: false,
+      hasPrev: false,
+    },
+  };
+}
