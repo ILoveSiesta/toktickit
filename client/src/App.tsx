@@ -10,6 +10,7 @@ import { RequesterTicketDetail } from "./components/RequesterTicketDetail.js";
 import { GlobalErrorBanner } from "./components/GlobalErrorBanner.js";
 import { Login } from "./components/Login.js";
 import { ChangePassword } from "./components/ChangePassword.js";
+import { StaffTicketQueue } from "./components/StaffTicketQueue.js";
 import "./theme.css";
 
 function TicketDetailWrapper() {
@@ -194,6 +195,17 @@ function LoginRoute() {
   );
 }
 
+function RootRedirect() {
+  const { user } = useAuth();
+  if (user?.role === "ADMINISTRATOR") {
+    return <Navigate to="/admin/users" replace />;
+  }
+  if (user?.role === "IT_STAFF") {
+    return <Navigate to="/queue" replace />;
+  }
+  return <Navigate to="/tickets" replace />;
+}
+
 function MainApp() {
   const { isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -223,7 +235,15 @@ function MainApp() {
       <Route path="/login" element={<LoginRoute />} />
       <Route path="/change-password" element={<ChangePasswordRoute />} />
       <Route element={<ProtectedLayout />}>
-        <Route path="/" element={<Navigate to="/tickets" replace />} />
+        <Route path="/" element={<RootRedirect />} />
+        <Route
+          path="/queue"
+          element={
+            <StaffTicketQueue
+              onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+            />
+          }
+        />
         <Route
           path="/tickets"
           element={
@@ -243,7 +263,7 @@ function MainApp() {
           }
         />
         <Route path="/tickets/:id" element={<TicketDetailWrapper />} />
-        <Route path="*" element={<Navigate to="/tickets" replace />} />
+        <Route path="*" element={<RootRedirect />} />
       </Route>
     </Routes>
   );
