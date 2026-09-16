@@ -105,7 +105,7 @@ Token ประกอบด้วย Claims ที่จำเป็นสำห
 | | `GET /api/auth/me` | Allowed | Allowed | Allowed |
 | | `POST /api/auth/change-password` | Allowed | Allowed | Allowed |
 | **Requester Tickets** | `GET /api/tickets` | Owned only | Blocked (use Queue) | Blocked (use Queue) |
-| | `POST /api/tickets` | Allowed | Allowed (as creator) | Allowed (as creator) |
+| | `POST /api/tickets` | Allowed | Blocked (403) | Blocked (403) |
 | | `GET /api/tickets/:id` | Owned only | Allowed | Allowed |
 | | `POST /api/tickets/:id/resolve-indication` | Owned only | Blocked | Blocked |
 | **Attachments** | `GET /api/attachments/:id/download` | Owned only | Allowed | Allowed |

@@ -223,12 +223,12 @@ describe("UI-03: StaffTicketQueue Table & Filters Component Tests", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("pagination-bar")).toBeInTheDocument();
-      expect(screen.getByTestId("page-btn-2")).toBeInTheDocument();
+      expect(screen.getByText(/Page 1 of 3/i)).toBeInTheDocument();
       expect(screen.getByTestId("next-page")).toBeInTheDocument();
     });
 
-    // Click page 2
-    await userEvent.click(screen.getByTestId("page-btn-2"));
+    // Click next page
+    await userEvent.click(screen.getByTestId("next-page"));
 
     await waitFor(() => {
       expect(queueSpy).toHaveBeenCalledWith(

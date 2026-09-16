@@ -85,4 +85,35 @@ describe("Lab 3 Authorization & RBAC API Tests (API-07 & API-09)", () => {
     expect(adminRes.body.success).toBe(true);
     expect(Array.isArray(adminRes.body.data)).toBe(true);
   });
+
+  // Role Restriction: Only Requesters are permitted to create tickets
+  it("blocks IT Staff and Administrator from creating tickets with 403 Forbidden", async () => {
+    // IT Staff attempt
+    const staffRes = await request(app)
+      .post("/api/tickets")
+      .set("Authorization", `Bearer ${staffToken}`)
+      .field("summary", "IT Staff attempting to create ticket")
+      .field("description", "This should be strictly blocked by RBAC.")
+      .field("categoryId", "1")
+      .field("relatedSystemId", "1")
+      .field("requestedPriority", "MEDIUM");
+
+    expect(staffRes.status).toBe(403);
+    expect(staffRes.body.success).toBe(false);
+    expect(staffRes.body.error.code).toBe("FORBIDDEN");
+
+    // Administrator attempt
+    const adminRes = await request(app)
+      .post("/api/tickets")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .field("summary", "Admin attempting to create ticket")
+      .field("description", "This should be strictly blocked by RBAC.")
+      .field("categoryId", "1")
+      .field("relatedSystemId", "1")
+      .field("requestedPriority", "MEDIUM");
+
+    expect(adminRes.status).toBe(403);
+    expect(adminRes.body.success).toBe(false);
+    expect(adminRes.body.error.code).toBe("FORBIDDEN");
+  });
 });

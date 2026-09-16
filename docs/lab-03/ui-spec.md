@@ -62,8 +62,8 @@
 ```
 [ TikTickIT Logo ]    [ Nav Links ตาม Role ]                    [ User Profile & Menu ]
                      - Requester: [My Tickets] [Create Ticket]   Michael Brown [IT Staff] ▼
-                     - IT Staff:  [My Queue]   [Create Ticket]   - Change Password
-                     - Admin:     [Admin Users]                  - Sign Out
+                     - IT Staff:  [My Queue]                     - Change Password
+                     - Admin:     [My Queue]   [Admin Users]     - Sign Out
 ```
 
 * **Header Background:** `#006B3C` (Zen Primary Green)
@@ -110,7 +110,7 @@
 
 * **Header Continuity:** ตัด Requester Selector เก่าออก โดยแสดงตัวตนของผู้ใช้ที่ล็อกอินอยู่ในปัจจุบัน
 * **Ticket Detail Modifications:**
-  * เพิ่มปุ่มดำเนินการ **"Problem Appears Resolved"** (ปุ่มโทนสีเขียวอ่อนขอบเข้ม) บริเวณส่วนหัวของตั๋ว หากตั๋วอยู่ในสถานะ `IN_PROGRESS` หรือ `WAITING_FOR_REQUESTER` เพื่อให้ผู้ร้องขอกดแจ้งเตือนเจ้าหน้าที่
+  * เพิ่มปุ่มดำเนินการ **"Problem Appears Resolved"** (ปุ่มโทนสีเขียวอ่อนขอบเข้ม) บริเวณส่วนหัวของตั๋วเคียงข้างปุ่ม Back (Top Action Bar) หากตั๋วอยู่ในสถานะ `IN_PROGRESS`, `WAITING_FOR_REQUESTER` หรือ `OPEN` เพื่อให้ผู้ร้องขอกดแจ้งเตือนเจ้าหน้าที่อย่างชัดเจนและไม่สับสนกับ Badge แสดงสถานะ
   * **Public Comments Section:** แถบแสดงประวัติการสื่อสารสาธารณะ:
     * แสดง Avatar วงกลมระบุอักษรย่อชื่อผู้โพสต์ (เช่น `JA` สำหรับ Jennifer Anderson)
     * ป้ายกำกับบทบาท (`Requester`, `IT Staff`) ข้างชื่อผู้เขียน
@@ -138,9 +138,10 @@
     7. `Status` (Badge แสดงสถานะตั๋ว)
     8. `Owner` (ชื่อเจ้าหน้าที่ หรือข้อความตัวเอียงสีเทา `Unassigned`)
   * **Hover Effect:** แถวของตารางจะเปลี่ยนเป็นสีเขียวอ่อนมาก (`#F0FDF4`) เมื่อวางเมาส์
-* **Pagination Bar:**
-  * ปุ่ม `< Previous` และ `Next >`
-  * หมายเลขหน้า `1`, `2`, `3`, ..., `9` โดยหน้าที่เลือกจะแสดงเป็นปุ่มสีเขียวเข้มตัวอักษรขาว
+* **Pagination Controls (Card Footer):**
+  * ผนวกเป็นแถบด้านล่างของการ์ดตาราง (Card Footer) ด้วยพื้นหลัง `#FAFCFB` และเส้นขอบบน `1px solid var(--color-border-neutral)` สอดคล้องกับหน้า My Tickets (Design Consistency)
+  * **ฝั่งซ้าย:** แสดงข้อความระบุจำนวนรายการ `Showing {start} - {end} of {total} tickets`
+  * **ฝั่งขวา:** ปุ่ม `Previous`, ข้อความระบุหน้าปัจจุบัน `Page {page} of {totalPages}`, และปุ่ม `Next`
 * **Mobile Layout (< 768px):** ตารางจะปรับเปลี่ยนเป็นการ์ดข้อมูลแนวตั้ง (Stacked Cards) แสดงหมายเลขตั๋วและ Status Badge ด้านบน ตามด้วย Summary และรายละเอียดสำคัญในรูปแบบ Badge เพื่อให้อ่านง่ายบนจอมือถือ
 
 ---

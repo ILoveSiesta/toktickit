@@ -7,6 +7,7 @@ import { AppHeader } from "./components/AppHeader.js";
 import { CreateTicket } from "./components/CreateTicket.js";
 import { MyTickets } from "./components/MyTickets.js";
 import { RequesterTicketDetail } from "./components/RequesterTicketDetail.js";
+import { StaffTicketDetail } from "./components/StaffTicketDetail.js";
 import { GlobalErrorBanner } from "./components/GlobalErrorBanner.js";
 import { Login } from "./components/Login.js";
 import { ChangePassword } from "./components/ChangePassword.js";
@@ -15,6 +16,7 @@ import "./theme.css";
 
 function TicketDetailWrapper() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const ticketId = Number(id);
 
@@ -23,16 +25,25 @@ function TicketDetailWrapper() {
       <div className="zen-container" style={{ padding: "var(--space-xl) var(--space-base)" }}>
         <button
           type="button"
-          onClick={() => navigate("/tickets")}
+          onClick={() => navigate(user?.role === "IT_STAFF" ? "/queue" : "/tickets")}
           className="zen-btn zen-btn-secondary"
           style={{ marginBottom: "var(--space-md)" }}
         >
-          ← Back to My Tickets
+          ← Back
         </button>
         <div className="zen-alert-error" role="alert">
           Invalid ticket ID.
         </div>
       </div>
+    );
+  }
+
+  if (user?.role === "IT_STAFF" || user?.role === "ADMINISTRATOR") {
+    return (
+      <StaffTicketDetail
+        ticketId={ticketId}
+        onBack={() => navigate("/queue")}
+      />
     );
   }
 

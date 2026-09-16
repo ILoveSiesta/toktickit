@@ -10,6 +10,7 @@ import { generateSafeStorageFileName } from "./utils/safeStorageName.js";
 import { PriorityLevel, Role } from "@prisma/client";
 import { authRouter } from "./routes/auth.js";
 import { staffRouter } from "./routes/staff.js";
+import { commentsNotesRouter } from "./routes/commentsNotes.js";
 import { authenticate, requireRole, enforcePasswordChanged } from "./middleware/auth.js";
 import { verifyToken } from "./utils/jwt.js";
 
@@ -45,6 +46,9 @@ app.use("/api/auth", authRouter);
 
 // Staff Workspace Routes (Lab 3 Issue 3)
 app.use("/api/staff", staffRouter);
+
+// Comments & Notes Routes (Lab 3 Issue 4)
+app.use("/api", commentsNotesRouter);
 
 // Administrator Routes (Protected with RBAC & BR-02 password change enforcement)
 app.get("/api/admin/users", authenticate, enforcePasswordChanged, requireRole(Role.ADMINISTRATOR), async (_req: Request, res: Response) => {
@@ -160,6 +164,15 @@ app.post(
             },
           });
         }
+        if (payload.role !== Role.REQUESTER) {
+          return res.status(403).json({
+            success: false,
+            error: {
+              code: "FORBIDDEN",
+              message: "Only Requesters are permitted to create support tickets.",
+            },
+          });
+        }
         requesterId = payload.id;
       } else {
         const rawRequesterId = req.headers["x-requester-id"];
@@ -186,6 +199,16 @@ app.post(
           error: {
             code: "INVALID_REQUESTER",
             message: "Specified requester does not exist or is inactive",
+          },
+        });
+      }
+
+      if (requester.role !== Role.REQUESTER) {
+        return res.status(403).json({
+          success: false,
+          error: {
+            code: "FORBIDDEN",
+            message: "Only Requesters are permitted to create support tickets.",
           },
         });
       }
@@ -349,8 +372,22 @@ app.post(
           },
         });
 
-        // Generate official ticketNumber based on ticket.id
-        const officialTicketNumber = generateTicketNumber(ticket.id, ticket.createdAt);
+        // Generate official ticketNumber based on ticket.id with collision avoidance
+        let seq = ticket.id;
+        let officialTicketNumber = generateTicketNumber(seq, ticket.createdAt);
+        let collision = await tx.ticket.findUnique({
+          where: { ticketNumber: officialTicketNumber },
+          select: { id: true },
+        });
+        while (collision && collision.id !== ticket.id) {
+          seq += 1000;
+          officialTicketNumber = generateTicketNumber(seq, ticket.createdAt);
+          collision = await tx.ticket.findUnique({
+            where: { ticketNumber: officialTicketNumber },
+            select: { id: true },
+          });
+        }
+
         const updatedTicket = await tx.ticket.update({
           where: { id: ticket.id },
           data: { ticketNumber: officialTicketNumber },
@@ -647,6 +684,7 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
         category: { select: { id: true, name: true } },
         relatedSystem: { select: { id: true, name: true } },
         requester: { select: { id: true, name: true, email: true, department: true } },
+        ticketOwner: { select: { id: true, name: true, email: true } },
         attachments: {
           select: {
             id: true,

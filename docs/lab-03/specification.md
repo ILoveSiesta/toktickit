@@ -91,8 +91,8 @@
 ### หมวดที่ 2: Role-Based Navigation & Authorization
 * **FR-06 (Role-Based Header & Navigation):** ระบบต้องแสดงแถบนำทางและเมนูตามบทบาทของผู้ใช้:
   * `Requester`: My Tickets, Create Ticket
-  * `IT Staff`: My Queue, Create Ticket (หากต้องการเปิดตั๋วในนามตนเอง)
-  * `Administrator`: Admin (User Management)
+  * `IT Staff`: My Queue
+  * `Administrator`: My Queue, Admin (User Management)
 * **FR-07 (Server-Side Authorization Enforcement):** ทุก Endpoint ที่ได้รับการปกป้อง ต้องตรวจสอบบทบาทและความเป็นเจ้าของที่ Backend หากผู้ใช้ไม่มีสิทธิ์ ระบบต้องตอบกลับด้วย HTTP Status Code ที่เหมาะสม (`401 Unauthorized` หรือ `403 Forbidden`) ทันที โดยไม่พึ่งพาการซ่อนปุ่มบนหน้าบ้าน
 
 ### หมวดที่ 3: Requester Continuity & Enhancements
@@ -184,8 +184,8 @@
    * แสดงชื่อผู้ใช้ปัจจุบันพร้อม Role Badge ที่มุมขวาบน พร้อมเมนูแบบดรอปดาวน์สำหรับ "Change Password" และ "Sign Out"
    * แสดงแท็บเมนูตามบทบาท:
      * `Requester`: My Tickets, Create Ticket
-     * `IT Staff`: My Queue, Create Ticket
-     * `Administrator`: Admin (User Management)
+     * `IT Staff`: My Queue
+     * `Administrator`: My Queue, Admin (User Management)
 2. **Login & Mandatory Password Change Screens:**
    * หน้า Login แบบการ์ดตรงกลางที่สะอาดตา พร้อมระบบตรวจสอบฟิลด์แบบ Real-time, แสดงสถานะปุ่มกดกำลังประมวลผล (Busy/Loading State) และข้อความแจ้งเตือนข้อผิดพลาดที่ปลอดภัย
    * หน้าจอและโฟลว์บังคับเปลี่ยนรหัสผ่าน (Mandatory First-Login Password Change) พร้อม Checklist แสดงความสมบูรณ์ของกฎรหัสผ่านแบบไดนามิก
