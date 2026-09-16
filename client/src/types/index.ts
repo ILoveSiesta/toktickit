@@ -101,3 +101,70 @@ export interface StaffQueueResponse {
   };
 }
 
+export interface StaffTicketDetailData {
+  id: number;
+  ticketNumber: string;
+  summary: string;
+  description: string;
+  requestedPriority: PriorityLevel;
+  itPriority: PriorityLevel;
+  currentStatus: TicketStatus;
+  resolvedIndicated: boolean;
+  ticketDate: string;
+  category: { id: number; name: string };
+  relatedSystem: { id: number; name: string };
+  requester: { id: number; name: string; email: string; department?: string | null };
+  ticketOwner: { id: number; name: string; email: string } | null;
+  attachments: Array<{
+    id: number;
+    originalFileName: string;
+    fileSize: number;
+    fileType: string;
+    isRemoved: boolean;
+    uploadedAt: string;
+  }>;
+  attachmentsCount: number;
+  commentsCount: number;
+  notesCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TicketComment {
+  id: number;
+  ticketId: number;
+  content: string;
+  createdAt: string;
+  author: {
+    id: number;
+    name: string;
+    role: Role;
+    email: string;
+  };
+}
+
+export interface InternalNote {
+  id: number;
+  ticketId: number;
+  content: string;
+  createdAt: string;
+  author: {
+    id: number;
+    name: string;
+    role: Role;
+    email: string;
+  };
+}
+
+export const PERMITTED_STATUS_TRANSITIONS: Record<TicketStatus, TicketStatus[]> = {
+  NEW: ["OPEN", "IN_PROGRESS", "CANCELLED"],
+  OPEN: ["IN_PROGRESS", "WAITING_FOR_REQUESTER", "RESOLVED", "CANCELLED"],
+  IN_PROGRESS: ["WAITING_FOR_REQUESTER", "RESOLVED", "CANCELLED"],
+  WAITING_FOR_REQUESTER: ["IN_PROGRESS", "RESOLVED", "CANCELLED"],
+  RESOLVED: ["CLOSED", "REOPENED"],
+  REOPENED: ["IN_PROGRESS", "RESOLVED", "CANCELLED"],
+  CLOSED: [],
+  CANCELLED: [],
+};
+
+

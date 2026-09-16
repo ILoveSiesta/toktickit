@@ -367,24 +367,24 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigate
               <thead>
                 <tr>
                   <th
-                    style={{ width: "140px", cursor: "pointer", userSelect: "none" }}
+                    style={{ width: "140px", cursor: "pointer", userSelect: "none", textAlign: "left" }}
                     onClick={() => handleSort("ticketNumber")}
                   >
                     Ticket No. {renderSortIndicator("ticketNumber")}
                   </th>
-                  <th>Summary</th>
-                  <th style={{ width: "130px" }}>Category</th>
-                  <th style={{ width: "110px" }}>Req. Priority</th>
-                  <th style={{ width: "110px" }}>IT Priority</th>
-                  <th style={{ width: "120px" }}>Status</th>
+                  <th style={{ textAlign: "left" }}>Summary</th>
+                  <th style={{ width: "130px", textAlign: "left" }}>Category</th>
+                  <th style={{ width: "110px", textAlign: "left" }}>Req. Priority</th>
+                  <th style={{ width: "110px", textAlign: "left" }}>IT Priority</th>
+                  <th style={{ width: "120px", textAlign: "left" }}>Status</th>
                   <th
-                    style={{ width: "120px", cursor: "pointer", userSelect: "none" }}
+                    style={{ width: "120px", cursor: "pointer", userSelect: "none", textAlign: "left" }}
                     onClick={() => handleSort("createdAt")}
                   >
                     Created Date {renderSortIndicator("createdAt")}
                   </th>
                   <th
-                    style={{ width: "120px", cursor: "pointer", userSelect: "none" }}
+                    style={{ width: "120px", cursor: "pointer", userSelect: "none", textAlign: "left" }}
                     onClick={() => handleSort("updatedAt")}
                   >
                     Last Updated {renderSortIndicator("updatedAt")}
@@ -399,7 +399,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigate
                     onClick={() => onSelectTicket(t.id)}
                     style={{ cursor: "pointer" }}
                   >
-                    <td>
+                    <td style={{ textAlign: "left" }}>
                       <strong style={{ color: "var(--color-primary-green)" }}>
                         {t.ticketNumber}
                       </strong>

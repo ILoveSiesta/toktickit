@@ -6,6 +6,12 @@ import {
   AuthUser,
   StaffQueueQueryParams,
   StaffQueueResponse,
+  StaffTicketDetailData,
+  TicketComment,
+  InternalNote,
+  PriorityLevel,
+  TicketStatus,
+  Role,
 } from "./types/index.js";
 
 const rawUrl = import.meta.env.VITE_API_URL || "/api";
@@ -395,7 +401,7 @@ export async function fetchStaffTicketQueue(
     throw err;
   }
 
-  return {
+    return {
     items: data.data || [],
     pagination: data.pagination || {
       page: params.page || 1,
@@ -407,3 +413,145 @@ export async function fetchStaffTicketQueue(
     },
   };
 }
+
+export async function fetchStaffTicketDetail(ticketId: number): Promise<StaffTicketDetailData> {
+  const res = await fetchWithInterceptor(`${API_BASE}/staff/tickets/${ticketId}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to fetch ticket details (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function fetchStaffAssignees(): Promise<Array<{ id: number; name: string; email: string; role: Role }>> {
+  const res = await fetchWithInterceptor(`${API_BASE}/staff/assignees`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    throw new Error(data?.error?.message || "Failed to fetch assignees");
+  }
+  return data.data || [];
+}
+
+export async function updateTicketAssignment(ticketId: number, ticketOwnerId: number | null): Promise<any> {
+  const res = await fetchWithInterceptor(`${API_BASE}/staff/tickets/${ticketId}/assignment`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ticketOwnerId }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to update ticket assignment (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function updateTicketPriority(ticketId: number, itPriority: PriorityLevel): Promise<any> {
+  const res = await fetchWithInterceptor(`${API_BASE}/staff/tickets/${ticketId}/priority`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ itPriority }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to update IT Priority (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function updateTicketStatus(ticketId: number, status: TicketStatus): Promise<any> {
+  const res = await fetchWithInterceptor(`${API_BASE}/staff/tickets/${ticketId}/status`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to update ticket status (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function fetchPublicComments(ticketId: number): Promise<TicketComment[]> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/comments`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    throw new Error(data?.error?.message || `Failed to load comments (HTTP ${res.status})`);
+  }
+  return data.data || [];
+}
+
+export async function postPublicComment(ticketId: number, body: string): Promise<TicketComment> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/comments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ body }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to post comment (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function fetchInternalNotes(ticketId: number): Promise<InternalNote[]> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/notes`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    throw new Error(data?.error?.message || `Failed to load internal notes (HTTP ${res.status})`);
+  }
+  return data.data || [];
+}
+
+export async function postInternalNote(ticketId: number, body: string): Promise<InternalNote> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/notes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ body }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to save internal note (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function indicateProblemResolved(ticketId: number): Promise<any> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/resolve-indication`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to indicate resolution (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+

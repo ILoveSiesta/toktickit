@@ -133,6 +133,25 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             )}
 
             {userRole === "IT_STAFF" && (
+              <button
+                type="button"
+                onClick={() => onSelectTab && onSelectTab("queue")}
+                style={{
+                  background: currentTab === "queue" ? "var(--color-secondary-green)" : "transparent",
+                  color: "#FFFFFF",
+                  border: "none",
+                  padding: "6px 10px",
+                  borderRadius: "var(--radius-sm)",
+                  fontWeight: 500,
+                  fontSize: "var(--font-size-body)",
+                  cursor: "pointer",
+                }}
+              >
+                📋 My Queue
+              </button>
+            )}
+
+            {userRole === "ADMINISTRATOR" && (
               <>
                 <button
                   type="button"
@@ -152,9 +171,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onSelectTab && onSelectTab("create-ticket")}
+                  onClick={() => onSelectTab && onSelectTab("admin-users")}
                   style={{
-                    background: currentTab === "create-ticket" ? "var(--color-secondary-green)" : "transparent",
+                    background: currentTab === "admin-users" ? "var(--color-secondary-green)" : "transparent",
                     color: "#FFFFFF",
                     border: "none",
                     padding: "6px 10px",
@@ -164,28 +183,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     cursor: "pointer",
                   }}
                 >
-                  + Create Ticket
+                  ⚙️ User Management
                 </button>
               </>
-            )}
-
-            {userRole === "ADMINISTRATOR" && (
-              <button
-                type="button"
-                onClick={() => onSelectTab && onSelectTab("admin-users")}
-                style={{
-                  background: currentTab === "admin-users" ? "var(--color-secondary-green)" : "transparent",
-                  color: "#FFFFFF",
-                  border: "none",
-                  padding: "6px 10px",
-                  borderRadius: "var(--radius-sm)",
-                  fontWeight: 500,
-                  fontSize: "var(--font-size-body)",
-                  cursor: "pointer",
-                }}
-              >
-                ⚙️ User Management
-              </button>
             )}
           </nav>
         </div>

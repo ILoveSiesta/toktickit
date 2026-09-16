@@ -472,44 +472,44 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
         </div>
       ) : (
         /* Data Display: Desktop Table + Mobile Stacked Cards */
-        <>
+        <div className="zen-card" style={{ padding: 0, overflow: "hidden" }}>
           {/* Desktop Table Layout */}
-          <div className="zen-table-responsive-desktop zen-card" style={{ padding: 0, overflow: "hidden" }}>
-            <table className="zen-table">
+          <div className="zen-table-responsive-desktop" style={{ overflowX: "auto", width: "100%" }}>
+            <table className="zen-table" style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
                   <th
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", textAlign: "left" }}
                     onClick={() => handleSort("ticketNumber")}
                     title="Sort by Ticket Number"
                   >
                     Ticket No. {renderSortIndicator("ticketNumber")}
                   </th>
                   <th
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", textAlign: "left" }}
                     onClick={() => handleSort("createdAt")}
                     title="Sort by Created Date"
                   >
                     Created Date {renderSortIndicator("createdAt")}
                   </th>
-                  <th>Summary</th>
-                  <th>Category</th>
-                  <th>Req Priority</th>
+                  <th style={{ textAlign: "left" }}>Summary</th>
+                  <th style={{ textAlign: "left" }}>Category</th>
+                  <th style={{ textAlign: "left" }}>Req Priority</th>
                   <th
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", textAlign: "left" }}
                     onClick={() => handleSort("itPriority")}
                     title="Sort by IT Priority"
                   >
                     IT Priority {renderSortIndicator("itPriority")}
                   </th>
                   <th
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", textAlign: "left" }}
                     onClick={() => handleSort("currentStatus")}
                     title="Sort by Status"
                   >
                     Status {renderSortIndicator("currentStatus")}
                   </th>
-                  <th>Owner</th>
+                  <th style={{ textAlign: "left" }}>Owner</th>
                 </tr>
               </thead>
               <tbody>
@@ -524,7 +524,7 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
                     onClick={() => onSelectTicket(t.id)}
                   >
                     {/* Ticket No */}
-                    <td>
+                    <td style={{ textAlign: "left" }}>
                       <button
                         type="button"
                         className="zen-btn-tertiary"
@@ -538,6 +538,10 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
                           color: "var(--color-primary-green)",
                           textDecoration: "underline",
                           cursor: "pointer",
+                          textAlign: "left",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "flex-start",
                         }}
                         data-testid="ticket-link"
                       >
@@ -698,69 +702,53 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
             ))}
           </div>
 
-          {/* Pagination Controls */}
-          {pagination.totalPages > 1 && (
-            <div
-              data-testid="pagination-bar"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "var(--space-xs)",
-                marginTop: "var(--space-lg)",
-                flexWrap: "wrap",
-              }}
-            >
-              {/* Previous Button */}
+          {/* Pagination Controls (Card Footer like MyTickets) */}
+          <div
+            data-testid="pagination-bar"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "var(--space-md)",
+              borderTop: "1px solid var(--color-border-neutral)",
+              backgroundColor: "#FAFCFB",
+              flexWrap: "wrap",
+              gap: "var(--space-md)",
+            }}
+          >
+            <span className="zen-text-muted" style={{ fontSize: "0.85rem" }}>
+              Showing {startItem} - {endItem} of {pagination.totalItems} tickets
+            </span>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)" }}>
               <button
                 type="button"
                 className="zen-btn zen-btn-secondary"
+                style={{ padding: "4px 12px", height: "32px", fontSize: "var(--font-size-sm)" }}
                 disabled={!pagination.hasPrev || page <= 1}
                 onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                style={{ padding: "6px 12px", minHeight: 36, fontSize: "var(--font-size-sm)" }}
                 data-testid="prev-page"
               >
-                ‹ Previous
+                Previous
               </button>
 
-              {/* Page Number Buttons */}
-              {[...Array(pagination.totalPages)].map((_, idx) => {
-                const pageNum = idx + 1;
-                const isActive = pageNum === page;
-                return (
-                  <button
-                    key={pageNum}
-                    type="button"
-                    className={`zen-btn ${isActive ? "zen-btn-primary" : "zen-btn-secondary"}`}
-                    onClick={() => setPage(pageNum)}
-                    style={{
-                      minHeight: 36,
-                      minWidth: 36,
-                      padding: "6px 10px",
-                      fontSize: "var(--font-size-sm)",
-                      fontWeight: isActive ? 700 : 500,
-                    }}
-                    data-testid={`page-btn-${pageNum}`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
+              <span style={{ margin: "0 var(--space-xs)", fontSize: "0.85rem", fontWeight: 600 }}>
+                Page {page} of {pagination.totalPages || 1}
+              </span>
 
-              {/* Next Button */}
               <button
                 type="button"
                 className="zen-btn zen-btn-secondary"
+                style={{ padding: "4px 12px", height: "32px", fontSize: "var(--font-size-sm)" }}
                 disabled={!pagination.hasNext || page >= pagination.totalPages}
                 onClick={() => setPage((prev) => Math.min(pagination.totalPages, prev + 1))}
-                style={{ padding: "6px 12px", minHeight: 36, fontSize: "var(--font-size-sm)" }}
                 data-testid="next-page"
               >
-                Next ›
+                Next
               </button>
             </div>
-          )}
-        </>
+          </div>
+        </div>
       )}
     </div>
   );
