@@ -7,6 +7,8 @@ interface AppHeaderProps {
   onSelectTab?: (tab: "my-tickets" | "create-ticket" | "queue" | "admin-users") => void;
   onChangeRequester?: () => void;
   onLogout?: () => void;
+  userRole?: "REQUESTER" | "IT_STAFF" | "ADMINISTRATOR";
+  userName?: string;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -14,8 +16,16 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onSelectTab,
   onChangeRequester,
   onLogout,
+  userRole: userRoleProp,
+  userName,
 }) => {
-  const { user, logout } = useAuth();
+  let authContext: any = null;
+  try {
+    authContext = useAuth();
+  } catch {}
+  const user = authContext?.user;
+  const logout = authContext?.logout;
+
   let requesterContext: any = null;
   try {
     requesterContext = useRequester();
@@ -24,7 +34,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const handleLogout = async () => {
     if (onLogout) {
       onLogout();
-    } else {
+    } else if (logout) {
       await logout();
     }
   };
@@ -37,8 +47,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     }
   };
 
-  const displayName = user?.name || requesterContext?.currentRequester?.name;
-  const userRole = user?.role || "REQUESTER";
+  const displayName = userName || user?.name || requesterContext?.currentRequester?.name;
+  const userRole = (userRoleProp || user?.role || (requesterContext?.currentRequester ? "REQUESTER" : "REQUESTER")) as "REQUESTER" | "IT_STAFF" | "ADMINISTRATOR";
 
   const getRoleBadgeStyle = (role: string) => {
     switch (role) {

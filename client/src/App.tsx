@@ -217,6 +217,17 @@ function RootRedirect() {
   return <Navigate to="/tickets" replace />;
 }
 
+function RequesterOnlyRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (user?.role && user.role !== "REQUESTER") {
+    if (user.role === "ADMINISTRATOR") {
+      return <Navigate to="/admin/users" replace />;
+    }
+    return <Navigate to="/queue" replace />;
+  }
+  return <>{children}</>;
+}
+
 function MainApp() {
   const { isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -258,19 +269,23 @@ function MainApp() {
         <Route
           path="/tickets"
           element={
-            <MyTickets
-              onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
-              onNavigateCreate={() => navigate("/tickets/create")}
-            />
+            <RequesterOnlyRoute>
+              <MyTickets
+                onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+                onNavigateCreate={() => navigate("/tickets/create")}
+              />
+            </RequesterOnlyRoute>
           }
         />
         <Route
           path="/tickets/create"
           element={
-            <CreateTicket
-              onTicketCreated={() => navigate("/tickets")}
-              onCancel={() => navigate("/tickets")}
-            />
+            <RequesterOnlyRoute>
+              <CreateTicket
+                onTicketCreated={() => navigate("/tickets")}
+                onCancel={() => navigate("/tickets")}
+              />
+            </RequesterOnlyRoute>
           }
         />
         <Route path="/tickets/:id" element={<TicketDetailWrapper />} />

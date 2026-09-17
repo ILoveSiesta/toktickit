@@ -21,6 +21,16 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onTicketCreated, onC
     return (user ? { id: user.id, name: user.name, email: user.email, isActive: true } : null) || requesterContext?.currentRequester;
   }, [user?.id, user?.name, user?.email, requesterContext?.currentRequester]);
 
+  if (user?.role && user.role !== "REQUESTER") {
+    return (
+      <div className="zen-container" style={{ padding: "var(--space-xl) var(--space-base)" }}>
+        <div className="zen-alert-error" role="alert" data-testid="forbidden-alert">
+          Only Requesters are permitted to create support tickets.
+        </div>
+      </div>
+    );
+  }
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [relatedSystems, setRelatedSystems] = useState<RelatedSystem[]>([]);
   const [loadingRefData, setLoadingRefData] = useState<boolean>(true);
