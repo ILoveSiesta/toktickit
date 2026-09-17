@@ -55,7 +55,7 @@ describe("Ticket Creation Strict Boundary Tests (Frontend)", () => {
       expect(screen.queryByText("+ Create Ticket")).not.toBeInTheDocument();
       expect(screen.queryByText("My Tickets")).not.toBeInTheDocument();
       expect(screen.getByText("📋 My Queue")).toBeInTheDocument();
-      expect(screen.getByText("⚙️ User Management")).toBeInTheDocument();
+      expect(screen.getByTestId("admin-users-nav")).toBeInTheDocument();
     });
   });
 

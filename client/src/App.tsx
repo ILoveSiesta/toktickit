@@ -12,6 +12,7 @@ import { GlobalErrorBanner } from "./components/GlobalErrorBanner.js";
 import { Login } from "./components/Login.js";
 import { ChangePassword } from "./components/ChangePassword.js";
 import { StaffTicketQueue } from "./components/StaffTicketQueue.js";
+import { UserManagement } from "./components/UserManagement.js";
 import "./theme.css";
 
 function TicketDetailWrapper() {
@@ -228,6 +229,17 @@ function RequesterOnlyRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AdminOnlyRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (user?.role && user.role !== "ADMINISTRATOR") {
+    if (user.role === "IT_STAFF") {
+      return <Navigate to="/queue" replace />;
+    }
+    return <Navigate to="/tickets" replace />;
+  }
+  return <>{children}</>;
+}
+
 function MainApp() {
   const { isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -286,6 +298,14 @@ function MainApp() {
                 onCancel={() => navigate("/tickets")}
               />
             </RequesterOnlyRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminOnlyRoute>
+              <UserManagement />
+            </AdminOnlyRoute>
           }
         />
         <Route path="/tickets/:id" element={<TicketDetailWrapper />} />

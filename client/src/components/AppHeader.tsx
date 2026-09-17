@@ -181,6 +181,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 </button>
                 <button
                   type="button"
+                  data-testid="admin-users-nav"
                   onClick={() => onSelectTab && onSelectTab("admin-users")}
                   style={{
                     background: currentTab === "admin-users" ? "var(--color-secondary-green)" : "transparent",
@@ -193,7 +194,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     cursor: "pointer",
                   }}
                 >
-                  ⚙️ User Management
+                  ⚙️ Admin
                 </button>
               </>
             )}

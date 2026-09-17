@@ -12,6 +12,9 @@ import {
   PriorityLevel,
   TicketStatus,
   Role,
+  AdminUser,
+  CreateAdminUserPayload,
+  UpdateAdminUserPayload,
 } from "./types/index.js";
 
 const rawUrl = import.meta.env.VITE_API_URL || "/api";
@@ -547,6 +550,80 @@ export async function indicateProblemResolved(ticketId: number): Promise<any> {
   const data = await res.json().catch(() => ({}));
   if (!res.ok || !data.success) {
     const errorMsg = data?.error?.message || `Failed to indicate resolution (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function fetchAdminUsers(params?: { search?: string; role?: string }): Promise<AdminUser[]> {
+  const searchParams = new URLSearchParams();
+  if (params?.search) searchParams.set("search", params.search.trim());
+  if (params?.role) searchParams.set("role", params.role);
+
+  const query = searchParams.toString();
+  const url = `${API_BASE}/admin/users${query ? `?${query}` : ""}`;
+
+  const res = await fetchWithInterceptor(url);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to fetch users (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data || [];
+}
+
+export async function createAdminUser(payload: CreateAdminUserPayload): Promise<AdminUser> {
+  const res = await fetchWithInterceptor(`${API_BASE}/admin/users`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to create user (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function updateAdminUser(userId: number, payload: UpdateAdminUserPayload): Promise<AdminUser> {
+  const res = await fetchWithInterceptor(`${API_BASE}/admin/users/${userId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to update user (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function resetAdminUserPassword(
+  userId: number,
+  newInitialPassword: string
+): Promise<{ message: string; mustChangePassword: boolean }> {
+  const res = await fetchWithInterceptor(`${API_BASE}/admin/users/${userId}/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ newInitialPassword }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to reset password (HTTP ${res.status})`;
     const err: any = new Error(errorMsg);
     err.code = data?.error?.code;
     err.status = res.status;
