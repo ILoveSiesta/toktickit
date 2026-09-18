@@ -11,6 +11,7 @@ import { PriorityLevel, Role } from "@prisma/client";
 import { authRouter } from "./routes/auth.js";
 import { staffRouter } from "./routes/staff.js";
 import { commentsNotesRouter } from "./routes/commentsNotes.js";
+import { adminRouter } from "./routes/admin.js";
 import { authenticate, requireRole, enforcePasswordChanged } from "./middleware/auth.js";
 import { verifyToken } from "./utils/jwt.js";
 
@@ -50,28 +51,8 @@ app.use("/api/staff", staffRouter);
 // Comments & Notes Routes (Lab 3 Issue 4)
 app.use("/api", commentsNotesRouter);
 
-// Administrator Routes (Protected with RBAC & BR-02 password change enforcement)
-app.get("/api/admin/users", authenticate, enforcePasswordChanged, requireRole(Role.ADMINISTRATOR), async (_req: Request, res: Response) => {
-  try {
-    const prisma = getPrisma();
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        department: true,
-        isActive: true,
-        mustChangePassword: true,
-        createdAt: true,
-      },
-      orderBy: { id: "asc" },
-    });
-    return res.status(200).json({ success: true, data: users });
-  } catch (error) {
-    return res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: "Failed to fetch users" } });
-  }
-});
+// Administrator Routes (Lab 3 Issue 5)
+app.use("/api/admin", adminRouter);
 
 // GET /api/requesters - List active development requesters
 app.get("/api/requesters", async (_req: Request, res: Response) => {

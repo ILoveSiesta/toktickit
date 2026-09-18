@@ -12,6 +12,7 @@ import { GlobalErrorBanner } from "./components/GlobalErrorBanner.js";
 import { Login } from "./components/Login.js";
 import { ChangePassword } from "./components/ChangePassword.js";
 import { StaffTicketQueue } from "./components/StaffTicketQueue.js";
+import { UserManagement } from "./components/UserManagement.js";
 import "./theme.css";
 
 function TicketDetailWrapper() {
@@ -217,6 +218,28 @@ function RootRedirect() {
   return <Navigate to="/tickets" replace />;
 }
 
+function RequesterOnlyRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (user?.role && user.role !== "REQUESTER") {
+    if (user.role === "ADMINISTRATOR") {
+      return <Navigate to="/admin/users" replace />;
+    }
+    return <Navigate to="/queue" replace />;
+  }
+  return <>{children}</>;
+}
+
+function AdminOnlyRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (user?.role && user.role !== "ADMINISTRATOR") {
+    if (user.role === "IT_STAFF") {
+      return <Navigate to="/queue" replace />;
+    }
+    return <Navigate to="/tickets" replace />;
+  }
+  return <>{children}</>;
+}
+
 function MainApp() {
   const { isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -258,10 +281,12 @@ function MainApp() {
         <Route
           path="/tickets"
           element={
-            <MyTickets
-              onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
-              onNavigateCreate={() => navigate("/tickets/create")}
-            />
+            <RequesterOnlyRoute>
+              <MyTickets
+                onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+                onNavigateCreate={() => navigate("/tickets/create")}
+              />
+            </RequesterOnlyRoute>
           }
         />
         <Route
@@ -269,8 +294,24 @@ function MainApp() {
           element={
             <CreateTicket
               onTicketCreated={() => navigate("/tickets")}
-              onCancel={() => navigate("/tickets")}
+              onCancel={() => {
+                if (user?.role === "ADMINISTRATOR") {
+                  navigate("/admin/users");
+                } else if (user?.role === "IT_STAFF") {
+                  navigate("/queue");
+                } else {
+                  navigate("/tickets");
+                }
+              }}
             />
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminOnlyRoute>
+              <UserManagement />
+            </AdminOnlyRoute>
           }
         />
         <Route path="/tickets/:id" element={<TicketDetailWrapper />} />

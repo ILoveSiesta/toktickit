@@ -167,4 +167,33 @@ export const PERMITTED_STATUS_TRANSITIONS: Record<TicketStatus, TicketStatus[]> 
   CANCELLED: [],
 };
 
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  role: Role;
+  department?: string | null;
+  isActive: boolean;
+  mustChangePassword: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateAdminUserPayload {
+  name: string;
+  email: string;
+  role: Role;
+  department?: string | null;
+  isActive?: boolean;
+  initialPassword: string;
+}
+
+export interface UpdateAdminUserPayload {
+  name?: string;
+  email?: string;
+  role?: Role;
+  department?: string | null;
+  isActive?: boolean;
+}
+
 

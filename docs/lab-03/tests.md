@@ -72,7 +72,8 @@
 | **UI-05** | UI | FR-16, BR-17, BR-18 | Public Comments vs Internal Notes UI | แสดงแท็บแยกชัดเจน โทนสีเขียวสำหรับ Public และสีส้มสำหรับ Private Note | `client/tests/lab-03/StaffTicketDetail.test.tsx` | **Pass** |
 | **UI-06** | UI | FR-17, FR-18, FR-19 | UserManagement list and modals | แสดงตารางผู้ใช้ Modal สร้าง/แก้ไข และสวิตช์เปิดปิดสถานะ Active | `client/tests/lab-03/UserManagement.test.tsx` | **Pass** |
 | **UI-07** | UI | BR-25, AC-12 | Self-deactivation button disabled for Admin | ปุ่ม Deactivate ถูก Disable เมื่อเปิดดูบัญชีตนเอง | `client/tests/lab-03/UserManagement.test.tsx` | **Pass** |
-| **UI-08** | UI | FR-09, FR-10 | Requester Ticket Detail enhancements | แสดงเฉพาะ Public Comments และปุ่ม Problem Appears Resolved (ไม่มี Note) | `client/tests/lab-03/RequesterTicketDetail.test.tsx`| **Pass** |
+| **UI-08** | UI | FR-09, FR-10 | Requester Ticket Detail enhancements & layout | แสดงเฉพาะ Public Comments (พร้อมป้าย Role: Requester, IT Staff, Admin) และปุ่ม Problem Appears Resolved วางเคียงข้างปุ่ม Back (ไม่มี Note) | `client/tests/lab-03/RequesterTicketDetail.test.tsx`| **Pass** |
+| **UI-09** | UI | FR-07, BR-07, AC-03 | Ticket Creation Strict Boundary UI Guard | ซ่อนปุ่ม Create Ticket จาก IT Staff/Admin และหากเข้าถึง `/tickets/create` ตรง จะแสดง Error Alert สีแดง "Only Requesters are permitted to create support tickets." พร้อมปุ่ม Return | `client/tests/lab-03/TicketCreationBoundary.test.tsx` | **Pass** |
 | **E2E-01** | E2E | FR-01, FR-04, FR-06 | Full login, role nav, and logout flow | เข้าสู่ระบบตาม Role ตรวจสอบ Navbar เฉพาะบทบาท และออกจากระบบสำเร็จ | `e2e/lab-03/authentication.spec.ts` | **Pass** |
 | **E2E-02** | E2E | FR-02, BR-02, AC-02 | Mandatory initial password change journey | บัญชีรหัสเริ่มต้นถูกบังคับเปลี่ยนรหัสผ่าน จึงจะสามารถเข้าสู่ระบบหลักได้ | `e2e/lab-03/authentication.spec.ts` | **Pass** |
 | **E2E-03** | E2E | FR-11 - FR-16 | IT Staff end-to-end ticket triage flow | เจ้าหน้าที่ค้นหาตั๋วในคิว -> รับตั๋ว -> เพิ่ม Note -> ปิดงานตั๋วสำเร็จ | `e2e/lab-03/staff-ticket-flow.spec.ts` | **Pass** |
@@ -101,7 +102,8 @@ client/tests/lab-03/
 ├── StaffTicketQueue.test.tsx      # ครอบคลุม UI-03
 ├── StaffTicketDetail.test.tsx     # ครอบคลุม UI-04, UI-05
 ├── UserManagement.test.tsx        # ครอบคลุม UI-06, UI-07
-└── RequesterTicketDetail.test.tsx # ครอบคลุม UI-08
+├── RequesterTicketDetail.test.tsx # ครอบคลุม UI-08
+└── TicketCreationBoundary.test.tsx# ครอบคลุม UI-09 (Ticket Creation Strict Boundary UI Guard)
 
 e2e/lab-03/
 ├── authentication.spec.ts         # ครอบคลุม E2E-01, E2E-02
