@@ -22,9 +22,20 @@ adminRouter.get("/users", async (req: Request, res: Response) => {
 
     const where: any = {};
 
-    if (role && typeof role === "string") {
-      if (Object.values(Role).includes(role as Role)) {
-        where.role = role as Role;
+    if (role && typeof role === "string" && role.trim() !== "ALL") {
+      const normalizedRole = role.trim().toUpperCase();
+      if (normalizedRole === "ADMIN" || normalizedRole === "ADMINISTRATOR") {
+        where.role = Role.ADMINISTRATOR;
+      } else if (
+        normalizedRole === "STAFF" ||
+        normalizedRole === "IT_STAFF" ||
+        normalizedRole === "IT STAFF"
+      ) {
+        where.role = Role.IT_STAFF;
+      } else if (normalizedRole === "REQUESTER") {
+        where.role = Role.REQUESTER;
+      } else if (Object.values(Role).includes(normalizedRole as Role)) {
+        where.role = normalizedRole as Role;
       } else {
         return res.status(200).json({ success: true, data: [] });
       }

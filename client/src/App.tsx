@@ -292,12 +292,18 @@ function MainApp() {
         <Route
           path="/tickets/create"
           element={
-            <RequesterOnlyRoute>
-              <CreateTicket
-                onTicketCreated={() => navigate("/tickets")}
-                onCancel={() => navigate("/tickets")}
-              />
-            </RequesterOnlyRoute>
+            <CreateTicket
+              onTicketCreated={() => navigate("/tickets")}
+              onCancel={() => {
+                if (user?.role === "ADMINISTRATOR") {
+                  navigate("/admin/users");
+                } else if (user?.role === "IT_STAFF") {
+                  navigate("/queue");
+                } else {
+                  navigate("/tickets");
+                }
+              }}
+            />
           }
         />
         <Route

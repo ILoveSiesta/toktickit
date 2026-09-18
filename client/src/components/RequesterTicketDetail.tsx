@@ -242,6 +242,31 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
     }
   };
 
+  const getRoleBadgeStyle = (role?: string) => {
+    switch (role) {
+      case "ADMINISTRATOR":
+        return { bg: "#EDE9FE", text: "#6D28D9", border: "#DDD6FE", label: "Admin" };
+      case "IT_STAFF":
+        return { bg: "#DCFCE7", text: "#15803D", border: "#86EFAC", label: "IT Staff" };
+      case "REQUESTER":
+        return { bg: "#E0F2FE", text: "#0369A1", border: "#BAE6FD", label: "Requester" };
+      default:
+        return { bg: "#F1F5F9", text: "#475569", border: "#CBD5E1", label: role || "User" };
+    }
+  };
+
+  const getAvatarBg = (role?: string) => {
+    switch (role) {
+      case "ADMINISTRATOR":
+        return "#6D28D9";
+      case "IT_STAFF":
+        return "#006B3C";
+      case "REQUESTER":
+      default:
+        return "#0369A1";
+    }
+  };
+
   if (loading) {
     return (
       <div className="zen-container" style={{ padding: "var(--space-2xl) var(--space-base)", textAlign: "center" }}>
@@ -706,7 +731,7 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
                       width: 28,
                       height: 28,
                       borderRadius: "50%",
-                      backgroundColor: c.author?.role === "REQUESTER" ? "#0369A1" : "#006B3C",
+                      backgroundColor: getAvatarBg(c.author?.role),
                       color: "#FFFFFF",
                       display: "flex",
                       alignItems: "center",
@@ -720,18 +745,24 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
                   <strong style={{ fontSize: "0.9rem", color: "var(--color-text-primary)" }}>
                     {c.author?.name || "User"}
                   </strong>
-                  <span
-                    className="zen-badge"
-                    style={{
-                      fontSize: "0.7rem",
-                      padding: "2px 6px",
-                      backgroundColor: c.author?.role === "REQUESTER" ? "#E0F2FE" : "#DCFCE7",
-                      color: c.author?.role === "REQUESTER" ? "#0369A1" : "#15803D",
-                      border: `1px solid ${c.author?.role === "REQUESTER" ? "#BAE6FD" : "#86EFAC"}`,
-                    }}
-                  >
-                    {c.author?.role === "REQUESTER" ? "Requester" : "IT Staff"}
-                  </span>
+                  {(() => {
+                    const roleStyle = getRoleBadgeStyle(c.author?.role);
+                    return (
+                      <span
+                        className="zen-badge"
+                        style={{
+                          fontSize: "0.7rem",
+                          padding: "2px 6px",
+                          backgroundColor: roleStyle.bg,
+                          color: roleStyle.text,
+                          border: `1px solid ${roleStyle.border}`,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {roleStyle.label}
+                      </span>
+                    );
+                  })()}
                   <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
                     {formatDateTime(c.createdAt)}
                   </span>

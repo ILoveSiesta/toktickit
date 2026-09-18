@@ -44,6 +44,13 @@ const mockComments = [
     createdAt: "2026-09-12T10:00:00.000Z",
     author: { id: 2, name: "Alex Thompson", role: "IT_STAFF", email: "alex.staff@toktickit.com" },
   },
+  {
+    id: 2,
+    ticketId: 201,
+    content: "Firewall rule has been verified by Administrator.",
+    createdAt: "2026-09-12T10:15:00.000Z",
+    author: { id: 1, name: "John Smith", role: "ADMINISTRATOR", email: "admin@toktick.it" },
+  },
 ];
 
 describe("UI-08: Requester Ticket Detail Enhancements & Isolation", () => {
@@ -55,7 +62,7 @@ describe("UI-08: Requester Ticket Detail Enhancements & Isolation", () => {
     vi.spyOn(api, "fetchPublicComments").mockResolvedValue(mockComments);
     vi.spyOn(api, "indicateProblemResolved").mockResolvedValue({ id: 201, resolvedIndicated: true });
     vi.spyOn(api, "postPublicComment").mockResolvedValue({
-      id: 2,
+      id: 3,
       ticketId: 201,
       content: "VPN is now working solidly. Thank you!",
       createdAt: new Date().toISOString(),
@@ -63,7 +70,7 @@ describe("UI-08: Requester Ticket Detail Enhancements & Isolation", () => {
     });
   });
 
-  it("renders public comments and allows posting a new public comment", async () => {
+  it("renders public comments with correct author role badges (Admin, IT Staff, Requester) and allows posting", async () => {
     render(<RequesterTicketDetail ticketId={201} onBack={onBackMock} />);
 
     await waitFor(() => {
@@ -75,6 +82,12 @@ describe("UI-08: Requester Ticket Detail Enhancements & Isolation", () => {
     expect(screen.getByText(/Public Comments/i)).toBeInTheDocument();
     expect(screen.getByText("We pushed an update to the VPN concentrator. Please reconnect.")).toBeInTheDocument();
 
+    // Verify correct role badges for IT Staff and Administrator
+    expect(screen.getByText("Alex Thompson")).toBeInTheDocument();
+    expect(screen.getByText("IT Staff")).toBeInTheDocument();
+    expect(screen.getByText("John Smith")).toBeInTheDocument();
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+
     // Post new comment
     const input = screen.getByTestId("requester-comment-input");
     await userEvent.type(input, "VPN is now working solidly. Thank you!");
@@ -83,6 +96,7 @@ describe("UI-08: Requester Ticket Detail Enhancements & Isolation", () => {
     expect(api.postPublicComment).toHaveBeenCalledWith(201, "VPN is now working solidly. Thank you!");
     await waitFor(() => {
       expect(screen.getByText("VPN is now working solidly. Thank you!")).toBeInTheDocument();
+      expect(screen.getByText("Requester")).toBeInTheDocument();
     });
   });
 

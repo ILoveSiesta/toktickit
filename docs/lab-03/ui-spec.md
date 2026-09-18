@@ -110,10 +110,10 @@
 
 * **Header Continuity:** ตัด Requester Selector เก่าออก โดยแสดงตัวตนของผู้ใช้ที่ล็อกอินอยู่ในปัจจุบัน
 * **Ticket Detail Modifications:**
-  * เพิ่มปุ่มดำเนินการ **"Problem Appears Resolved"** (ปุ่มโทนสีเขียวอ่อนขอบเข้ม) บริเวณส่วนหัวของตั๋วเคียงข้างปุ่ม Back (Top Action Bar) หากตั๋วอยู่ในสถานะ `IN_PROGRESS`, `WAITING_FOR_REQUESTER` หรือ `OPEN` เพื่อให้ผู้ร้องขอกดแจ้งเตือนเจ้าหน้าที่อย่างชัดเจนและไม่สับสนกับ Badge แสดงสถานะ
+  * เพิ่มปุ่มดำเนินการ **"Problem Appears Resolved"** (ปุ่มโทนสีเขียวอ่อนขอบเข้ม) บริเวณส่วนหัวตั๋ววางเคียงข้างปุ่ม Back (Top Action Bar) หากตั๋วอยู่ในสถานะ `IN_PROGRESS`, `WAITING_FOR_REQUESTER` หรือ `OPEN` เพื่อให้ผู้ร้องขอกดแจ้งเตือนเจ้าหน้าที่อย่างชัดเจนและไม่สับสนกับ Badge แสดงสถานะ
   * **Public Comments Section:** แถบแสดงประวัติการสื่อสารสาธารณะ:
     * แสดง Avatar วงกลมระบุอักษรย่อชื่อผู้โพสต์ (เช่น `JA` สำหรับ Jennifer Anderson)
-    * ป้ายกำกับบทบาท (`Requester`, `IT Staff`) ข้างชื่อผู้เขียน
+    * ป้ายกำกับบทบาท (`Requester`, `IT Staff`, `Admin`) ข้างชื่อผู้เขียน
     * วันที่และเวลาการโพสต์ในรูปแบบ `May 13, 2026 11:45 AM`
     * กล่องข้อความแสดงความคิดเห็นพร้อมเส้นแบ่งสบายตา
     * ช่องพิมพ์ข้อความ `Add Public Comment` พร้อมปุ่ม "Post Comment" สีเขียว
@@ -178,7 +178,7 @@
 #### ส่วนแสดงรายการผู้ใช้ (User List View)
 * **Toolbar:**
   * กล่องค้นหาผู้ใช้: `"Search users by name or email..."`
-  * เมนูกรองบทบาท (Filter by Role): All Roles, Requester, IT Staff, Administrator
+  * เมนูกรองบทบาท (Filter by Role:): All Roles, Requester, IT Staff, Administrator พร้อมปุ่ม "Clear Filters"
   * ปุ่มหลัก **"+ Create User"** สี Zen Green เด่นชัดทางด้านขวา
 * **User Table:**
   * คอลัมน์: `Name`, `Email`, `Role` (Badge สีเฉพาะบทบาท), `Status` (Active สีเขียว / Inactive สีแดง), และปุ่ม `Edit`
@@ -214,7 +214,7 @@
 4. **Action Confirmations:**
    * การกระทำที่มีผลกระทบรุนแรง (เช่น การ Deactivate บัญชี หรือการ Cancel ตั๋ว) ต้องมี Modal Pop-up ยืนยันก่อนทำรายการเสมอ
 5. **Access Denied / 403 Screen:**
-   * หากผู้ใช้พยายามเข้าถึง URL ที่ไม่มีสิทธิ์ (เช่น Requester พยายามเข้า `/admin/users`) ระบบจะแสดงหน้าจอ Access Denied ที่เป็นมิตร พร้อมปุ่ม "Return to Dashboard"
+   * หากผู้ใช้พยายามเข้าถึง URL ที่ไม่มีสิทธิ์ (เช่น Requester พยายามเข้า `/admin/users` หรือ IT Staff/Administrator พยายามเข้า `/tickets/create` โดยตรง) ระบบจะแสดงหน้าจอ Access Denied หรือ Error Alert สีแดง (`"Only Requesters are permitted to create support tickets."`) พร้อมปุ่ม Return กลับสู่หน้าหลักตามบทบาท เพื่อให้ผู้ใช้ได้รับ Feedback ที่ชัดเจน ไม่ใช่การ Redirect เงียบๆ
 
 ---
 

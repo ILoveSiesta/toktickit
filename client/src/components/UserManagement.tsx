@@ -358,11 +358,12 @@ export const UserManagement: React.FC = () => {
             htmlFor="role-filter"
             style={{
               fontSize: "var(--font-size-sm)",
-              color: "var(--color-text-muted)",
-              fontWeight: 500,
+              color: "var(--color-text-primary)",
+              fontWeight: 600,
+              whiteSpace: "nowrap",
             }}
           >
-            Role:
+            Filter by Role:
           </label>
           <select
             id="role-filter"
@@ -370,7 +371,7 @@ export const UserManagement: React.FC = () => {
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
             className="zen-select"
-            style={{ minWidth: "160px" }}
+            style={{ minWidth: "170px" }}
           >
             <option value="ALL">All Roles</option>
             <option value="REQUESTER">Requester</option>
