@@ -336,7 +336,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
     );
   }
 
-  if (error || !ticket) {
+  if (!ticket) {
     return (
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem" }}>
         <button
@@ -433,6 +433,29 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           </button>
         )}
       </div>
+
+      {/* Operational Error Feedback */}
+      {error && (
+        <div
+          data-testid="staff-detail-error-alert"
+          role="alert"
+          style={{
+            background: "#FEE2E2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
+            padding: "0.75rem 1rem",
+            borderRadius: "6px",
+            marginBottom: "1.25rem",
+            fontSize: "0.9rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+          }}
+        >
+          <span>⚠️</span>
+          <span>{error}</span>
+        </div>
+      )}
 
       {/* Global Success / Operational Feedback */}
       {opSuccessMessage && (

@@ -282,6 +282,7 @@ export const UserManagement: React.FC = () => {
       >
         <div>
           <h1
+            data-testid="admin-users-title"
             style={{
               fontSize: "1.75rem",
               fontWeight: 700,
