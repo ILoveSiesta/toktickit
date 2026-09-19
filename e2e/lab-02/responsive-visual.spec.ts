@@ -1,11 +1,17 @@
 import { test, expect } from "@playwright/test";
 import path from "path";
 import fs from "fs";
+import { execSync } from "child_process";
 
 test.describe("Responsive & Visual Inspection (RESP-01, RESP-02, RESP-03)", () => {
   const screenshotsDir = path.resolve(process.cwd(), "artifacts/lab-02/screenshots");
 
   test.beforeAll(async () => {
+    try {
+      execSync("npm run prisma:seed --prefix server", { stdio: "ignore" });
+    } catch (e) {
+      console.error("Failed to seed database in test.beforeAll:", e);
+    }
     // Ensure screenshot directories exist
     fs.mkdirSync(path.join(screenshotsDir, "create-ticket"), { recursive: true });
     fs.mkdirSync(path.join(screenshotsDir, "my-tickets"), { recursive: true });
@@ -13,16 +19,16 @@ test.describe("Responsive & Visual Inspection (RESP-01, RESP-02, RESP-03)", () =
   });
 
   const setupUserContext = async (page: any) => {
-    await page.goto("/");
-    const requesterDropdown = page.getByTestId("requester-dropdown");
+    await page.goto("/login");
     const myTicketsHeading = page.getByRole("heading", { name: /My Tickets/i });
-
-    await expect(requesterDropdown.or(myTicketsHeading)).toBeVisible();
-    if (await requesterDropdown.isVisible()) {
-      await requesterDropdown.selectOption({ label: "Jennifer Anderson (jennifer@toktick.it) — Marketing" });
-      await page.getByTestId("continue-btn").click();
-      await expect(myTicketsHeading).toBeVisible();
+    if (await myTicketsHeading.isVisible()) {
+      return;
     }
+    await page.getByTestId("login-email-input").fill("jennifer@toktick.it");
+    await page.getByTestId("login-password-input").fill("TokTickIT2026!");
+    await page.getByTestId("login-submit-btn").click();
+    await expect(page).toHaveURL(/\/tickets/);
+    await expect(myTicketsHeading).toBeVisible();
   };
 
   test("RESP-01: Desktop Viewport (>= 992px)", async ({ page }) => {

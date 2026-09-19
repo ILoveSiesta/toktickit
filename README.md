@@ -1,6 +1,6 @@
 # TokTickIT - IT Service Ticketing System
 
-**Lab 2: Requester Ticketing MVP with UI Foundation & Zen Green Theme**
+**Lab 3: TokTickIT Users, Roles, IT Staff Ticketing, and Admin Screens**
 
 TokTickIT เป็นระบบจัดการและรับเรื่องแจ้งปัญหาบริการเทคโนโลยีสารสนเทศ (IT Service Desk) สำหรับองค์กร พัฒนาโดยมุ่งเน้นสถาปัตยกรรมที่สะอาด ปลอดภัย และยึดหลัก **Zen Green Design Language**
 
@@ -28,7 +28,7 @@ TokTickIT เป็นระบบจัดการและรับเรื�
 สร้างไฟล์ `client/.env` โดยคัดลอกและปรับแก้จากไฟล์ `client/.env.example`
 
 ### Database Migration & Idempotent Seeding
-รันคำสั่ง Migration และ Seed ข้อมูลตั้งต้นสำหรับ Lab 2 (Categories, Related Systems, Development Requesters ทั้ง Active และ Inactive):
+รันคำสั่ง Migration และ Seed ข้อมูลตั้งต้นสำหรับ Lab 3 (Categories, Related Systems, และบัญชีผู้ใช้จริงสำหรับ Requester, IT Staff, และ Administrator ทั้งแบบ Active/Inactive):
 ```bash
 # ติดตั้ง Dependencies และรัน Prisma Migration & Seed
 npm install

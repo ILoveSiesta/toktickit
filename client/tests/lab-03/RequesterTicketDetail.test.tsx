@@ -42,14 +42,14 @@ const mockComments = [
     ticketId: 201,
     content: "We pushed an update to the VPN concentrator. Please reconnect.",
     createdAt: "2026-09-12T10:00:00.000Z",
-    author: { id: 2, name: "Alex Thompson", role: "IT_STAFF", email: "alex.staff@toktickit.com" },
+    author: { id: 2, name: "Alex Thompson", role: "IT_STAFF" as const, email: "alex.staff@toktickit.com" },
   },
   {
     id: 2,
     ticketId: 201,
     content: "Firewall rule has been verified by Administrator.",
     createdAt: "2026-09-12T10:15:00.000Z",
-    author: { id: 1, name: "John Smith", role: "ADMINISTRATOR", email: "admin@toktick.it" },
+    author: { id: 1, name: "John Smith", role: "ADMINISTRATOR" as const, email: "admin@toktick.it" },
   },
 ];
 
