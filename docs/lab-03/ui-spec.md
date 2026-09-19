@@ -157,17 +157,25 @@
   * **IT Priority Dropdown:** เลือกปรับระดับความสำคัญ (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`)
   * **Current Status Dropdown:** เลือกเปลี่ยนสถานะตาม Transition Matrix (ฟิลด์นี้จะแสดงเฉพาะตัวเลือกสถานะที่อนุญาตให้เปลี่ยนได้จากสถานะปัจจุบันเท่านั้น)
 * **Summary & Description:** กล่องข้อความระบุปัญหาจากผู้แจ้งแบบอ่านอย่างเดียว
+* **White Card Container Containment (Zero Inner Overflow):**
+  * โซนที่ 1 และ โซนที่ 2 มีการกำหนด `box-sizing: border-box`, `max-width: 100%`, และ `overflow: hidden` เพื่อเป็น Guardrail ควบคุมไม่ให้ element ภายในดันหรือตกกรอบสีขาวของ UI ออกมา
+  * Dropdown controls ทั้งหมด (`Ticket Owner`, `IT Priority`, `Current Status`) มีการกำหนด `box-sizing: border-box` และ `max-width: 100%` เพื่อป้องกันขนาด padding และความยาวของชื่อสถานะดันทะลุขอบขวาของกล่อง Operational Controls
+  * ข้อมูล Metadata ฝั่งอ่านอย่างเดียว (`Category`, `System`, `Requester`, `Email`) และฟิลด์ข้อความยาว (`Summary`, `Description`) รองรับ `flex-wrap: wrap`, `word-break: break-word` และ `overflow-wrap: anywhere` เพื่อให้ข้อความยาวหรืออีเมลตัดคำได้อย่างเป็นระเบียบภายในกรอบสีเทาและกรอบการ์ดสีขาว
+  * ป้ายรายชื่อไฟล์แนบ (Attachments Badge) มีการจำกัดความยาวชื่อไฟล์ (`max-width: 220px` พร้อม text-ellipsis) และ `flex-shrink: 0` สำหรับไอคอน/ปุ่ม Download ป้องกันแถบไฟล์แนบยาวดันหลุดกรอบการ์ด
 
 #### โซนที่ 2: Communication & Collaboration Tabs (แท็บด้านล่าง)
 มีแท็บสลับการทำงาน 2 แท็บหลัก:
 1. **Public Comments Tab (สีเขียว Zen Green):**
    * สำหรับการสื่อสารที่โปร่งใสระหว่างผู้แจ้งและทีมไอที
    * กล่องพิมพ์ข้อความ `Add Public Comment` และปุ่ม "Post Comment" สีเขียว
-   * รายการความคิดเห็นเรียงตามลำดับเวลา (Ascending) พร้อมป้ายชื่อผู้เขียน
+   * รายการความคิดเห็นเรียงตามลำดับเวลา (Ascending) พร้อมป้ายชื่อผู้เขียน และเนื้อหาความคิดเห็นรองรับ `word-break: break-word` / `overflow-wrap: anywhere`
 2. **Internal Notes Tab (สีส้มอำพัน Amber / Warning Tone):**
    * มีป้ายเตือนชัดเจน: `🔒 Private - Visible only to IT Staff and Administrators`
    * พื้นหลังของกล่องบันทึกใช้สีส้มอ่อน `#FFFBEB` ขอบสีเหลืองอำพัน `#FCD34D` เพื่อเตือนสติเจ้าหน้าที่ไม่ให้สับสนกับข้อคิดเห็นสาธารณะ
-   * กล่องพิมพ์บันทึก `Add Internal Note` และปุ่ม "Save Internal Note" สีเหลืองเข้มปนน้ำตาล
+   * กล่องพิมพ์บันทึก `Add Internal Note` และปุ่ม "Save Internal Note" สีเหลืองเข้มปนน้ำตาล พร้อมการตัดคำป้องกันการตกกรอบสีขาวเช่นเดียวกัน
+3. **Collaboration Tab Containment:**
+   * แถบสลับแท็บด้านบนกำหนด `flex-wrap: wrap` และความกว้างปุ่มแบบยืดหยุ่น `flex: 1 1 200px` ป้องกันปุ่มแท็บเบียดหรือล้นขอบการ์ดบนจอขนาดเล็ก
+   * ส่วนหัวข้อความในแต่ละ Comment/Note กำหนด `flex-wrap: wrap` เพื่อให้ชื่อผู้เขียน บทบาท และวันที่/เวลาเรียงตัวพอดี ไม่ดันหลุดขอบขวาของการ์ดสีขาว
 
 ---
 
@@ -180,9 +188,14 @@
   * กล่องค้นหาผู้ใช้: `"Search users by name or email..."`
   * เมนูกรองบทบาท (Filter by Role:): All Roles, Requester, IT Staff, Administrator พร้อมปุ่ม "Clear Filters"
   * ปุ่มหลัก **"+ Create User"** สี Zen Green เด่นชัดทางด้านขวา
-* **User Table:**
+* **User Table (Desktop Layout $\ge 768\text{px}$):**
   * คอลัมน์: `Name`, `Email`, `Role` (Badge สีเฉพาะบทบาท), `Status` (Active สีเขียว / Inactive สีแดง), และปุ่ม `Edit`
   * ปุ่ม `Edit` (หรือคลิกที่แถว) จะเปิดหน้าต่างแก้ไขผู้ใช้
+* **Mobile Stacked Cards View ($< 768\text{px}$):**
+  * เพื่อความสม่ำเสมอกับหน้า My Tickets และ My Queue เมื่อเปิดบนหน้าจอมือถือ ตารางผู้ใช้จะถูกปรับเปลี่ยนเป็นการ์ดข้อมูล (Stacked Cards) อัตโนมัติ
+  * แต่ละการ์ดแสดง: ชื่อ-นามสกุล (พร้อม Badge "You" สำหรับตนเอง), อีเมล, ป้ายสถานะ Active/Inactive, ป้ายกำกับ Role และปุ่ม "Edit"
+  * เส้นขอบซ้ายเน้นสี Zen Green (`4px solid var(--color-primary-green)`) ปราศจากการเลื่อนแนวนอน
+  * ค้นหาและกรองบทบาททำงานร่วมกับการ์ดบนหน้าจอมือถือได้อย่างสมบูรณ์
 
 #### Slide-over / Modal: Create & Edit User
 * **Create User Form:**
@@ -195,8 +208,17 @@
 * **Edit User Form:**
   * แก้ไขชื่อ อีเมล บทบาท และสถานะ Active
   * **Safety Guardrail UI:** หากเป็นบัญชีของแอดมินที่กำลังล็อกอินอยู่ สวิตช์ Active จะถูก Disable พร้อมคำอธิบายใต้สวิตช์ *"You cannot deactivate your own account"*
-  * **Destructive Action:** ปุ่ม "Deactivate User" สีแดงกรอบขาว (เมื่อกดจะแสดง Confirmation Modal ยืนยัน)
+  * **Lifecycle Status Actions (Symmetrical Button Design):**
+    * **Active Accounts:** แสดงปุ่ม "Deactivate" สีแดงกรอบขาว เพื่อปิดการใช้งานบัญชี (มี Confirmation Modal ยืนยัน)
+    * **Inactive Accounts:** แสดงปุ่ม "Activate" สี Zen Green กรอบเขียว แทนที่ปุ่ม Deactivate เพื่อเปิดใช้งานบัญชีกลับคืนมา (มี Confirmation Modal ยืนยัน)
   * **Reset Password Action:** ปุ่ม "Reset Initial Password" เพื่อตั้งรหัสผ่านชั่วคราวใหม่ให้ผู้ใช้
+* **Mobile Modal Responsive & Symmetrical Button Wrap Guardrails:**
+  * กำหนด `max-height: 90vh` และฟอร์มภายในมี `overflow-y: auto` ป้องกันเนื้อหาล้นในแนวตั้ง
+  * ปุ่ม Action ด้านล่าง (Save Changes, Cancel, Deactivate/Activate, Reset Password) ถูกจัดกลุ่มผ่าน `.zen-modal-actions-container` และ `.zen-modal-action-group` แบ่งออกเป็น 2 กลุ่มอย่างชัดเจน:
+    * **Group 1 (Form Actions):** `Save Changes` และ `Cancel`
+    * **Group 2 (Lifecycle & Security Actions):** `Deactivate` (สีแดง) หรือ `Activate` (สีเขียว) กำหนด `min-width: 96px` เท่ากัน และตามด้วยปุ่ม `🔑 Reset Password`
+  * เมื่อแสดงผลบนหน้าจอมือถือ ($< 640\text{px}$) ทั้งบัญชี Active และ Inactive จะเรียงตัวในตำแหน่งเดียวกันแบบ 100% เป๊ะ โดยแถวบนจะเป็นปุ่มบันทึก/ยกเลิก และแถวล่างจะเป็นปุ่มสลับสถานะ/รีเซ็ตรหัสผ่าน ชิดซ้ายทั้งหมด (`justify-content: flex-start`) ไร้ปัญหาความต่างของความยาวข้อความทำให้ปุ่มกระโดดคนละแถว
+  * ส่วนหัว Modal (Modal Header) รองรับ `word-break: break-word` เพื่อไม่ให้ชื่อผู้ใช้ที่ยาวดันปุ่มปิด (×) ตกขอบจอ
 
 ---
 
@@ -227,3 +249,22 @@
 * **Touch Targets:** ปุ่มกด ตัวเลือก และไอคอนเมนูทั้งหมดต้องมีขนาดพื้นที่กดไม่น้อยกว่า `44px x 44px` บนหน้าจอมือถือ
 * **Color Contrast:** อัตราส่วน Contrast ของตัวอักษรและสีพื้นหลังต้องไม่ต่ำกว่า `4.5:1` ตามมาตรฐาน WCAG 2.1 AA
 * **No Horizontal Scrolling:** ทุกหน้าจอต้องไม่มีปัญหาเนื้อหาล้นออกนอกขอบจอแนวนอนในทุกขนาดหน้าจอ
+
+---
+
+## 8.8. Visual Checklist
+
+ตารางตรวจสอบความถูกต้องด้าน Visual และความพร้อมของส่วนต่อประสานผู้ใช้ตามมาตรฐาน Zen Green Design และข้อกำหนดของ Lab 3 ครอบคลุมทั้ง 9 มิติ:
+
+| Category / Dimension | Inspection Criteria | Status | Details / Observations |
+| :--- | :--- | :---: | :--- |
+| **Design consistency** | การใช้ชุดสี Zen Green Palette (`#006B3C`, `#0B7A46`, `#EAF6EF`, `#F5F7F6`), ฟอนต์สไตล์, และรัศมีขอบมน (`8px`) สม่ำเสมอทุกหน้าจอ | **Pass** | UI ทุกหน้าจอ (Login, Queue, Ticket Detail, Admin) สอดคล้องกับ Zen Green Design System ไม่มีสีแปลกปลอม |
+| **Role navigation** | แถบเมนูนำทางปรับเปลี่ยนตามบทบาท (Requester, IT Staff, Admin) อย่างถูกต้อง พร้อม Guardrail ไม่แสดงหรือนำทางไปเมนูที่ไม่มีสิทธิ์ | **Pass** | Header แสดงเมนูเฉพาะบทบาทที่ล็อกอิน (Admin เห็น Admin Users & My Queue, IT Staff เห็น My Queue, Requester เห็น My Tickets & Create Ticket) |
+| **Badges** | ป้ายกำกับ Role, Status, และ Priority ใช้คู่สีที่มี Contrast ชัดเจนและสอดคล้องกับมาตรฐานที่กำหนดในข้อ 1.2 | **Pass** | สี Badge แยกแยะชัดเจน (เช่น Requester ฟ้า, IT Staff เขียว, Admin ม่วง, Critical แดง, Inactive แดง) อ่านง่ายและไม่กลืนกับพื้นหลัง |
+| **Editable/read-only fields** | แยกแยะฟิลด์ที่แก้ไขได้ (`#FFFFFF`) และฟิลด์อ่านอย่างเดียว (`#F1F5F3` Soft Gray-Green) อย่างชัดเจน ป้องกันความสับสนของผู้ใช้ | **Pass** | ข้อมูล Requester Info และ Ticket Metadata เป็นพื้นหลังเทาอมเขียวอ่อน ส่วน Owner/Priority/Status เป็นสีขาวพร้อมขอบโฟกัส |
+| **Validation placement** | ข้อความแจ้งเตือนความผิดพลาด (Validation Error) แสดงอยู่ใต้ช่อง Input ที่เกี่ยวข้องทันที พร้อมขอบแดง `#DC2626` | **Pass** | ตรวจสอบในฟอร์ม Login, Create User, Edit User และฟอร์มเปลี่ยนรหัสผ่าน แสดงข้อความใต้ฟิลด์พร้อมขอบแดงชัดเจน |
+| **Focus states** | มีการเน้น Focus Ring หรือขอบสีเขียว Secondary Green (`#0B7A46`) เมื่อกดเลือกหรือ Tab ไปยัง Input / ปุ่ม / ลิงก์ | **Pass** | ทุก Input field, Dropdown, และ Button มี Focus outline ชัดเจน รองรับ Accessibility และการนำทางด้วย Keyboard ตามมาตรฐาน WCAG 2.1 |
+| **Clipping** | ไม่มีการตัดทอนหรือตกขอบของข้อความ ตัวเลข Badge หรือปุ่มกดในทุกขนาดหน้าจอ | **Pass** | กล่องข้อความและ Label ขยายตามเนื้อหา, แถบปุ่ม Action ในหน้า Edit User Modal (Save Changes, Cancel, Deactivate, Reset Password) ชิดซ้ายและมี Flex-wrap เป็นระเบียบ, ป้ายไฟล์แนบมีการ Truncate ชื่อไฟล์ยาวไม่ให้ล้นการ์ด ไม่มีปุ่มหรือข้อมูลใดตกขอบจอหรือตัดขาด |
+| **Overlap** | ไม่มีองค์ประกอบหรือเลเยอร์ซ้อนทับกันผิดตำแหน่ง เช่น Dropdown, Modal, Sticky Header หรือ Floating Buttons | **Pass** | Modal ทั้งหมดมี Backdrop overlay ที่ถูกต้อง, Sticky Header ไม่บังเนื้อหาตาราง, Dropdown แสดงอยู่เหนือเนื้อหาโดยรอบ, การ์ดข้อมูลบนมือถือเว้นระยะห่าง Gap ชัดเจน |
+| **Horizontal overflow** | ไม่มีปัญหาแถบเลื่อนแนวนอน (Horizontal Scrollbar) ที่ไม่พึงประสงค์ในระดับ Page-level บนหน้าจอ Desktop, Tablet, และ Mobile | **Pass** | ทดสอบบน Viewport $1280\times800$, $820\times1180$, และ $375\times667$ ทั้งหน้าตารางและหน้า Ticket Detail (White Card Containment) โดยทุก Element ภายในกรอบสีขาว UI มี `box-sizing: border-box`, `max-width: 100%`, `word-break: break-word` ปราศจาก Inner และ Page-level Horizontal Overflow |
+

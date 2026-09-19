@@ -3,7 +3,7 @@ import path from "path";
 import { execSync } from "child_process";
 
 test.describe("Administrator User Management Flow (E2E-04)", () => {
-  const adminScreenshotsDir = path.resolve(process.cwd(), "artifacts/lab-03/screenshots/part-8-admin-ui");
+  const adminScreenshotsDir = path.resolve(process.cwd(), "artifacts/lab-03/screenshots/user-management");
 
   test.beforeAll(async () => {
     try {
@@ -68,7 +68,6 @@ test.describe("Administrator User Management Flow (E2E-04)", () => {
     await page.getByTestId("create-user-name").fill(testUserName);
     await page.getByTestId("create-user-email").fill(testUserEmail);
     await page.getByTestId("create-user-role").selectOption("IT_STAFF");
-    await page.getByTestId("create-user-dept").fill("Systems Support");
     await page.getByTestId("create-user-password").fill("TokTickIT2026!");
     await page.getByTestId("submit-create-user-btn").click();
 

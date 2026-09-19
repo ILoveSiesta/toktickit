@@ -3,7 +3,7 @@ import path from "path";
 import { execSync } from "child_process";
 
 test.describe("Authentication & Session Flows (E2E-01 & E2E-02)", () => {
-  const screenshotsDir = path.resolve(process.cwd(), "artifacts/lab-03/screenshots/part-5-login-password");
+  const screenshotsDir = path.resolve(process.cwd(), "artifacts/lab-03/screenshots/authentication");
 
   test.beforeAll(async () => {
     try {

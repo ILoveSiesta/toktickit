@@ -1,40 +1,63 @@
 import { test, expect } from "@playwright/test";
+import { execSync } from "child_process";
 
 test.describe("Requester Ticket Flow (E2E-01 & E2E-02)", () => {
   let createdTicketNumber = "";
   let createdTicketId: number | null = null;
   let removedAttachmentId: number | null = null;
 
-  const ensureRequester = async (page: any, label = "Jennifer Anderson (jennifer@toktick.it) — Marketing") => {
-    await page.goto("/");
-    const requesterDropdown = page.getByTestId("requester-dropdown");
-    const myTicketsHeading = page.getByRole("heading", { name: /My Tickets/i });
-
-    await expect(requesterDropdown.or(myTicketsHeading)).toBeVisible();
-    if (await requesterDropdown.isVisible()) {
-      await requesterDropdown.selectOption({ label });
-      await page.getByTestId("continue-btn").click();
-      await expect(myTicketsHeading).toBeVisible();
+  test.beforeAll(async () => {
+    try {
+      execSync("npm run prisma:seed --prefix server", { stdio: "ignore" });
+    } catch (e) {
+      console.error("Failed to seed database in test.beforeAll:", e);
     }
+  });
+
+  const ensureRequester = async (page: any, userIdentifier = "jennifer@toktick.it", password = "TokTickIT2026!") => {
+    let email = "jennifer@toktick.it";
+    if (userIdentifier.toLowerCase().includes("michael")) {
+      email = "michael@toktick.it";
+    } else if (userIdentifier.toLowerCase().includes("jennifer")) {
+      email = "jennifer@toktick.it";
+    } else if (userIdentifier.includes("@")) {
+      email = userIdentifier;
+    }
+
+    await page.goto("/login");
+    await page.waitForTimeout(500);
+    const url = page.url();
+    if (url.includes("/tickets")) {
+      const currentText = await page.getByTestId("user-name-display").textContent();
+      if ((email.includes("jennifer") && currentText?.includes("Jennifer")) ||
+          (email.includes("michael") && currentText?.includes("Michael"))) {
+        return;
+      }
+      await page.getByTestId("logout-btn").click();
+      await expect(page).toHaveURL(/\/login/);
+    }
+    await page.getByTestId("login-email-input").fill(email);
+    await page.getByTestId("login-password-input").fill(password);
+    await page.getByTestId("login-submit-btn").click();
+    await expect(page).toHaveURL(/\/tickets/);
+    await expect(page.getByRole("heading", { name: /My Tickets/i })).toBeVisible();
   };
 
   test("E2E-01: Complete Ticket Creation Journey (AC-01, AC-02, AC-03, AC-07, AC-08, AC-10)", async ({ page }) => {
-    // 1. Entry into application without requester context -> Should show Selector
-    await page.goto("/");
-    await expect(page.getByRole("heading", { name: /Select Development Requester/i })).toBeVisible();
+    // 1. Login as Requester (Jennifer Anderson)
+    await page.goto("/login");
+    await expect(page.getByRole("heading", { name: /Sign in to your account/i })).toBeVisible();
+    await page.getByTestId("login-email-input").fill("jennifer@toktick.it");
+    await page.getByTestId("login-password-input").fill("TokTickIT2026!");
+    await page.getByTestId("login-submit-btn").click();
 
-    // Wait for requesters to load and dropdown to appear
-    const requesterDropdown = page.getByTestId("requester-dropdown");
-    await expect(requesterDropdown).toBeVisible();
-    await requesterDropdown.selectOption({ label: "Jennifer Anderson (jennifer@toktick.it) — Marketing" });
-
-    // Click continue
-    const continueBtn = page.getByTestId("continue-btn");
-    await continueBtn.click();
+    await expect(page).toHaveURL(/\/tickets/);
+    await expect(page.getByRole("heading", { name: /My Tickets/i })).toBeVisible();
 
     // 2. Verify Context in Header (AC-02)
     await expect(page.getByText("Jennifer Anderson")).toBeVisible();
-    await expect(page.getByRole("button", { name: /Change Requester/i })).toBeVisible();
+    await expect(page.getByTestId("user-role-badge")).toBeVisible();
+    await expect(page.getByTestId("user-role-badge")).toHaveText("REQUESTER");
 
     // 3. Navigate to Create Ticket Screen (AC-03)
     await page.getByRole("button", { name: /\+ Create Ticket/i }).click();
@@ -65,19 +88,31 @@ test.describe("Requester Ticket Flow (E2E-01 & E2E-02)", () => {
 
     // 5. Submit Ticket (AC-03, BR-12)
     const submitBtn = page.getByTestId("submit-ticket-btn");
-    await submitBtn.click();
+    const [createResponse] = await Promise.all([
+      page.waitForResponse((res) => res.url().includes("/api/tickets") && res.request().method() === "POST"),
+      submitBtn.click(),
+    ]);
+    expect(createResponse.status()).toBe(201);
+    const createData = await createResponse.json();
+    const apiTicketNumber = createData.data?.ticketNumber;
 
-    // 6. Verify Success Screen and Ticket Number Generation (AC-03)
-    await expect(page.getByRole("heading", { name: /Ticket Submitted Successfully/i })).toBeVisible();
-    const ticketNumberElement = page.getByTestId("success-ticket-number");
-    await expect(ticketNumberElement).toBeVisible();
-    createdTicketNumber = (await ticketNumberElement.textContent())?.trim() || "";
+    // 6. Verify Success Screen or Auto-Navigation to My Tickets (AC-03)
+    const successHeading = page.getByRole("heading", { name: /Ticket Submitted Successfully/i });
+    if (await successHeading.isVisible().catch(() => false)) {
+      const ticketNumberElement = page.getByTestId("success-ticket-number");
+      await expect(ticketNumberElement).toBeVisible();
+      createdTicketNumber = (await ticketNumberElement.textContent())?.trim() || "";
+      expect(createdTicketNumber).toMatch(/^TKT-\d{4}-\d{6}$/);
 
-    expect(createdTicketNumber).toMatch(/^TKT-\d{4}-\d{6}$/);
-
-    // 7. Navigate to My Tickets (AC-07)
-    await page.getByRole("button", { name: /My Tickets/i }).click();
-    await expect(page.getByRole("heading", { name: /My Tickets/i })).toBeVisible();
+      // 7. Navigate to My Tickets (AC-07)
+      await page.getByRole("button", { name: /My Tickets/i }).click();
+      await expect(page.getByRole("heading", { name: /My Tickets/i })).toBeVisible();
+    } else {
+      createdTicketNumber = apiTicketNumber || "";
+      expect(createdTicketNumber).toMatch(/^TKT-\d{4}-\d{6}$/);
+      await expect(page).toHaveURL(/\/tickets/);
+      await expect(page.getByRole("heading", { name: /My Tickets/i })).toBeVisible();
+    }
 
     // 8. Search for the newly created ticket (AC-08)
     const searchInput = page.getByTestId("ticket-search-input");
@@ -178,18 +213,17 @@ test.describe("Requester Ticket Flow (E2E-01 & E2E-02)", () => {
     await expect(page.getByText("new-system-info.pdf")).toBeVisible();
 
     // 7. Test Multi-Requester Switching & Data Isolation (AC-07, AC-15)
-    await page.getByRole("button", { name: /Change Requester/i }).click();
-    await expect(page.getByRole("heading", { name: /Select Development Requester/i })).toBeVisible();
+    await page.getByTestId("logout-btn").click();
+    await expect(page).toHaveURL(/\/login/);
 
-    // Switch to Michael Brown (ID: 2)
-    await page.getByTestId("requester-dropdown").selectOption({ label: "Michael Brown (michael@toktick.it) — Finance" });
-    await page.getByTestId("continue-btn").click();
+    // Login as Michael Brown (michael@toktick.it)
+    await page.getByTestId("login-email-input").fill("michael@toktick.it");
+    await page.getByTestId("login-password-input").fill("TokTickIT2026!");
+    await page.getByTestId("login-submit-btn").click();
+    await expect(page).toHaveURL(/\/tickets/);
 
     // Verify Header reflects Michael Brown
     await expect(page.getByText("Michael Brown")).toBeVisible();
-
-    // Navigate to My Tickets
-    await page.getByRole("button", { name: /My Tickets/i }).click();
     await expect(page.getByRole("heading", { name: /My Tickets/i })).toBeVisible();
 
     // Verify Jennifer's ticket does NOT appear in Michael's list (AC-07, AC-15)

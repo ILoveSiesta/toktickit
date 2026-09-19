@@ -3,8 +3,8 @@ import path from "path";
 import { execSync } from "child_process";
 
 test.describe("IT Staff Ticket Queue & Triage Flow (E2E-03)", () => {
-  const queueScreenshotsDir = path.resolve(process.cwd(), "artifacts/lab-03/screenshots/part-6-staff-queue");
-  const detailScreenshotsDir = path.resolve(process.cwd(), "artifacts/lab-03/screenshots/part-7-staff-detail");
+  const queueScreenshotsDir = path.resolve(process.cwd(), "artifacts/lab-03/screenshots/staff-queue");
+  const detailScreenshotsDir = path.resolve(process.cwd(), "artifacts/lab-03/screenshots/staff-ticket-detail");
 
   test.beforeAll(async () => {
     try {
