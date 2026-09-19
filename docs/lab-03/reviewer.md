@@ -11,4 +11,4 @@
 |  https://github.com/ILoveSiesta/toktickit/pull/29  | feat/staff-workspace-queue | Approve |
 |  https://github.com/ILoveSiesta/toktickit/pull/30  | feat/ticket-lifecycle-ops | Approve |
 |  https://github.com/ILoveSiesta/toktickit/pull/31  | feat/admin-user-management | Approve |
-
+|  https://github.com/ILoveSiesta/toktickit/pull/32  | test/final-validation | Approve |
