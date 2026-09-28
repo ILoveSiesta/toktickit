@@ -58,6 +58,30 @@ npm run dev --prefix client
 
 ---
 
+## Default User Accounts (บัญชีผู้ใช้สำหรับการทดสอบ)
+
+ข้อมูลบัญชีผู้ใช้ตั้งต้น (Seed Data) สำหรับการเข้าสู่ระบบและทดสอบแต่ละสิทธิ์ (Role):
+
+| Role | ชื่อ (Name) | Email | Password | สถานะ (Status) | หมายเหตุ |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Administrator** | John Smith | `admin@toktickit.com` | `TokTickIT2026!` | Active | ผู้ดูแลระบบ จัดการผู้ใช้และระบบทั้งหมด |
+| **IT Staff** | Alex Thompson | `alex.staff@toktickit.com` | `TokTickIT2026!` | Active | เจ้าหน้าที่ IT รับเรื่องและจัดการตั๋ว |
+| **IT Staff** | Lisa Martinez | `lisa.staff@toktickit.com` | `TokTickIT2026!` | Active | เจ้าหน้าที่ IT รับเรื่องและจัดการตั๋ว |
+| **IT Staff** | Kevin Patel | `kevin.staff@toktickit.com` | `TokTickIT2026!` | Active | **ต้องเปลี่ยนรหัสผ่านเมื่อเข้าสู่ระบบครั้งแรก** (`mustChangePassword: true`) |
+| **IT Staff** | Robert Wilson | `robert.inactive@toktickit.com` | `TokTickIT2026!` | Inactive | บัญชีถูกปิดการใช้งาน (สำหรับทดสอบปฏิเสธการล็อกอิน) |
+| **Requester** | Jennifer Anderson | `jennifer@toktick.it` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | Michael Brown | `michael@toktick.it` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | Sarah Johnson | `sarah@toktick.it` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | David Lee | `david@toktick.it` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | Amanda Clark | `amanda.clark@toktickit.com` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | Alex Inactive | `alex.inactive@toktick.it` | `TokTickIT2026!` | Inactive | บัญชีถูกปิดการใช้งาน (สำหรับทดสอบปฏิเสธการล็อกอิน) |
+
+> **หมายเหตุเพิ่มเติมเกี่ยวกับการเปลี่ยนรหัสผ่าน:**
+> - สำหรับบัญชี **Kevin Patel** (`kevin.staff@toktickit.com`) ระบบได้ตั้งค่า `mustChangePassword: true` ไว้ ทำให้เมื่อเข้าสู่ระบบสำเร็จ จะถูกบังคับเปลี่ยนรหัสผ่านทันทีก่อนเข้าใช้งานส่วนอื่น
+
+
+---
+
 ## Testing Suites
 
 โปรเจกต์รองรับการทดสอบครบ 5 ระดับ (Unit, API Integration, UI Component, Responsive Visual, และ E2E):
