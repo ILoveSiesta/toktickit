@@ -95,5 +95,9 @@ describe("UI-02 & UI-03: CreateTicket Component", () => {
 
     // Resolve API call
     resolveSubmit!({ success: true, data: { id: 101, ticketNumber: "TKT-2026-000101" } });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Ticket Submitted Successfully/i)).toBeInTheDocument();
+    });
   });
 });

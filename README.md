@@ -1,6 +1,6 @@
 # TokTickIT - IT Service Ticketing System
 
-**Lab 2: Requester Ticketing MVP with UI Foundation & Zen Green Theme**
+**Lab 3: TokTickIT Users, Roles, IT Staff Ticketing, and Admin Screens**
 
 TokTickIT เป็นระบบจัดการและรับเรื่องแจ้งปัญหาบริการเทคโนโลยีสารสนเทศ (IT Service Desk) สำหรับองค์กร พัฒนาโดยมุ่งเน้นสถาปัตยกรรมที่สะอาด ปลอดภัย และยึดหลัก **Zen Green Design Language**
 
@@ -28,13 +28,13 @@ TokTickIT เป็นระบบจัดการและรับเรื�
 สร้างไฟล์ `client/.env` โดยคัดลอกและปรับแก้จากไฟล์ `client/.env.example`
 
 ### Database Migration & Idempotent Seeding
-รันคำสั่ง Migration และ Seed ข้อมูลตั้งต้นสำหรับ Lab 2 (Categories, Related Systems, Development Requesters ทั้ง Active และ Inactive):
+รันคำสั่ง Migration และ Seed ข้อมูลตั้งต้นสำหรับ Lab 3 (Categories, Related Systems, และบัญชีผู้ใช้จริงสำหรับ Requester, IT Staff, และ Administrator ทั้งแบบ Active/Inactive):
 ```bash
 # ติดตั้ง Dependencies และรัน Prisma Migration & Seed
 npm install
 npm install --prefix server
 npm install --prefix client
-npm run prisma:migrate --prefix server
+npm run prisma:deploy --prefix server
 npm run prisma:seed --prefix server
 ```
 
@@ -55,6 +55,30 @@ npm run dev --prefix server
 npm run dev --prefix client
 ```
 *Web Application URL: `http://localhost:5173`*
+
+---
+
+## Default User Accounts (บัญชีผู้ใช้สำหรับการทดสอบ)
+
+ข้อมูลบัญชีผู้ใช้ตั้งต้น (Seed Data) สำหรับการเข้าสู่ระบบและทดสอบแต่ละสิทธิ์ (Role):
+
+| Role | ชื่อ (Name) | Email | Password | สถานะ (Status) | หมายเหตุ |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Administrator** | John Smith | `admin@toktickit.com` | `TokTickIT2026!` | Active | ผู้ดูแลระบบ จัดการผู้ใช้และระบบทั้งหมด |
+| **IT Staff** | Alex Thompson | `alex.staff@toktickit.com` | `TokTickIT2026!` | Active | เจ้าหน้าที่ IT รับเรื่องและจัดการตั๋ว |
+| **IT Staff** | Lisa Martinez | `lisa.staff@toktickit.com` | `TokTickIT2026!` | Active | เจ้าหน้าที่ IT รับเรื่องและจัดการตั๋ว |
+| **IT Staff** | Kevin Patel | `kevin.staff@toktickit.com` | `TokTickIT2026!` | Active | **ต้องเปลี่ยนรหัสผ่านเมื่อเข้าสู่ระบบครั้งแรก** (`mustChangePassword: true`) |
+| **IT Staff** | Robert Wilson | `robert.inactive@toktickit.com` | `TokTickIT2026!` | Inactive | บัญชีถูกปิดการใช้งาน (สำหรับทดสอบปฏิเสธการล็อกอิน) |
+| **Requester** | Jennifer Anderson | `jennifer@toktick.it` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | Michael Brown | `michael@toktick.it` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | Sarah Johnson | `sarah@toktick.it` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | David Lee | `david@toktick.it` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | Amanda Clark | `amanda.clark@toktickit.com` | `TokTickIT2026!` | Active | ผู้ใช้งานทั่วไป แจ้งเรื่องและติดตามสถานะตั๋ว |
+| **Requester** | Alex Inactive | `alex.inactive@toktick.it` | `TokTickIT2026!` | Inactive | บัญชีถูกปิดการใช้งาน (สำหรับทดสอบปฏิเสธการล็อกอิน) |
+
+> **หมายเหตุเพิ่มเติมเกี่ยวกับการเปลี่ยนรหัสผ่าน:**
+> - สำหรับบัญชี **Kevin Patel** (`kevin.staff@toktickit.com`) ระบบได้ตั้งค่า `mustChangePassword: true` ไว้ ทำให้เมื่อเข้าสู่ระบบสำเร็จ จะถูกบังคับเปลี่ยนรหัสผ่านทันทีก่อนเข้าใช้งานส่วนอื่น
+
 
 ---
 

@@ -7,7 +7,13 @@ import { getPrisma } from "./prisma.js";
 import { generateTicketNumber } from "./utils/ticketGenerator.js";
 import { validateAttachment } from "./utils/attachmentValidator.js";
 import { generateSafeStorageFileName } from "./utils/safeStorageName.js";
-import { PriorityLevel } from "@prisma/client";
+import { PriorityLevel, Role } from "@prisma/client";
+import { authRouter } from "./routes/auth.js";
+import { staffRouter } from "./routes/staff.js";
+import { commentsNotesRouter } from "./routes/commentsNotes.js";
+import { adminRouter } from "./routes/admin.js";
+import { authenticate, requireRole, enforcePasswordChanged } from "./middleware/auth.js";
+import { verifyToken } from "./utils/jwt.js";
 
 export const app = express();
 
@@ -36,12 +42,24 @@ app.get("/api/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok", service: "TokTickIT API" });
 });
 
+// Authentication Routes (Lab 3 Issue 2)
+app.use("/api/auth", authRouter);
+
+// Staff Workspace Routes (Lab 3 Issue 3)
+app.use("/api/staff", staffRouter);
+
+// Comments & Notes Routes (Lab 3 Issue 4)
+app.use("/api", commentsNotesRouter);
+
+// Administrator Routes (Lab 3 Issue 5)
+app.use("/api/admin", adminRouter);
+
 // GET /api/requesters - List active development requesters
 app.get("/api/requesters", async (_req: Request, res: Response) => {
   try {
     const prisma = getPrisma();
-    const requesters = await prisma.requesterUser.findMany({
-      where: { isActive: true },
+    const requesters = await prisma.user.findMany({
+      where: { role: "REQUESTER", isActive: true },
       select: {
         id: true,
         name: true,
@@ -104,21 +122,55 @@ app.post(
     try {
       const prisma = getPrisma();
 
-      // 1. Authenticate Requester Context via Header
-      const rawRequesterId = req.headers["x-requester-id"];
-      const requesterId = Number(rawRequesterId);
+      // 1. Authenticate Requester Context via Bearer Token or X-Requester-Id Header
+      let requesterId: number;
+      const authHeader = req.headers["authorization"];
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const payload = verifyToken(authHeader.substring(7).trim());
+        if (!payload) {
+          return res.status(401).json({
+            success: false,
+            error: {
+              code: "UNAUTHORIZED",
+              message: "Invalid or expired authentication token",
+            },
+          });
+        }
+        if (payload.mustChangePassword) {
+          return res.status(403).json({
+            success: false,
+            error: {
+              code: "PASSWORD_CHANGE_REQUIRED",
+              message: "You must change your password before continuing into the application.",
+            },
+          });
+        }
+        if (payload.role !== Role.REQUESTER) {
+          return res.status(403).json({
+            success: false,
+            error: {
+              code: "FORBIDDEN",
+              message: "Only Requesters are permitted to create support tickets.",
+            },
+          });
+        }
+        requesterId = payload.id;
+      } else {
+        const rawRequesterId = req.headers["x-requester-id"];
+        requesterId = Number(rawRequesterId);
 
-      if (!rawRequesterId || isNaN(requesterId)) {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: "UNAUTHORIZED_CONTEXT",
-            message: "Missing or invalid X-Requester-Id header",
-          },
-        });
+        if (!rawRequesterId || isNaN(requesterId)) {
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: "UNAUTHORIZED_CONTEXT",
+              message: "Missing or invalid X-Requester-Id header",
+            },
+          });
+        }
       }
 
-      const requester = await prisma.requesterUser.findUnique({
+      const requester = await prisma.user.findUnique({
         where: { id: requesterId },
       });
 
@@ -128,6 +180,16 @@ app.post(
           error: {
             code: "INVALID_REQUESTER",
             message: "Specified requester does not exist or is inactive",
+          },
+        });
+      }
+
+      if (requester.role !== Role.REQUESTER) {
+        return res.status(403).json({
+          success: false,
+          error: {
+            code: "FORBIDDEN",
+            message: "Only Requesters are permitted to create support tickets.",
           },
         });
       }
@@ -291,8 +353,22 @@ app.post(
           },
         });
 
-        // Generate official ticketNumber based on ticket.id
-        const officialTicketNumber = generateTicketNumber(ticket.id, ticket.createdAt);
+        // Generate official ticketNumber based on ticket.id with collision avoidance
+        let seq = ticket.id;
+        let officialTicketNumber = generateTicketNumber(seq, ticket.createdAt);
+        let collision = await tx.ticket.findUnique({
+          where: { ticketNumber: officialTicketNumber },
+          select: { id: true },
+        });
+        while (collision && collision.id !== ticket.id) {
+          seq += 1000;
+          officialTicketNumber = generateTicketNumber(seq, ticket.createdAt);
+          collision = await tx.ticket.findUnique({
+            where: { ticketNumber: officialTicketNumber },
+            select: { id: true },
+          });
+        }
+
         const updatedTicket = await tx.ticket.update({
           where: { id: ticket.id },
           data: { ticketNumber: officialTicketNumber },
@@ -334,17 +410,42 @@ app.post(
 app.get("/api/tickets", async (req: Request, res: Response) => {
   try {
     const prisma = getPrisma();
-    const rawRequesterId = req.headers["x-requester-id"];
-    const requesterId = Number(rawRequesterId);
+    let requesterId: number;
+    const authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const payload = verifyToken(authHeader.substring(7).trim());
+      if (!payload) {
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: "UNAUTHORIZED",
+            message: "Invalid or expired authentication token",
+          },
+        });
+      }
+      if (payload.mustChangePassword) {
+        return res.status(403).json({
+          success: false,
+          error: {
+            code: "PASSWORD_CHANGE_REQUIRED",
+            message: "You must change your password before continuing into the application.",
+          },
+        });
+      }
+      requesterId = payload.id;
+    } else {
+      const rawRequesterId = req.headers["x-requester-id"];
+      requesterId = Number(rawRequesterId);
 
-    if (!rawRequesterId || isNaN(requesterId)) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: "UNAUTHORIZED_CONTEXT",
-          message: "Missing or invalid X-Requester-Id header",
-        },
-      });
+      if (!rawRequesterId || isNaN(requesterId)) {
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: "UNAUTHORIZED_CONTEXT",
+            message: "Missing or invalid X-Requester-Id header",
+          },
+        });
+      }
     }
 
     // Query parameters
@@ -452,7 +553,7 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
           requestedPriority: true,
           itPriority: true,
           currentStatus: true,
-          ticketOwner: true,
+          ticketOwner: { select: { id: true, name: true } },
           ticketDate: true,
           createdAt: true,
           updatedAt: true,
@@ -480,7 +581,7 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
       requestedPriority: t.requestedPriority,
       itPriority: t.itPriority,
       currentStatus: t.currentStatus,
-      ticketOwner: t.ticketOwner,
+      ticketOwner: t.ticketOwner ? t.ticketOwner.name : null,
       ticketDate: t.ticketDate,
       createdAt: t.createdAt,
       updatedAt: t.updatedAt,
@@ -515,9 +616,6 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
   try {
     const prisma = getPrisma();
     const ticketId = Number(req.params.id);
-    const rawRequesterId = req.headers["x-requester-id"];
-    const requesterId = Number(rawRequesterId);
-
     if (isNaN(ticketId)) {
       return res.status(400).json({
         success: false,
@@ -525,11 +623,40 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
       });
     }
 
-    if (!rawRequesterId || isNaN(requesterId)) {
-      return res.status(400).json({
-        success: false,
-        error: { code: "UNAUTHORIZED_CONTEXT", message: "Missing or invalid X-Requester-Id header" },
-      });
+    let requesterId: number;
+    let isStaffOrAdmin = false;
+    const authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const payload = verifyToken(authHeader.substring(7).trim());
+      if (!payload) {
+        return res.status(401).json({
+          success: false,
+          error: { code: "UNAUTHORIZED", message: "Invalid or expired authentication token" },
+        });
+      }
+      if (payload.mustChangePassword) {
+        return res.status(403).json({
+          success: false,
+          error: {
+            code: "PASSWORD_CHANGE_REQUIRED",
+            message: "You must change your password before continuing into the application.",
+          },
+        });
+      }
+      requesterId = payload.id;
+      if (payload.role === Role.IT_STAFF || payload.role === Role.ADMINISTRATOR) {
+        isStaffOrAdmin = true;
+      }
+    } else {
+      const rawRequesterId = req.headers["x-requester-id"];
+      requesterId = Number(rawRequesterId);
+
+      if (!rawRequesterId || isNaN(requesterId)) {
+        return res.status(400).json({
+          success: false,
+          error: { code: "UNAUTHORIZED_CONTEXT", message: "Missing or invalid X-Requester-Id header" },
+        });
+      }
     }
 
     const ticket = await prisma.ticket.findUnique({
@@ -538,6 +665,7 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
         category: { select: { id: true, name: true } },
         relatedSystem: { select: { id: true, name: true } },
         requester: { select: { id: true, name: true, email: true, department: true } },
+        ticketOwner: { select: { id: true, name: true, email: true } },
         attachments: {
           select: {
             id: true,
@@ -561,8 +689,8 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
       });
     }
 
-    // Ownership Enforcement (BR-22)
-    if (ticket.requesterId !== requesterId) {
+    // Ownership Enforcement (BR-08, BR-22)
+    if (!isStaffOrAdmin && ticket.requesterId !== requesterId) {
       return res.status(403).json({
         success: false,
         error: {

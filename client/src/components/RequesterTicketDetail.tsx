@@ -1,6 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useAuth } from "../context/AuthContext.js";
 import { useRequester } from "../context/RequesterContext.js";
-import { fetchTicketDetail, uploadTicketAttachments, removeAttachment, downloadAttachment } from "../api.js";
+import {
+  fetchTicketDetail,
+  uploadTicketAttachments,
+  removeAttachment,
+  downloadAttachment,
+  fetchPublicComments,
+  postPublicComment,
+  indicateProblemResolved,
+} from "../api.js";
 
 interface RequesterTicketDetailProps {
   ticketId: number;
@@ -8,11 +17,26 @@ interface RequesterTicketDetailProps {
 }
 
 export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ticketId, onBack }) => {
-  const { currentRequester } = useRequester();
+  const { user } = useAuth();
+  let requesterContext: any = null;
+  try {
+    requesterContext = useRequester();
+  } catch {}
+
+  const currentRequester = useMemo(() => {
+    return (user ? { id: user.id, name: user.name, email: user.email, isActive: true } : null) || requesterContext?.currentRequester;
+  }, [user?.id, user?.name, user?.email, requesterContext?.currentRequester]);
 
   const [ticket, setTicket] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Comments state (UI-08)
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState<string>("");
+  const [commentLoading, setCommentLoading] = useState<boolean>(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
+  const [resolveLoading, setResolveLoading] = useState<boolean>(false);
 
   // Soft-remove modal state
   const [removingAttachment, setRemovingAttachment] = useState<any | null>(null);
@@ -25,19 +49,28 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
   const [uploadLoading, setUploadLoading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  const requesterId = currentRequester?.id;
+
   const loadTicket = useCallback(async () => {
-    if (!currentRequester) return;
+    if (!requesterId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchTicketDetail(ticketId, currentRequester.id);
+      const [data, commentsList] = await Promise.all([
+        fetchTicketDetail(ticketId, requesterId),
+        fetchPublicComments(ticketId).catch(() => []),
+      ]);
       setTicket(data);
+      setComments(commentsList);
     } catch (err: any) {
       setError(err.message || "Failed to load ticket details");
     } finally {
       setLoading(false);
     }
-  }, [ticketId, currentRequester]);
+  }, [ticketId, requesterId]);
 
   useEffect(() => {
     loadTicket();
@@ -128,6 +161,36 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
     }
   };
 
+  const handleProblemAppearsResolved = async () => {
+    if (!ticket || ticket.resolvedIndicated || resolveLoading) return;
+    setResolveLoading(true);
+    try {
+      await indicateProblemResolved(ticket.id);
+      setTicket((prev: any) => (prev ? { ...prev, resolvedIndicated: true } : null));
+    } catch (err: any) {
+      alert(err.message || "Failed to indicate problem resolution.");
+    } finally {
+      setResolveLoading(false);
+    }
+  };
+
+  const handlePostComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newComment.trim();
+    if (!trimmed) return;
+    setCommentLoading(true);
+    setCommentError(null);
+    try {
+      const created = await postPublicComment(ticket.id, trimmed);
+      setComments((prev) => [...prev, created]);
+      setNewComment("");
+    } catch (err: any) {
+      setCommentError(err.message || "Failed to post comment.");
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
   const formatFileSize = (bytes: number) => {
     if (!bytes) return "0 B";
     if (bytes < 1024) return `${bytes} B`;
@@ -176,6 +239,31 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
         return "zen-badge-low";
       default:
         return "zen-badge-medium";
+    }
+  };
+
+  const getRoleBadgeStyle = (role?: string) => {
+    switch (role) {
+      case "ADMINISTRATOR":
+        return { bg: "#EDE9FE", text: "#6D28D9", border: "#DDD6FE", label: "Admin" };
+      case "IT_STAFF":
+        return { bg: "#DCFCE7", text: "#15803D", border: "#86EFAC", label: "IT Staff" };
+      case "REQUESTER":
+        return { bg: "#E0F2FE", text: "#0369A1", border: "#BAE6FD", label: "Requester" };
+      default:
+        return { bg: "#F1F5F9", text: "#475569", border: "#CBD5E1", label: role || "User" };
+    }
+  };
+
+  const getAvatarBg = (role?: string) => {
+    switch (role) {
+      case "ADMINISTRATOR":
+        return "#6D28D9";
+      case "IT_STAFF":
+        return "#006B3C";
+      case "REQUESTER":
+      default:
+        return "#0369A1";
     }
   };
 
@@ -239,14 +327,51 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
           gap: "var(--space-md)",
         }}
       >
-        <button
-          type="button"
-          onClick={onBack}
-          className="zen-btn zen-btn-secondary"
-          style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-xs)" }}
-        >
-          ← Back to My Tickets
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={onBack}
+            className="zen-btn zen-btn-secondary"
+            style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-xs)" }}
+          >
+            ← Back to My Tickets
+          </button>
+
+          {ticket.resolvedIndicated ? (
+            <span
+              data-testid="resolved-indicated-badge"
+              className="zen-badge"
+              style={{ backgroundColor: "#E0F2FE", color: "#0369A1", border: "1px solid #BAE6FD", fontWeight: 600, padding: "6px 12px" }}
+            >
+              ✓ Problem Appears Resolved (Pending Review)
+            </span>
+          ) : (
+            (ticket.currentStatus === "IN_PROGRESS" || ticket.currentStatus === "WAITING_FOR_REQUESTER" || ticket.currentStatus === "OPEN") && (
+              <button
+                type="button"
+                data-testid="resolve-indicated-btn"
+                onClick={handleProblemAppearsResolved}
+                disabled={resolveLoading}
+                className="zen-btn"
+                style={{
+                  backgroundColor: "#EAF6EF",
+                  color: "#006B3C",
+                  border: "1.5px solid #006B3C",
+                  fontWeight: 600,
+                  fontSize: "0.875rem",
+                  cursor: resolveLoading ? "not-allowed" : "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                  padding: "6px 12px",
+                }}
+              >
+                {resolveLoading ? "Submitting..." : "Problem Appears Resolved"}
+              </button>
+            )
+          )}
+        </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", flexWrap: "wrap" }}>
           <span className={`zen-badge ${getStatusBadgeClass(ticket.currentStatus)}`}>
@@ -355,7 +480,7 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
                 fontWeight: 500,
               }}
             >
-              {ticket.ticketOwner || "Unassigned"}
+              {ticket.ticketOwner?.name || (typeof ticket.ticketOwner === "string" ? ticket.ticketOwner : "Unassigned")}
             </div>
           </div>
         </div>
@@ -373,6 +498,10 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
               fontWeight: 600,
               fontSize: "1rem",
               color: "var(--color-text-dark)",
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+              boxSizing: "border-box",
+              maxWidth: "100%",
             }}
           >
             {ticket.summary}
@@ -393,6 +522,10 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
               whiteSpace: "pre-wrap",
               lineHeight: 1.6,
               color: "var(--color-text-dark)",
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+              boxSizing: "border-box",
+              maxWidth: "100%",
             }}
           >
             {ticket.description}
@@ -562,6 +695,136 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
             </div>
           )}
         </div>
+      </div>
+
+      {/* Public Comments Section (UI Spec 3.2 / UI-08) */}
+      <div className="zen-card" data-testid="public-comments-section" style={{ marginBottom: "var(--space-xl)" }}>
+        <h2 className="zen-subtitle" style={{ fontSize: "1.125rem", color: "var(--color-primary-green)", marginBottom: "var(--space-md)" }}>
+          Public Comments ({comments.length})
+        </h2>
+        <p className="zen-text-muted" style={{ fontSize: "0.875rem", marginBottom: "var(--space-md)" }}>
+          Messages and updates shared between you and the IT support team.
+        </p>
+
+        {/* Comments List */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)", marginBottom: "var(--space-lg)" }}>
+          {comments.length === 0 ? (
+            <div
+              style={{
+                padding: "var(--space-lg)",
+                textAlign: "center",
+                color: "var(--color-text-muted)",
+                backgroundColor: "var(--color-field-readonly)",
+                borderRadius: "var(--radius-sm)",
+                border: "1px dashed var(--color-border)",
+              }}
+            >
+              No comments on this ticket yet.
+            </div>
+          ) : (
+            comments.map((c) => (
+              <div
+                key={c.id}
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "var(--space-md)",
+                  boxShadow: "var(--shadow-sm)",
+                  boxSizing: "border-box",
+                  maxWidth: "100%",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", marginBottom: "var(--space-xs)", flexWrap: "wrap" }}>
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: "50%",
+                      backgroundColor: getAvatarBg(c.author?.role),
+                      color: "#FFFFFF",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 700,
+                      fontSize: "0.75rem",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {c.author?.name ? c.author.name.slice(0, 2).toUpperCase() : "??"}
+                  </div>
+                  <strong style={{ fontSize: "0.9rem", color: "var(--color-text-primary)" }}>
+                    {c.author?.name || "User"}
+                  </strong>
+                  {(() => {
+                    const roleStyle = getRoleBadgeStyle(c.author?.role);
+                    return (
+                      <span
+                        className="zen-badge"
+                        style={{
+                          fontSize: "0.7rem",
+                          padding: "2px 6px",
+                          backgroundColor: roleStyle.bg,
+                          color: roleStyle.text,
+                          border: `1px solid ${roleStyle.border}`,
+                          fontWeight: 600,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {roleStyle.label}
+                      </span>
+                    );
+                  })()}
+                  <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "var(--color-text-muted)", whiteSpace: "nowrap" }}>
+                    {formatDateTime(c.createdAt)}
+                  </span>
+                </div>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.9rem",
+                    color: "var(--color-text-primary)",
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {c.content}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Post Comment Form */}
+        <form onSubmit={handlePostComment}>
+          {commentError && (
+            <div className="zen-text-error" style={{ marginBottom: "var(--space-sm)" }}>
+              {commentError}
+            </div>
+          )}
+          <div style={{ marginBottom: "var(--space-sm)" }}>
+            <label className="zen-label">Add Public Comment</label>
+            <textarea
+              data-testid="requester-comment-input"
+              className="zen-textarea"
+              rows={3}
+              placeholder="Ask a question or provide additional details to the IT team..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+            />
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button
+              type="submit"
+              data-testid="requester-comment-submit"
+              disabled={commentLoading || !newComment.trim()}
+              className="zen-btn zen-btn-primary"
+            >
+              {commentLoading ? "Posting..." : "Post Comment"}
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* Soft-Removal Confirmation Modal (BR-19 / UI-07) */}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useAuth } from "../context/AuthContext.js";
 import { useRequester } from "../context/RequesterContext.js";
 import { fetchTickets, fetchCategories } from "../api.js";
 import { Category } from "../types/index.js";
@@ -9,7 +10,15 @@ interface MyTicketsProps {
 }
 
 export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigateCreate }) => {
-  const { currentRequester } = useRequester();
+  const { user } = useAuth();
+  let requesterContext: any = null;
+  try {
+    requesterContext = useRequester();
+  } catch {}
+
+  const currentRequester = useMemo(() => {
+    return (user ? { id: user.id, name: user.name, email: user.email, isActive: true } : null) || requesterContext?.currentRequester;
+  }, [user?.id, user?.name, user?.email, requesterContext?.currentRequester]);
 
   const [tickets, setTickets] = useState<any[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -36,7 +45,10 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigate
   }, []);
 
   const loadTickets = useCallback(async () => {
-    if (!currentRequester) return;
+    if (!currentRequester) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -350,29 +362,29 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigate
         /* Tickets Table & Mobile Cards */
         <div className="zen-card" style={{ padding: 0, overflow: "hidden" }}>
           {/* Desktop/Tablet Table View */}
-          <div className="zen-table-responsive-desktop" style={{ overflowX: "auto" }}>
-            <table className="zen-table">
+          <div className="zen-table-responsive-desktop" style={{ overflowX: "auto", width: "100%" }}>
+            <table className="zen-table" style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
                   <th
-                    style={{ width: "140px", cursor: "pointer", userSelect: "none" }}
+                    style={{ width: "140px", cursor: "pointer", userSelect: "none", textAlign: "left" }}
                     onClick={() => handleSort("ticketNumber")}
                   >
                     Ticket No. {renderSortIndicator("ticketNumber")}
                   </th>
-                  <th>Summary</th>
-                  <th style={{ width: "130px" }}>Category</th>
-                  <th style={{ width: "110px" }}>Req. Priority</th>
-                  <th style={{ width: "110px" }}>IT Priority</th>
-                  <th style={{ width: "120px" }}>Status</th>
+                  <th style={{ textAlign: "left" }}>Summary</th>
+                  <th style={{ width: "130px", textAlign: "left" }}>Category</th>
+                  <th style={{ width: "110px", textAlign: "left" }}>Req. Priority</th>
+                  <th style={{ width: "110px", textAlign: "left" }}>IT Priority</th>
+                  <th style={{ width: "120px", textAlign: "left" }}>Status</th>
                   <th
-                    style={{ width: "120px", cursor: "pointer", userSelect: "none" }}
+                    style={{ width: "120px", cursor: "pointer", userSelect: "none", textAlign: "left" }}
                     onClick={() => handleSort("createdAt")}
                   >
                     Created Date {renderSortIndicator("createdAt")}
                   </th>
                   <th
-                    style={{ width: "120px", cursor: "pointer", userSelect: "none" }}
+                    style={{ width: "120px", cursor: "pointer", userSelect: "none", textAlign: "left" }}
                     onClick={() => handleSort("updatedAt")}
                   >
                     Last Updated {renderSortIndicator("updatedAt")}
@@ -387,7 +399,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigate
                     onClick={() => onSelectTicket(t.id)}
                     style={{ cursor: "pointer" }}
                   >
-                    <td>
+                    <td style={{ textAlign: "left" }}>
                       <strong style={{ color: "var(--color-primary-green)" }}>
                         {t.ticketNumber}
                       </strong>

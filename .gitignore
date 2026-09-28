@@ -20,3 +20,6 @@ server/uploads/*
 # test results & reports
 test-results/
 playwright-report/
+
+# AI agent internal handover
+docs/lab-03/agents.md
