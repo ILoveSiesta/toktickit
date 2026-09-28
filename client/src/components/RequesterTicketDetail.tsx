@@ -498,6 +498,10 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
               fontWeight: 600,
               fontSize: "1rem",
               color: "var(--color-text-dark)",
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+              boxSizing: "border-box",
+              maxWidth: "100%",
             }}
           >
             {ticket.summary}
@@ -518,6 +522,10 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
               whiteSpace: "pre-wrap",
               lineHeight: 1.6,
               color: "var(--color-text-dark)",
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+              boxSizing: "border-box",
+              maxWidth: "100%",
             }}
           >
             {ticket.description}
@@ -723,9 +731,11 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
                   borderRadius: "var(--radius-sm)",
                   padding: "var(--space-md)",
                   boxShadow: "var(--shadow-sm)",
+                  boxSizing: "border-box",
+                  maxWidth: "100%",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", marginBottom: "var(--space-xs)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", marginBottom: "var(--space-xs)", flexWrap: "wrap" }}>
                   <div
                     style={{
                       width: 28,
@@ -738,6 +748,7 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
                       justifyContent: "center",
                       fontWeight: 700,
                       fontSize: "0.75rem",
+                      flexShrink: 0,
                     }}
                   >
                     {c.author?.name ? c.author.name.slice(0, 2).toUpperCase() : "??"}
@@ -757,17 +768,27 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
                           color: roleStyle.text,
                           border: `1px solid ${roleStyle.border}`,
                           fontWeight: 600,
+                          whiteSpace: "nowrap",
                         }}
                       >
                         {roleStyle.label}
                       </span>
                     );
                   })()}
-                  <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+                  <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "var(--color-text-muted)", whiteSpace: "nowrap" }}>
                     {formatDateTime(c.createdAt)}
                   </span>
                 </div>
-                <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--color-text-primary)", whiteSpace: "pre-wrap" }}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.9rem",
+                    color: "var(--color-text-primary)",
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere",
+                  }}
+                >
                   {c.content}
                 </p>
               </div>

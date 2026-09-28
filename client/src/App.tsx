@@ -241,7 +241,7 @@ function AdminOnlyRoute({ children }: { children: React.ReactNode }) {
 }
 
 function MainApp() {
-  const { isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   // Handle Loading state during initial session restoration

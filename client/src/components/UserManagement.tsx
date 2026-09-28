@@ -25,7 +25,6 @@ export const UserManagement: React.FC = () => {
   const [createName, setCreateName] = useState<string>("");
   const [createEmail, setCreateEmail] = useState<string>("");
   const [createRole, setCreateRole] = useState<Role>("REQUESTER");
-  const [createDept, setCreateDept] = useState<string>("");
   const [createIsActive, setCreateIsActive] = useState<boolean>(true);
   const [createPassword, setCreatePassword] = useState<string>("");
   const [createError, setCreateError] = useState<string | null>(null);
@@ -36,7 +35,6 @@ export const UserManagement: React.FC = () => {
   const [editName, setEditName] = useState<string>("");
   const [editEmail, setEditEmail] = useState<string>("");
   const [editRole, setEditRole] = useState<Role>("REQUESTER");
-  const [editDept, setEditDept] = useState<string>("");
   const [editIsActive, setEditIsActive] = useState<boolean>(true);
   const [editError, setEditError] = useState<string | null>(null);
   const [isSubmittingEdit, setIsSubmittingEdit] = useState<boolean>(false);
@@ -50,6 +48,10 @@ export const UserManagement: React.FC = () => {
   // Deactivate Confirmation Modal State
   const [deactivatingUser, setDeactivatingUser] = useState<AdminUser | null>(null);
   const [isSubmittingDeactivate, setIsSubmittingDeactivate] = useState<boolean>(false);
+
+  // Activate Confirmation Modal State
+  const [activatingUser, setActivatingUser] = useState<AdminUser | null>(null);
+  const [isSubmittingActivate, setIsSubmittingActivate] = useState<boolean>(false);
 
   // Global Notification
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -85,7 +87,6 @@ export const UserManagement: React.FC = () => {
     setEditName(user.name);
     setEditEmail(user.email);
     setEditRole(user.role);
-    setEditDept(user.department || "");
     setEditIsActive(user.isActive);
     setEditError(null);
   };
@@ -114,7 +115,7 @@ export const UserManagement: React.FC = () => {
         name: createName.trim(),
         email: createEmail.trim(),
         role: createRole,
-        department: createDept.trim() || null,
+        department: null,
         isActive: createIsActive,
         initialPassword: createPassword,
       });
@@ -123,7 +124,6 @@ export const UserManagement: React.FC = () => {
       setCreateName("");
       setCreateEmail("");
       setCreateRole("REQUESTER");
-      setCreateDept("");
       setCreateIsActive(true);
       setCreatePassword("");
       showSuccess(`User ${newUser.name} created successfully.`);
@@ -162,7 +162,7 @@ export const UserManagement: React.FC = () => {
         name: editName.trim(),
         email: editEmail.trim(),
         role: editRole,
-        department: editDept.trim() || null,
+        department: null,
         isActive: editIsActive,
       });
 
@@ -199,6 +199,27 @@ export const UserManagement: React.FC = () => {
       alert(err.message || "Failed to deactivate user.");
     } finally {
       setIsSubmittingDeactivate(false);
+    }
+  };
+
+  // Submit Activate User
+  const handleConfirmActivate = async () => {
+    if (!activatingUser) return;
+
+    setIsSubmittingActivate(true);
+    try {
+      await updateAdminUser(activatingUser.id, { isActive: true });
+      const activatedName = activatingUser.name;
+      setActivatingUser(null);
+      if (editingUser?.id === activatingUser.id) {
+        setEditingUser(null);
+      }
+      showSuccess(`User ${activatedName} has been activated.`);
+      await loadUsers();
+    } catch (err: any) {
+      alert(err.message || "Failed to activate user.");
+    } finally {
+      setIsSubmittingActivate(false);
     }
   };
 
@@ -282,6 +303,7 @@ export const UserManagement: React.FC = () => {
       >
         <div>
           <h1
+            data-testid="admin-users-title"
             style={{
               fontSize: "1.75rem",
               fontWeight: 700,
@@ -443,87 +465,211 @@ export const UserManagement: React.FC = () => {
             )}
           </div>
         ) : (
-          <table
-            data-testid="users-table"
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              textAlign: "left",
-              fontSize: "var(--font-size-sm)",
-            }}
-          >
-            <thead>
-              <tr
+          <>
+            {/* Desktop Table Layout (>= 768px) */}
+            <div className="zen-table-responsive-desktop">
+              <table
+                data-testid="users-table"
                 style={{
-                  backgroundColor: "var(--color-page-bg)",
-                  borderBottom: "1px solid var(--color-border-neutral)",
-                  color: "var(--color-text-muted)",
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  textAlign: "left",
+                  fontSize: "var(--font-size-sm)",
                 }}
               >
-                <th style={{ padding: "12px 16px", fontWeight: 600 }}>Name</th>
-                <th style={{ padding: "12px 16px", fontWeight: 600 }}>Email</th>
-                <th style={{ padding: "12px 16px", fontWeight: 600 }}>Role</th>
-                <th style={{ padding: "12px 16px", fontWeight: 600 }}>Status</th>
-                <th style={{ padding: "12px 16px", fontWeight: 600, textAlign: "right" }}>
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr
-                  key={user.id}
-                  data-testid={`user-row-${user.id}`}
-                  style={{
-                    borderBottom: "1px solid var(--color-border-neutral)",
-                    transition: "background-color 0.15s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "var(--color-pale-green)")
-                  }
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                >
-                  <td style={{ padding: "12px 16px" }}>
-                    <div
-                      data-testid={`user-name-${user.id}`}
-                      style={{ fontWeight: 600, color: "var(--color-text-primary)" }}
+                <thead>
+                  <tr
+                    style={{
+                      backgroundColor: "var(--color-page-bg)",
+                      borderBottom: "1px solid var(--color-border-neutral)",
+                      color: "var(--color-text-muted)",
+                    }}
+                  >
+                    <th style={{ padding: "12px 16px", fontWeight: 600 }}>Name</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600 }}>Email</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600 }}>Role</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600 }}>Status</th>
+                    <th style={{ padding: "12px 16px", fontWeight: 600, textAlign: "right" }}>
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr
+                      key={user.id}
+                      data-testid={`user-row-${user.id}`}
+                      style={{
+                        borderBottom: "1px solid var(--color-border-neutral)",
+                        transition: "background-color 0.15s ease",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor = "var(--color-pale-green)")
+                      }
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                     >
-                      {user.name}
-                      {user.id === currentUser?.id && (
+                      <td style={{ padding: "12px 16px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span
+                            data-testid={`user-name-${user.id}`}
+                            style={{ fontWeight: 600, color: "var(--color-text-primary)" }}
+                          >
+                            {user.name}
+                          </span>
+                          {user.id === currentUser?.id && (
+                            <span
+                              style={{
+                                fontSize: "11px",
+                                backgroundColor: "var(--color-pale-green)",
+                                color: "var(--color-primary-green)",
+                                padding: "2px 6px",
+                                borderRadius: "10px",
+                              }}
+                            >
+                              You
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td
+                        data-testid={`user-email-${user.id}`}
+                        style={{ padding: "12px 16px", color: "var(--color-text-muted)" }}
+                      >
+                        {user.email}
+                      </td>
+                      <td style={{ padding: "12px 16px" }}>
                         <span
+                          data-testid={`user-role-${user.id}`}
                           style={{
-                            marginLeft: "6px",
-                            fontSize: "10px",
-                            backgroundColor: "#E2E8F0",
-                            color: "#475569",
-                            padding: "2px 6px",
-                            borderRadius: "10px",
+                            ...getRoleBadgeStyle(user.role),
+                            padding: "3px 8px",
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            display: "inline-block",
                           }}
                         >
-                          You
+                          {user.role === "IT_STAFF"
+                            ? "IT Staff"
+                            : user.role === "ADMINISTRATOR"
+                            ? "Administrator"
+                            : "Requester"}
                         </span>
-                      )}
-                    </div>
-                    {user.department && (
-                      <div
-                        style={{
-                          fontSize: "var(--font-size-xs)",
-                          color: "var(--color-text-muted)",
-                        }}
-                      >
-                        {user.department}
+                      </td>
+                      <td style={{ padding: "12px 16px" }}>
+                        <span
+                          data-testid={`user-status-${user.id}`}
+                          style={{
+                            ...getStatusBadgeStyle(user.isActive),
+                            padding: "3px 8px",
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            display: "inline-block",
+                          }}
+                        >
+                          {user.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "12px 16px", textAlign: "right" }}>
+                        <button
+                          type="button"
+                          data-testid={`edit-user-btn-${user.id}`}
+                          onClick={() => handleOpenEdit(user)}
+                          className="zen-btn zen-btn-secondary"
+                          style={{
+                            padding: "4px 10px",
+                            fontSize: "var(--font-size-xs)",
+                            borderRadius: "var(--radius-sm)",
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Stacked Cards Layout (< 768px) */}
+            <div className="zen-card-responsive-mobile" style={{ padding: "var(--space-md)" }}>
+              {users.map((user) => (
+                <div
+                  key={user.id}
+                  className="zen-card"
+                  data-testid={`user-card-${user.id}`}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "var(--space-xs)",
+                    padding: "var(--space-md)",
+                    borderLeft: "4px solid var(--color-primary-green)",
+                    boxShadow: "var(--shadow-xs)",
+                    backgroundColor: "var(--color-surface)",
+                    borderRadius: "var(--radius-sm)",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span
+                          data-testid={`user-name-card-${user.id}`}
+                          style={{ fontWeight: 600, fontSize: "var(--font-size-base)", color: "var(--color-text-primary)" }}
+                        >
+                          {user.name}
+                        </span>
+                        {user.id === currentUser?.id && (
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              backgroundColor: "var(--color-pale-green)",
+                              color: "var(--color-primary-green)",
+                              padding: "2px 6px",
+                              borderRadius: "10px",
+                              fontWeight: 600,
+                            }}
+                          >
+                            You
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </td>
-                  <td
-                    data-testid={`user-email-${user.id}`}
-                    style={{ padding: "12px 16px", color: "var(--color-text-muted)" }}
-                  >
-                    {user.email}
-                  </td>
-                  <td style={{ padding: "12px 16px" }}>
+                      <div
+                        data-testid={`user-email-card-${user.id}`}
+                        style={{ fontSize: "var(--font-size-sm)", color: "var(--color-text-muted)", marginTop: "2px" }}
+                      >
+                        {user.email}
+                      </div>
+                    </div>
+
                     <span
-                      data-testid={`user-role-${user.id}`}
+                      data-testid={`user-status-card-${user.id}`}
+                      style={{
+                        ...getStatusBadgeStyle(user.isActive),
+                        padding: "3px 8px",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        display: "inline-block",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {user.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: "8px",
+                      paddingTop: "8px",
+                      borderTop: "1px dashed var(--color-border-neutral)",
+                    }}
+                  >
+                    <span
+                      data-testid={`user-role-card-${user.id}`}
                       style={{
                         ...getRoleBadgeStyle(user.role),
                         padding: "3px 8px",
@@ -539,41 +685,25 @@ export const UserManagement: React.FC = () => {
                         ? "Administrator"
                         : "Requester"}
                     </span>
-                  </td>
-                  <td style={{ padding: "12px 16px" }}>
-                    <span
-                      data-testid={`user-status-${user.id}`}
-                      style={{
-                        ...getStatusBadgeStyle(user.isActive),
-                        padding: "3px 8px",
-                        borderRadius: "12px",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        display: "inline-block",
-                      }}
-                    >
-                      {user.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td style={{ padding: "12px 16px", textAlign: "right" }}>
+
                     <button
                       type="button"
-                      data-testid={`edit-user-btn-${user.id}`}
+                      data-testid={`edit-user-btn-card-${user.id}`}
                       onClick={() => handleOpenEdit(user)}
                       className="zen-btn zen-btn-secondary"
                       style={{
-                        padding: "4px 10px",
+                        padding: "6px 14px",
                         fontSize: "var(--font-size-xs)",
                         borderRadius: "var(--radius-sm)",
                       }}
                     >
                       Edit
                     </button>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </>
         )}
       </div>
 
@@ -602,6 +732,9 @@ export const UserManagement: React.FC = () => {
               width: "100%",
               maxWidth: "500px",
               boxShadow: "var(--shadow-lg)",
+              maxHeight: "90vh",
+              display: "flex",
+              flexDirection: "column",
               overflow: "hidden",
             }}
           >
@@ -613,9 +746,10 @@ export const UserManagement: React.FC = () => {
                 padding: "16px 20px",
                 borderBottom: "1px solid var(--color-border-neutral)",
                 backgroundColor: "var(--color-page-bg)",
+                flexShrink: 0,
               }}
             >
-              <h2 style={{ fontSize: "1.15rem", fontWeight: 700, margin: 0 }}>Create New User</h2>
+              <h2 style={{ fontSize: "1.15rem", fontWeight: 700, margin: 0, wordBreak: "break-word" }}>Create New User</h2>
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
@@ -631,7 +765,7 @@ export const UserManagement: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleCreateSubmit} style={{ padding: "20px" }}>
+            <form onSubmit={handleCreateSubmit} style={{ padding: "20px", overflowY: "auto", boxSizing: "border-box" }}>
               {createError && (
                 <div
                   data-testid="create-error-alert"
@@ -718,30 +852,6 @@ export const UserManagement: React.FC = () => {
                   <option value="IT_STAFF">IT Staff</option>
                   <option value="ADMINISTRATOR">Administrator</option>
                 </select>
-              </div>
-
-              <div style={{ marginBottom: "14px" }}>
-                <label
-                  htmlFor="create-dept"
-                  style={{
-                    display: "block",
-                    fontSize: "var(--font-size-xs)",
-                    fontWeight: 600,
-                    marginBottom: "4px",
-                  }}
-                >
-                  Department (Optional)
-                </label>
-                <input
-                  id="create-dept"
-                  type="text"
-                  data-testid="create-user-dept"
-                  value={createDept}
-                  onChange={(e) => setCreateDept(e.target.value)}
-                  placeholder="e.g. Technical Support"
-                  className="zen-input"
-                  style={{ width: "100%" }}
-                />
               </div>
 
               <div style={{ marginBottom: "14px" }}>
@@ -860,6 +970,9 @@ export const UserManagement: React.FC = () => {
               width: "100%",
               maxWidth: "500px",
               boxShadow: "var(--shadow-lg)",
+              maxHeight: "90vh",
+              display: "flex",
+              flexDirection: "column",
               overflow: "hidden",
             }}
           >
@@ -871,9 +984,10 @@ export const UserManagement: React.FC = () => {
                 padding: "16px 20px",
                 borderBottom: "1px solid var(--color-border-neutral)",
                 backgroundColor: "var(--color-page-bg)",
+                flexShrink: 0,
               }}
             >
-              <h2 style={{ fontSize: "1.15rem", fontWeight: 700, margin: 0 }}>
+              <h2 style={{ fontSize: "1.15rem", fontWeight: 700, margin: 0, wordBreak: "break-word" }}>
                 Edit User: {editingUser.name}
               </h2>
               <button
@@ -891,7 +1005,7 @@ export const UserManagement: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleEditSubmit} style={{ padding: "20px" }}>
+            <form onSubmit={handleEditSubmit} style={{ padding: "20px", overflowY: "auto", boxSizing: "border-box" }}>
               {editError && (
                 <div
                   data-testid="edit-error-alert"
@@ -978,29 +1092,6 @@ export const UserManagement: React.FC = () => {
                 </select>
               </div>
 
-              <div style={{ marginBottom: "14px" }}>
-                <label
-                  htmlFor="edit-dept"
-                  style={{
-                    display: "block",
-                    fontSize: "var(--font-size-xs)",
-                    fontWeight: 600,
-                    marginBottom: "4px",
-                  }}
-                >
-                  Department
-                </label>
-                <input
-                  id="edit-dept"
-                  type="text"
-                  data-testid="edit-user-dept"
-                  value={editDept}
-                  onChange={(e) => setEditDept(e.target.value)}
-                  className="zen-input"
-                  style={{ width: "100%" }}
-                />
-              </div>
-
               {/* Status Switch with BR-25 Guardrail */}
               <div
                 style={{
@@ -1048,35 +1139,70 @@ export const UserManagement: React.FC = () => {
                 )}
               </div>
 
-              {/* Action Buttons: Reset Password & Deactivate Action */}
+              {/* Action Buttons: Left-aligned with consistent 2-row layout across all viewports (Mobile S to Desktop) */}
               <div
+                className="zen-modal-actions-container"
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "var(--space-xs)",
+                  flexDirection: "column",
+                  gap: "var(--space-sm)",
                   paddingTop: "var(--space-sm)",
                   borderTop: "1px solid var(--color-border-neutral)",
+                  width: "100%",
                 }}
               >
-                <div>
+                {/* Group 1: Primary Form Actions (Row 1) */}
+                <div
+                  className="zen-modal-action-group"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "var(--space-xs)",
+                    flexWrap: "nowrap",
+                  }}
+                >
+                  <button
+                    type="submit"
+                    data-testid="submit-edit-user-btn"
+                    className="zen-btn zen-btn-primary"
+                    disabled={isSubmittingEdit}
+                    style={{
+                      backgroundColor: "var(--color-primary-green)",
+                      color: "#FFFFFF",
+                      whiteSpace: "nowrap",
+                      padding: "8px 16px",
+                      fontSize: "var(--font-size-xs)",
+                    }}
+                  >
+                    {isSubmittingEdit ? "Saving..." : "Save Changes"}
+                  </button>
+
                   <button
                     type="button"
-                    data-testid="reset-password-btn"
-                    onClick={() => {
-                      setResetTargetUser(editingUser);
-                      setNewInitialPassword("");
-                      setResetError(null);
-                    }}
+                    data-testid="cancel-edit-user-btn"
+                    onClick={() => setEditingUser(null)}
                     className="zen-btn zen-btn-secondary"
-                    style={{ fontSize: "var(--font-size-xs)" }}
+                    disabled={isSubmittingEdit}
+                    style={{
+                      whiteSpace: "nowrap",
+                      padding: "8px 16px",
+                      fontSize: "var(--font-size-xs)",
+                    }}
                   >
-                    🔑 Reset Password
+                    Cancel
                   </button>
                 </div>
 
-                <div style={{ display: "flex", gap: "var(--space-xs)" }}>
+                {/* Group 2: Lifecycle & Security Actions (Row 2 - 100% Symmetrical Coordinates) */}
+                <div
+                  className="zen-modal-action-group"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "var(--space-xs)",
+                    flexWrap: "nowrap",
+                  }}
+                >
                   {!isEditingSelf && editingUser.isActive && (
                     <button
                       type="button"
@@ -1087,9 +1213,37 @@ export const UserManagement: React.FC = () => {
                         borderColor: "var(--color-error)",
                         color: "var(--color-error)",
                         fontSize: "var(--font-size-xs)",
+                        whiteSpace: "nowrap",
+                        width: "88px",
+                        minWidth: "88px",
+                        padding: "8px 10px",
+                        textAlign: "center",
+                        justifyContent: "center",
                       }}
                     >
                       Deactivate
+                    </button>
+                  )}
+
+                  {!isEditingSelf && !editingUser.isActive && (
+                    <button
+                      type="button"
+                      data-testid="activate-user-btn"
+                      onClick={() => setActivatingUser(editingUser)}
+                      className="zen-btn zen-btn-secondary"
+                      style={{
+                        borderColor: "var(--color-primary-green)",
+                        color: "var(--color-primary-green)",
+                        fontSize: "var(--font-size-xs)",
+                        whiteSpace: "nowrap",
+                        width: "88px",
+                        minWidth: "88px",
+                        padding: "8px 10px",
+                        textAlign: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      Activate
                     </button>
                   )}
 
@@ -1103,6 +1257,12 @@ export const UserManagement: React.FC = () => {
                         opacity: 0.5,
                         cursor: "not-allowed",
                         fontSize: "var(--font-size-xs)",
+                        whiteSpace: "nowrap",
+                        width: "88px",
+                        minWidth: "88px",
+                        padding: "8px 10px",
+                        textAlign: "center",
+                        justifyContent: "center",
                       }}
                       title="You cannot deactivate your own account"
                     >
@@ -1112,24 +1272,20 @@ export const UserManagement: React.FC = () => {
 
                   <button
                     type="button"
-                    data-testid="cancel-edit-user-btn"
-                    onClick={() => setEditingUser(null)}
+                    data-testid="reset-password-btn"
+                    onClick={() => {
+                      setResetTargetUser(editingUser);
+                      setNewInitialPassword("");
+                      setResetError(null);
+                    }}
                     className="zen-btn zen-btn-secondary"
-                    disabled={isSubmittingEdit}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    data-testid="submit-edit-user-btn"
-                    className="zen-btn zen-btn-primary"
-                    disabled={isSubmittingEdit}
                     style={{
-                      backgroundColor: "var(--color-primary-green)",
-                      color: "#FFFFFF",
+                      fontSize: "var(--font-size-xs)",
+                      whiteSpace: "nowrap",
+                      padding: "8px 12px",
                     }}
                   >
-                    {isSubmittingEdit ? "Saving..." : "Save Changes"}
+                    🔑 Reset Password
                   </button>
                 </div>
               </div>
@@ -1164,6 +1320,9 @@ export const UserManagement: React.FC = () => {
               maxWidth: "460px",
               boxShadow: "var(--shadow-lg)",
               padding: "20px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              boxSizing: "border-box",
             }}
           >
             <h3 style={{ fontSize: "1.1rem", fontWeight: 700, margin: "0 0 8px 0" }}>
@@ -1277,6 +1436,9 @@ export const UserManagement: React.FC = () => {
               maxWidth: "440px",
               boxShadow: "var(--shadow-lg)",
               padding: "20px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              boxSizing: "border-box",
             }}
           >
             <h3
@@ -1337,6 +1499,100 @@ export const UserManagement: React.FC = () => {
                 }}
               >
                 {isSubmittingDeactivate ? "Deactivating..." : "Deactivate Account"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 5: Confirm Activation */}
+      {activatingUser && (
+        <div
+          data-testid="confirm-activate-modal"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "var(--space-md)",
+            zIndex: 1100,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: "var(--radius-md)",
+              width: "100%",
+              maxWidth: "440px",
+              boxShadow: "var(--shadow-lg)",
+              padding: "20px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              boxSizing: "border-box",
+            }}
+          >
+            <h3
+              style={{
+                fontSize: "1.15rem",
+                fontWeight: 700,
+                margin: "0 0 8px 0",
+                color: "var(--color-primary-green)",
+              }}
+            >
+              Activate User Account
+            </h3>
+            <p
+              style={{
+                fontSize: "var(--font-size-sm)",
+                color: "var(--color-text-primary)",
+                marginBottom: "16px",
+                lineHeight: 1.5,
+              }}
+            >
+              Are you sure you want to activate <strong>{activatingUser.name}</strong>?
+              They will be allowed to log in and use TokTickIT.
+            </p>
+            <div
+              style={{
+                fontSize: "12px",
+                color: "var(--color-text-muted)",
+                backgroundColor: "var(--color-page-bg)",
+                padding: "8px 12px",
+                borderRadius: "var(--radius-sm)",
+                marginBottom: "20px",
+              }}
+            >
+              ✓ <strong>Account Reactivation:</strong> The user's account status will be set to active immediately.
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--space-sm)" }}>
+              <button
+                type="button"
+                data-testid="cancel-confirm-activate-btn"
+                onClick={() => setActivatingUser(null)}
+                className="zen-btn zen-btn-secondary"
+                disabled={isSubmittingActivate}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                data-testid="confirm-activate-btn"
+                onClick={handleConfirmActivate}
+                className="zen-btn"
+                disabled={isSubmittingActivate}
+                style={{
+                  backgroundColor: "var(--color-primary-green)",
+                  color: "#FFFFFF",
+                  border: "none",
+                }}
+              >
+                {isSubmittingActivate ? "Activating..." : "Activate Account"}
               </button>
             </div>
           </div>

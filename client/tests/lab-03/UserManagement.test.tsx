@@ -184,6 +184,60 @@ describe("UI-06 & UI-07: UserManagement Component Tests", () => {
     });
   });
 
+  it("UI-07: enables activation for INACTIVE users and supports activation confirmation modal", async () => {
+    const updateSpy = vi.spyOn(api, "updateAdminUser").mockResolvedValue({
+      ...mockUsers[3],
+      isActive: true,
+    });
+
+    render(
+      <AuthContext.Provider value={mockAuthValue}>
+        <UserManagement />
+      </AuthContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("user-name-4")).toBeInTheDocument();
+    });
+
+    // Click Edit on Kevin Patel (id: 4, Inactive user)
+    const editInactiveBtn = screen.getByTestId("edit-user-btn-4");
+    await userEvent.click(editInactiveBtn);
+
+    // Modal is open
+    expect(screen.getByTestId("edit-user-modal")).toBeInTheDocument();
+
+    // Verify Activate button is shown instead of Deactivate
+    const activateBtn = screen.getByTestId("activate-user-btn");
+    expect(activateBtn).toBeInTheDocument();
+    expect(activateBtn).toHaveTextContent("Activate");
+    expect(screen.queryByTestId("deactivate-user-btn")).not.toBeInTheDocument();
+
+    // Click Activate
+    await userEvent.click(activateBtn);
+
+    // Confirmation Modal opens
+    expect(screen.getByTestId("confirm-activate-modal")).toBeInTheDocument();
+    expect(screen.getByTestId("confirm-activate-modal")).toHaveTextContent(/Activate User Account/i);
+    expect(screen.getByTestId("confirm-activate-modal")).toHaveTextContent(
+      /Are you sure you want to activate/i
+    );
+
+    // Confirm activation
+    const confirmBtn = screen.getByTestId("confirm-activate-btn");
+    await userEvent.click(confirmBtn);
+
+    await waitFor(() => {
+      expect(updateSpy).toHaveBeenCalledWith(4, { isActive: true });
+    });
+
+    // Modals close
+    await waitFor(() => {
+      expect(screen.queryByTestId("confirm-activate-modal")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("edit-user-modal")).not.toBeInTheDocument();
+    });
+  });
+
   // UI-07: Self-deactivation button disabled for Admin (BR-25)
   it("UI-07: disables deactivation switch and button when admin edits their own account (BR-25)", async () => {
     render(

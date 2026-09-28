@@ -336,7 +336,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
     );
   }
 
-  if (error || !ticket) {
+  if (!ticket) {
     return (
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem" }}>
         <button
@@ -377,7 +377,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   const reqPriorityStyle = getPriorityBadgeStyle(ticket.requestedPriority);
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "1.5rem 1rem 3rem" }}>
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "1.5rem 1rem 3rem", boxSizing: "border-box", width: "100%" }}>
       {/* Top Breadcrumb & Back Bar */}
       <div
         style={{
@@ -385,9 +385,11 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           justifyContent: "space-between",
           alignItems: "center",
           marginBottom: "1.25rem",
+          flexWrap: "wrap",
+          gap: "0.75rem",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
           <button
             onClick={onBack}
             style={{
@@ -403,11 +405,12 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               fontWeight: 500,
               fontSize: "0.9rem",
               transition: "all 0.15s ease",
+              whiteSpace: "nowrap",
             }}
           >
             ← Back to Queue
           </button>
-          <span style={{ color: "#5F756B", fontSize: "0.9rem" }}>
+          <span style={{ color: "#5F756B", fontSize: "0.9rem", wordBreak: "break-word" }}>
             Queue &gt; <strong style={{ color: "#1A2E26" }}>{ticket.ticketNumber}</strong>
           </span>
         </div>
@@ -427,12 +430,38 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               fontSize: "0.875rem",
               cursor: isUpdatingOwner ? "not-allowed" : "pointer",
               opacity: isUpdatingOwner ? 0.7 : 1,
+              whiteSpace: "nowrap",
             }}
           >
             {isUpdatingOwner ? "Claiming..." : "Claim for Me"}
           </button>
         )}
       </div>
+
+      {/* Operational Error Feedback */}
+      {error && (
+        <div
+          data-testid="staff-detail-error-alert"
+          role="alert"
+          style={{
+            background: "#FEE2E2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
+            padding: "0.75rem 1rem",
+            borderRadius: "6px",
+            marginBottom: "1.25rem",
+            fontSize: "0.9rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            boxSizing: "border-box",
+            wordBreak: "break-word",
+          }}
+        >
+          <span>⚠️</span>
+          <span>{error}</span>
+        </div>
+      )}
 
       {/* Global Success / Operational Feedback */}
       {opSuccessMessage && (
@@ -449,6 +478,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             display: "flex",
             alignItems: "center",
             gap: "0.5rem",
+            boxSizing: "border-box",
+            wordBreak: "break-word",
           }}
         >
           <span>✓</span>
@@ -470,10 +501,12 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             alignItems: "center",
             gap: "0.75rem",
             fontWeight: 500,
+            boxSizing: "border-box",
+            flexWrap: "wrap",
           }}
         >
           <span style={{ fontSize: "1.25rem" }}>💡</span>
-          <div>
+          <div style={{ wordBreak: "break-word" }}>
             <strong>Requester Indication:</strong> The requester indicated that this problem appears resolved. Please review and transition the ticket status to <em>RESOLVED</em> or <em>CLOSED</em> if satisfied.
           </div>
         </div>
@@ -488,6 +521,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
           padding: "1.5rem",
           marginBottom: "1.5rem",
+          boxSizing: "border-box",
+          maxWidth: "100%",
+          overflow: "hidden",
         }}
       >
         {/* Ticket Title & Status Header */}
@@ -503,9 +539,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             gap: "1rem",
           }}
         >
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
-              <h1 style={{ margin: 0, fontSize: "1.5rem", color: "#1A2E26", fontWeight: 700 }}>
+          <div style={{ minWidth: 0, maxWidth: "100%" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem", flexWrap: "wrap" }}>
+              <h1 style={{ margin: 0, fontSize: "1.5rem", color: "#1A2E26", fontWeight: 700, wordBreak: "break-word" }}>
                 {ticket.ticketNumber}
               </h1>
               <span
@@ -518,6 +554,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   backgroundColor: currentStatusStyle.bg,
                   color: currentStatusStyle.text,
                   border: `1px solid ${currentStatusStyle.border}`,
+                  whiteSpace: "nowrap",
                 }}
               >
                 {ticket.currentStatus}
@@ -528,7 +565,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
             <div>
               <span style={{ fontSize: "0.75rem", color: "#5F756B", display: "block", marginBottom: "0.2rem" }}>
                 Req Priority
@@ -543,6 +580,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   backgroundColor: reqPriorityStyle.bg,
                   color: reqPriorityStyle.text,
                   border: `1px solid ${reqPriorityStyle.border}`,
+                  whiteSpace: "nowrap",
                 }}
               >
                 {ticket.requestedPriority}
@@ -555,7 +593,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))",
             gap: "1.25rem",
             marginBottom: "1.5rem",
           }}
@@ -567,6 +605,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               padding: "1.25rem",
               borderRadius: "6px",
               border: "1px solid #E2E8F0",
+              boxSizing: "border-box",
+              minWidth: 0,
+              maxWidth: "100%",
             }}
           >
             <h3
@@ -582,23 +623,23 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               Ticket Information
             </h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.65rem", fontSize: "0.875rem" }}>
-              <div>
-                <span style={{ color: "#5F756B", fontWeight: 500, display: "inline-block", width: "110px" }}>Category:</span>
-                <span style={{ fontWeight: 600, color: "#1A2E26" }}>{ticket.category.name}</span>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.25rem" }}>
+                <span style={{ color: "#5F756B", fontWeight: 500, minWidth: "110px" }}>Category:</span>
+                <span style={{ fontWeight: 600, color: "#1A2E26", wordBreak: "break-word" }}>{ticket.category.name}</span>
               </div>
-              <div>
-                <span style={{ color: "#5F756B", fontWeight: 500, display: "inline-block", width: "110px" }}>Related System:</span>
-                <span style={{ fontWeight: 600, color: "#1A2E26" }}>{ticket.relatedSystem.name}</span>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.25rem" }}>
+                <span style={{ color: "#5F756B", fontWeight: 500, minWidth: "110px" }}>Related System:</span>
+                <span style={{ fontWeight: 600, color: "#1A2E26", wordBreak: "break-word" }}>{ticket.relatedSystem.name}</span>
               </div>
-              <div>
-                <span style={{ color: "#5F756B", fontWeight: 500, display: "inline-block", width: "110px" }}>Requester:</span>
-                <span style={{ fontWeight: 600, color: "#1A2E26" }}>{ticket.requester.name}</span>
-                <span style={{ color: "#5F756B", fontSize: "0.8rem", marginLeft: "0.4rem" }}>({ticket.requester.email})</span>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.25rem" }}>
+                <span style={{ color: "#5F756B", fontWeight: 500, minWidth: "110px" }}>Requester:</span>
+                <span style={{ fontWeight: 600, color: "#1A2E26", wordBreak: "break-word" }}>{ticket.requester.name}</span>
+                <span style={{ color: "#5F756B", fontSize: "0.8rem", wordBreak: "break-all" }}>({ticket.requester.email})</span>
               </div>
               {ticket.requester.department && (
-                <div>
-                  <span style={{ color: "#5F756B", fontWeight: 500, display: "inline-block", width: "110px" }}>Department:</span>
-                  <span style={{ color: "#1A2E26" }}>{ticket.requester.department}</span>
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.25rem" }}>
+                  <span style={{ color: "#5F756B", fontWeight: 500, minWidth: "110px" }}>Department:</span>
+                  <span style={{ color: "#1A2E26", wordBreak: "break-word" }}>{ticket.requester.department}</span>
                 </div>
               )}
             </div>
@@ -611,6 +652,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               padding: "1.25rem",
               borderRadius: "6px",
               border: "2px solid #EAF6EF",
+              boxSizing: "border-box",
+              minWidth: 0,
+              maxWidth: "100%",
             }}
           >
             <h3
@@ -646,6 +690,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   disabled={isUpdatingOwner}
                   style={{
                     width: "100%",
+                    maxWidth: "100%",
+                    boxSizing: "border-box",
                     padding: "0.5rem 0.75rem",
                     borderRadius: "6px",
                     border: "1px solid #CBD5E1",
@@ -679,7 +725,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                 >
                   IT Priority {isUpdatingPriority && <span style={{ color: "#006B3C" }}>(saving...)</span>}
                 </label>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
                   <select
                     id="it-priority-select"
                     data-testid="it-priority-select"
@@ -688,6 +734,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                     disabled={isUpdatingPriority}
                     style={{
                       flex: 1,
+                      minWidth: "140px",
+                      maxWidth: "100%",
+                      boxSizing: "border-box",
                       padding: "0.5rem 0.75rem",
                       borderRadius: "6px",
                       border: "1px solid #CBD5E1",
@@ -711,6 +760,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                       backgroundColor: itPriorityStyle.bg,
                       color: itPriorityStyle.text,
                       border: `1px solid ${itPriorityStyle.border}`,
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {ticket.itPriority}
@@ -734,6 +784,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   disabled={isUpdatingStatus || isTerminal}
                   style={{
                     width: "100%",
+                    maxWidth: "100%",
+                    boxSizing: "border-box",
                     padding: "0.5rem 0.75rem",
                     borderRadius: "6px",
                     border: "1px solid #CBD5E1",
@@ -765,7 +817,16 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
         {/* Summary & Description */}
         <div style={{ marginBottom: "1.25rem" }}>
-          <h3 style={{ margin: "0 0 0.5rem 0", fontSize: "1rem", color: "#1A2E26", fontWeight: 600 }}>
+          <h3
+            style={{
+              margin: "0 0 0.5rem 0",
+              fontSize: "1rem",
+              color: "#1A2E26",
+              fontWeight: 600,
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+            }}
+          >
             {ticket.summary}
           </h3>
           <div
@@ -778,6 +839,10 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               lineHeight: 1.6,
               color: "#334155",
               whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+              boxSizing: "border-box",
+              maxWidth: "100%",
             }}
           >
             {ticket.description}
@@ -803,11 +868,24 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                     border: "1px solid #CBD5E1",
                     borderRadius: "6px",
                     fontSize: "0.85rem",
+                    maxWidth: "100%",
+                    boxSizing: "border-box",
                   }}
                 >
-                  <span>📎</span>
-                  <span style={{ fontWeight: 500 }}>{att.originalFileName}</span>
-                  <span style={{ color: "#5F756B", fontSize: "0.75rem" }}>
+                  <span style={{ flexShrink: 0 }}>📎</span>
+                  <span
+                    title={att.originalFileName}
+                    style={{
+                      fontWeight: 500,
+                      maxWidth: "220px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {att.originalFileName}
+                  </span>
+                  <span style={{ color: "#5F756B", fontSize: "0.75rem", flexShrink: 0 }}>
                     ({Math.round(att.fileSize / 1024)} KB)
                   </span>
                   <button
@@ -819,6 +897,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                       cursor: "pointer",
                       fontWeight: 600,
                       padding: "0 0.25rem",
+                      flexShrink: 0,
                     }}
                   >
                     Download
@@ -838,6 +917,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           border: "1px solid #CBD5E1",
           boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
           overflow: "hidden",
+          boxSizing: "border-box",
+          maxWidth: "100%",
         }}
       >
         {/* Tab Selection Bar */}
@@ -846,6 +927,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             display: "flex",
             borderBottom: "1px solid #E2E8F0",
             background: "#F8FAFC",
+            flexWrap: "wrap",
           }}
         >
           {/* Public Comments Tab Button */}
@@ -853,8 +935,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             data-testid="public-comments-tab"
             onClick={() => setActiveTab("comments")}
             style={{
-              flex: 1,
-              padding: "1rem 1.5rem",
+              flex: "1 1 200px",
+              padding: "1rem 1.25rem",
               background: activeTab === "comments" ? "#FFFFFF" : "transparent",
               border: "none",
               borderBottom: activeTab === "comments" ? "3px solid #006B3C" : "3px solid transparent",
@@ -867,6 +949,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               justifyContent: "center",
               gap: "0.5rem",
               transition: "all 0.15s ease",
+              boxSizing: "border-box",
             }}
           >
             <span>💬 Public Comments</span>
@@ -889,8 +972,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             data-testid="internal-notes-tab"
             onClick={() => setActiveTab("notes")}
             style={{
-              flex: 1,
-              padding: "1rem 1.5rem",
+              flex: "1 1 200px",
+              padding: "1rem 1.25rem",
               background: activeTab === "notes" ? "#FFFFFF" : "transparent",
               border: "none",
               borderBottom: activeTab === "notes" ? "3px solid #D97706" : "3px solid transparent",
@@ -903,6 +986,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               justifyContent: "center",
               gap: "0.5rem",
               transition: "all 0.15s ease",
+              boxSizing: "border-box",
             }}
           >
             <span>🔒 Internal Notes</span>
@@ -922,11 +1006,20 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
         </div>
 
         {/* Tab Content Container */}
-        <div style={{ padding: "1.5rem" }}>
+        <div style={{ padding: "1.5rem", boxSizing: "border-box", maxWidth: "100%" }}>
           {/* TAB 1: PUBLIC COMMENTS */}
           {activeTab === "comments" && (
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "1rem",
+                  flexWrap: "wrap",
+                  gap: "0.5rem",
+                }}
+              >
                 <h3 style={{ margin: 0, fontSize: "1.1rem", color: "#1A2E26" }}>
                   Public Conversation
                 </h3>
@@ -962,9 +1055,19 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                           borderRadius: "8px",
                           padding: "1rem 1.25rem",
                           boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+                          boxSizing: "border-box",
+                          maxWidth: "100%",
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.6rem" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.6rem",
+                            marginBottom: "0.6rem",
+                            flexWrap: "wrap",
+                          }}
+                        >
                           {/* Initials Avatar */}
                           <div
                             style={{
@@ -978,12 +1081,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                               justifyContent: "center",
                               fontWeight: 700,
                               fontSize: "0.8rem",
+                              flexShrink: 0,
                             }}
                           >
                             {getInitials(comment.author.name)}
                           </div>
-                          <div>
-                            <span style={{ fontWeight: 600, color: "#1A2E26", fontSize: "0.9rem", marginRight: "0.5rem" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                            <span style={{ fontWeight: 600, color: "#1A2E26", fontSize: "0.9rem" }}>
                               {comment.author.name}
                             </span>
                             <span
@@ -995,16 +1099,26 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                                 backgroundColor: roleStyle.bg,
                                 color: roleStyle.text,
                                 border: `1px solid ${roleStyle.border}`,
+                                whiteSpace: "nowrap",
                               }}
                             >
                               {roleStyle.label}
                             </span>
                           </div>
-                          <span style={{ marginLeft: "auto", fontSize: "0.8rem", color: "#64748B" }}>
+                          <span style={{ marginLeft: "auto", fontSize: "0.8rem", color: "#64748B", whiteSpace: "nowrap" }}>
                             {formatDate(comment.createdAt)}
                           </span>
                         </div>
-                        <div style={{ fontSize: "0.9rem", color: "#334155", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+                        <div
+                          style={{
+                            fontSize: "0.9rem",
+                            color: "#334155",
+                            lineHeight: 1.5,
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                            overflowWrap: "anywhere",
+                          }}
+                        >
                           {comment.content}
                         </div>
                       </div>
@@ -1080,6 +1194,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   gap: "0.5rem",
                   fontWeight: 600,
                   fontSize: "0.875rem",
+                  boxSizing: "border-box",
+                  flexWrap: "wrap",
                 }}
               >
                 <span>🔒</span>
@@ -1113,9 +1229,19 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                           borderRadius: "8px",
                           padding: "1rem 1.25rem",
                           boxShadow: "0 1px 2px rgba(245, 158, 11, 0.05)",
+                          boxSizing: "border-box",
+                          maxWidth: "100%",
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.6rem" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.6rem",
+                            marginBottom: "0.6rem",
+                            flexWrap: "wrap",
+                          }}
+                        >
                           <div
                             style={{
                               width: "32px",
@@ -1128,12 +1254,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                               justifyContent: "center",
                               fontWeight: 700,
                               fontSize: "0.8rem",
+                              flexShrink: 0,
                             }}
                           >
                             {getInitials(note.author.name)}
                           </div>
-                          <div>
-                            <span style={{ fontWeight: 600, color: "#78350F", fontSize: "0.9rem", marginRight: "0.5rem" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                            <span style={{ fontWeight: 600, color: "#78350F", fontSize: "0.9rem" }}>
                               {note.author.name}
                             </span>
                             <span
@@ -1145,16 +1272,26 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                                 backgroundColor: roleStyle.bg,
                                 color: roleStyle.text,
                                 border: `1px solid ${roleStyle.border}`,
+                                whiteSpace: "nowrap",
                               }}
                             >
                               {roleStyle.label}
                             </span>
                           </div>
-                          <span style={{ marginLeft: "auto", fontSize: "0.8rem", color: "#92400E" }}>
+                          <span style={{ marginLeft: "auto", fontSize: "0.8rem", color: "#92400E", whiteSpace: "nowrap" }}>
                             {formatDate(note.createdAt)}
                           </span>
                         </div>
-                        <div style={{ fontSize: "0.9rem", color: "#451A03", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+                        <div
+                          style={{
+                            fontSize: "0.9rem",
+                            color: "#451A03",
+                            lineHeight: 1.5,
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                            overflowWrap: "anywhere",
+                          }}
+                        >
                           {note.content}
                         </div>
                       </div>
