@@ -176,9 +176,12 @@
   "result": "System powered on successfully; 24-hr burn-in test passed.",
   "followUpRequired": false,
   "followUpNote": null,
-  "attachmentNotes": "IMG_20261004_1030_board.png"
+  "attachmentNotes": "IMG_20261004_1030_board.png",
+  "expectedUpdatedAt": "2026-10-04T10:30:15.000Z"
 }
 ```
+* **Validation & Concurrency Rules:**
+  - `expectedUpdatedAt`: ISO-8601 String สำหรับ Optimistic Concurrency Control หากในฐานข้อมูลมีค่า `updatedAt` ใหม่กว่า จะตอบกลับด้วย `409 Conflict`
 * **Response Status Codes:**
   - `200 OK`: แก้ไขสำเร็จ
   - `400 Bad Request`: ข้อมูลไม่ถูกต้อง หรือ validation ล้มเหลว
@@ -209,12 +212,13 @@
 }
 ```
 * **Business & Security Rules:**
-  - หาก Requester ส่ง `problemAppearsResolved: true` ระบบจะบันทึก `resolvedIndicated = true` โดยสถานะตั๋วจะ**คงเดิม** (ไม่เปลี่ยนเป็น `RESOLVED`)
-  - หากส่งคำขอเปลี่ยนสถานะผิดกฎ Transition Matrix (เช่น `NEW` -> `CLOSED`) ระบบตอบกลับ `400 Bad Request`
-  - หาก `expectedUpdatedAt` เก่ากว่า `ticket.updatedAt` ในฐานข้อมูล ระบบตอบกลับ `409 Conflict` ป้องกัน Stale Updates
+  - **Resolution Gate Rule (Requester):** หาก Requester ส่ง `problemAppearsResolved: true` ระบบจะบันทึก `resolvedIndicated = true` โดยสถานะตั๋วจะ**คงเดิม** (ไม่เปลี่ยนเป็น `RESOLVED`)
+  - **Resolution Prerequisites Enforcement (Staff/Admin):** ก่อนที่สถานะตั๋วจะเปลี่ยนเป็น `RESOLVED` ได้ ตั๋วใบนั้น**ต้องมี Ticket Owner ที่ได้รับการมอบหมายแล้ว (`ownerId != null`)** และ**ต้องมีบันทึก Actions Taken อย่างน้อย 1 รายการ (`actionsTaken.length >= 1`)** หากไม่ผ่านเกณฑ์จะปฏิเสธด้วย `400 Bad Request` (`RESOLUTION_PREREQUISITE_FAILED`)
+  - **Transition Matrix Guard:** หากส่งคำขอเปลี่ยนสถานะผิดกฎ Transition Matrix (เช่น `NEW` -> `CLOSED`) ระบบตอบกลับ `400 Bad Request` (`INVALID_STATUS_TRANSITION`)
+  - **Concurrency Conflict Guard:** หาก `expectedUpdatedAt` เก่ากว่า `ticket.updatedAt` ในฐานข้อมูล ระบบตอบกลับ `409 Conflict` (`STALE_UPDATE_CONFLICT`) ป้องกันการบันทึกทับซ้อน
 * **Response Status Codes:**
   - `200 OK`: อัปเดตสถานะสำเร็จ
-  - `400 Bad Request`: Transition ผิดกฎ
+  - `400 Bad Request`: Transition ผิดกฎ หรือไม่ผ่าน Resolution Prerequisites
   - `403 Forbidden`: ไม่มีสิทธิ์เปลี่ยนเป็นสถานะนั้น
   - `409 Conflict`: Stale update conflict
 
@@ -222,7 +226,17 @@
 
 ## 5. Operational Dashboards Endpoints
 
-### 5.1. Requester Dashboard Data
+### 5.1. Dashboard Global Calculation & Time Rules (Section 6.2)
+* **Business Time Zone:** `Asia/Bangkok (UTC+7)`
+* **Daily Date Boundaries:** ตัดรอบวันตั้งแต่เวลา `00:00:00` ถึง `23:59:59` ตามเวลาประเทศไทย
+* **Date Calculations:**
+  - `recentlyResolved`: นับตั๋วที่อยู่ในสถานะ `RESOLVED` ภายในช่วง 30 วันปฏิทินย้อนหลัง
+  - `trends`: คำนวณความแตกต่างของจำนวนตั๋วสะสมระหว่างวันนี้ (Current Day ณ เวลาปัจจุบัน) เทียบกับวันก่อนหน้า (Yesterday ณ สิ้นสุดวัน 23:59:59)
+* **Empty Behavior:** เมื่อไม่มีข้อมูลตั๋วที่ตรงตามเงื่อนไข ตัวเลขสถิติต้องส่งคืนค่า `0` (ห้ามส่งคืน `null`) และรายการตั๋วส่งคืนเป็น Array ว่าง `[]`
+
+---
+
+### 5.2. Requester Dashboard Data
 * **Endpoint:** `GET /api/dashboard/requester`
 * **Description:** ส่งคืนตัวเลขสถิติสรุปและตั๋วล่าสุดเฉพาะของผู้ใช้ Requester ที่ล็อกอินอยู่
 * **Authorized Roles:** `REQUESTER` (หาก IT Staff หรือ Admin เรียก จะปฏิเสธด้วย `403 Forbidden` หรือ redirect ไปยัง staff dashboard)
@@ -238,9 +252,9 @@
   "success": true,
   "data": {
     "summary": {
-      "myOpenTickets": 3,
+      "totalOpen": 3,
       "inProgress": 2,
-      "waitingForRequester": 0,
+      "waitingForRequester": 1,
       "recentlyResolved": 5,
       "closed": 12
     },
@@ -268,7 +282,7 @@
 
 ---
 
-### 5.2. IT Staff / Admin Dashboard Data
+### 5.3. IT Staff / Admin Dashboard Data
 * **Endpoint:** `GET /api/dashboard/staff`
 * **Description:** ส่งคืนตัวเลขสถิติสรุปงานปฏิบัติการสำหรับเจ้าหน้าที่ไอทีและผู้ดูแลระบบ คำนวณจากฐานข้อมูลโดยตรง
 * **Authorized Roles:** `IT_STAFF`, `ADMINISTRATOR` (Requester เรียกจะได้รับ `403 Forbidden`)
@@ -285,14 +299,22 @@
   "success": true,
   "data": {
     "summary": {
+      "unassigned": 12,
       "new": 14,
       "open": 23,
       "inProgress": 18,
       "waitingForRequester": 7,
       "myAssigned": 16,
-      "unassigned": 12,
       "resolved": 35,
       "closed": 50
+    },
+    "trends": {
+      "unassigned": "+3",
+      "new": "+2",
+      "open": "-1",
+      "inProgress": "+4",
+      "waitingForRequester": "0",
+      "myAssigned": "+1"
     },
     "byPriority": {
       "CRITICAL": 3,
@@ -338,6 +360,9 @@
 ## 6. Regression & Continued APIs Reference
 
 ระบบใน Lab 4 ต้องคงความเข้ากันได้ 100% กับ Endpoint เดิมทั้งหมด:
+* `GET /api/health` (Health check endpoint)
+* `GET /api/categories` (Category list with related systems)
+* `GET /api/related-systems` (Related systems reference data)
 * `POST /api/auth/login` (Login with JWT)
 * `POST /api/auth/logout` (Logout)
 * `GET /api/auth/me` (Current user info)
@@ -357,3 +382,4 @@
 * `POST /api/admin/users` (Admin create user)
 * `PATCH /api/admin/users/:id` (Admin update user / deactivate)
 * `POST /api/admin/users/:id/reset-password` (Admin reset initial password)
+

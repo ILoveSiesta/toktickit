@@ -41,35 +41,37 @@
 ## 3. Screen Specifications
 
 ### 3.1. Screen 1: IT Staff Dashboard
+* **Business Time Zone:** `Asia/Bangkok (UTC+7)` (รอบการคำนวณวัน 00:00:00 - 23:59:59)
 
 ```text
-+-----------------------------------------------------------------------------------------+
-| [TikTokIT]    [Dashboard (Active)]    [My Queue]                       [Michael (Staff) v] |
-+-----------------------------------------------------------------------------------------+
-| Welcome back, Michael!                                                 [ Refresh Data ] |
-| Here is what is happening with your queue today.                                        |
-|                                                                                         |
-| +-------------+ +-------------+ +-------------+ +-------------+ +-------------+         |
-| | New         | | Open        | | In Progress | | Waiting Req | | My Assigned |         |
-| | 14          | | 23          | | 18          | | 7           | | 16          |  Cards  |
-| | +2 from yest| | -1 from yest| | +4 from yest| | = from yest | | +1 from yest|         |
-| +-------------+ +-------------+ +-------------+ +-------------+ +-------------+         |
-|                                                                                         |
-| +---------------------------------------------------------+ +-------------------------+ |
-| | My Recent Tickets                              View all | | Quick Actions           | |
-| |---------------------------------------------------------| |-------------------------| |
-| | TKT-2026-001234  Laptop battery drain  [In Prog]  09:14 | | [+] Create Ticket       | |
-| | TKT-2026-001230  Printer offline       [Open]     08:12 | | [Q] Search Tickets      | |
-| | TKT-2026-001228  Outlook freezing      [Open]     May 6 | | [=] My Queue            | |
-| | TKT-2026-001223  Phone not ringing     [Open]     May 5 | |-------------------------| |
-| | TKT-2026-001115  VPN disconnects       [Resolv]   May 4 | | Priority Distribution   | |
-| |                                                         | | Critical: 3  High: 8    | |
-| |                                                         | | Medium: 25   Low: 19    | |
-| +---------------------------------------------------------+ +-------------------------+ |
-+-----------------------------------------------------------------------------------------+
++---------------------------------------------------------------------------------------------------+
+| [TikTokIT]    [Dashboard (Active)]    [My Queue]                                 [Michael (Staff) v] |
++---------------------------------------------------------------------------------------------------+
+| Welcome back, Michael!                                                           [ Refresh Data ] |
+| Here is what is happening with your queue today.                                                  |
+|                                                                                                   |
+| +-----------+ +-----------+ +-----------+ +-----------+ +-----------+ +-----------+               |
+| | Unassigned| | New       | | Open      | |In Progress| |Waiting Req| |My Assigned|               |
+| | 12        | | 14        | | 23        | | 18        | | 7         | | 16        |  Metric Cards |
+| | +3 yest   | | +2 yest   | | -1 yest   | | +4 yest   | | = yest    | | +1 yest   |               |
+| +-----------+ +-----------+ +-----------+ +-----------+ +-----------+ +-----------+               |
+|                                                                                                   |
+| +---------------------------------------------------------+ +-----------------------------------+ |
+| | My Recent Tickets                              View all | | Quick Actions                     | |
+| |---------------------------------------------------------| |-----------------------------------| |
+| | TKT-2026-001234  Laptop battery drain  [In Prog]  09:14 | | [+] Create Ticket                 | |
+| | TKT-2026-001230  Printer offline       [Open]     08:12 | | [Q] Search Tickets                | |
+| | TKT-2026-001228  Outlook freezing      [Open]     May 6 | | [=] My Queue                      | |
+| | TKT-2026-001223  Phone not ringing     [Open]     May 5 | |-----------------------------------| |
+| | TKT-2026-001115  VPN disconnects       [Resolv]   May 4 | | Priority Distribution             | |
+| |                                                         | | Critical: 3  High: 8              | |
+| |                                                         | | Medium: 25   Low: 19              | |
+| +---------------------------------------------------------+ +-----------------------------------+ |
++---------------------------------------------------------------------------------------------------+
 ```
 
 * **Interactive Drill-down:**
+  - คลิกการ์ด `Unassigned` $\to$ นำทางไปยัง `/tickets?assigned=unassigned` (แสดงเฉพาะตั๋วที่ยังไม่มีผู้รับผิดชอบ)
   - คลิกการ์ด `New` $\to$ นำทางไปยัง `/tickets?status=NEW`
   - คลิกการ์ด `Open` $\to$ นำทางไปยัง `/tickets?status=OPEN`
   - คลิกการ์ด `In Progress` $\to$ นำทางไปยัง `/tickets?status=IN_PROGRESS`
@@ -79,36 +81,38 @@
 ---
 
 ### 3.2. Screen 2: Requester Dashboard
+* **Business Time Zone:** `Asia/Bangkok (UTC+7)` (รอบการคำนวณวัน 00:00:00 - 23:59:59)
 
 ```text
-+-----------------------------------------------------------------------------------------+
-| [TikTokIT]    [Dashboard (Active)]    [My Tickets]    [Create Ticket] [Jennifer (Req) v] |
-+-----------------------------------------------------------------------------------------+
-| Welcome, Jennifer!                                                                      |
-| Here is the latest on your support requests.                                            |
-|                                                                                         |
-| +-------------------+ +-------------------+ +-------------------+ +-------------------+ |
-| | My Open Tickets   | | In Progress       | | Resolved          | | Closed            | |
-| | 3                 | | 2                 | | 5                 | | 12                | |
-| | [View all ->]     | | [View all ->]     | | [View all ->]     | | [View all ->]     | |
-| +-------------------+ +-------------------+ +-------------------+ +-------------------+ |
-|                                                                                         |
-| +---------------------------------------------------------+ +-------------------------+ |
-| | My Recent Tickets                              View all | | Quick Actions           | |
-| |---------------------------------------------------------| |-------------------------| |
-| | TKT-2026-001234  Laptop battery drain  [In Prog]  09:14 | | [+] Create Ticket       | |
-| | TKT-2026-001222  Request Figma access  [Resolv]   May 11| |     Submit a new request| |
-| | TKT-2026-001213  Need new monitor      [Open]     May 9 | |-------------------------| |
-| | TKT-2026-001005  Email not syncing     [Resolv]   May 7 | | [=] View My Tickets     | |
-| | TKT-2026-000850  Password reset req    [Closed]   Apr 30| |     Track existing      | |
-| +---------------------------------------------------------+ +-------------------------+ |
-+-----------------------------------------------------------------------------------------+
++---------------------------------------------------------------------------------------------------+
+| [TikTokIT]    [Dashboard (Active)]    [My Tickets]    [Create Ticket]           [Jennifer (Req) v] |
++---------------------------------------------------------------------------------------------------+
+| Welcome, Jennifer!                                                                                |
+| Here is the latest on your support requests.                                                      |
+|                                                                                                   |
+| +---------------+ +---------------+ +---------------+ +---------------+ +---------------+         |
+| |My Open Tickets| |In Progress    | |Waiting for You| |Recent Resolved| |Closed         |         |
+| | 3             | | 2             | | 1             | | 5 (Last 30d)  | | 12            |  Cards  |
+| | [View all ->] | | [View all ->] | | [View all ->] | | [View all ->] | | [View all ->] |         |
+| +---------------+ +---------------+ +---------------+ +---------------+ +---------------+         |
+|                                                                                                   |
+| +---------------------------------------------------------+ +-----------------------------------+ |
+| | My Recent Tickets                              View all | | Quick Actions                     | |
+| |---------------------------------------------------------| |-----------------------------------| |
+| | TKT-2026-001234  Laptop battery drain  [In Prog]  09:14 | | [+] Create Ticket                 | |
+| | TKT-2026-001222  Request Figma access  [Resolv]   May 11| |     Submit a new request          | |
+| | TKT-2026-001213  Need new monitor      [Open]     May 9 | |-----------------------------------| |
+| | TKT-2026-001005  Email not syncing     [Resolv]   May 7 | | [=] View My Tickets               | |
+| | TKT-2026-000850  Password reset req    [Closed]   Apr 30| |     Track existing                | |
+| +---------------------------------------------------------+ +-----------------------------------+ |
++---------------------------------------------------------------------------------------------------+
 ```
 
 * **Interactive Drill-down:**
   - คลิกการ์ด `My Open Tickets` $\to$ นำทางไปยัง `/my-tickets?status=OPEN_GROUP`
   - คลิกการ์ด `In Progress` $\to$ นำทางไปยัง `/my-tickets?status=IN_PROGRESS`
-  - คลิกการ์ด `Resolved` $\to$ นำทางไปยัง `/my-tickets?status=RESOLVED`
+  - คลิกการ์ด `Waiting for You` $\to$ นำทางไปยัง `/my-tickets?status=WAITING_FOR_REQUESTER`
+  - คลิกการ์ด `Recent Resolved` $\to$ นำทางไปยัง `/my-tickets?status=RESOLVED&recent=true`
   - คลิกการ์ด `Closed` $\to$ นำทางไปยัง `/my-tickets?status=CLOSED`
 
 ---

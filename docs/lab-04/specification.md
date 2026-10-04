@@ -119,21 +119,33 @@
 | `CANCELLED` | *(ไม่มี - ยกเลิกตั๋ว)* | *(Terminal State)* |
 
 * **BR-09 (Resolution Gate Rule):** เมื่อ Requester ระบุว่า "Problem Appears Resolved" ระบบจะอัปเดตฟิลด์ `resolvedIndicated = true` เท่านั้น โดยสถานะตั๋วจะยังคงเป็นสถานะเดิม (เช่น `IN_PROGRESS` หรือ `WAITING_FOR_REQUESTER`) จนกว่า IT Staff หรือ Admin จะเข้ามาเปลี่ยนสถานะตั๋วเป็น `RESOLVED` อย่างเป็นทางการ
-* **BR-10 (Resolution Prerequisites):** การเปลี่ยนสถานะเป็น `RESOLVED` ต้องกระทำโดย IT Staff หรือ Administrator เท่านั้น
-* **BR-11 (Concurrency Conflict Guard):** การอัปเดตสถานะตั๋วหรือบันทึก Actions Taken ต้องส่ง `updatedAt` ล่าสุดมาตรวจสอบ หากข้อมูลในฐานข้อมูลเปลี่ยนไปแล้ว ระบบต้องปฏิเสธด้วย `409 Conflict`
+* **BR-10 (Resolution Prerequisites):** ก่อนที่สถานะตั๋วจะสามารถเปลี่ยนเป็น `RESOLVED` ได้อย่างเป็นทางการ ตั๋วใบนั้นต้องผ่านเกณฑ์เงื่อนไขบังคับครบถ้วนดังนี้:
+  1. ต้องมีผู้รับผิดชอบตั๋วที่ได้รับการมอบหมายแล้ว (`ownerId != null`)
+  2. ต้องมีบันทึกการปฏิบัติงาน (Actions Taken) อย่างน้อย 1 รายการภายใต้ตั๋วใบนั้น (`actionsTaken.length >= 1`)
+  3. ผู้ดำเนินการเปลี่ยนสถานะต้องมีบทบาทเป็น `IT_STAFF` หรือ `ADMINISTRATOR` เท่านั้น
+  หากไม่ผ่านเงื่อนไขข้อใดข้อหนึ่ง Backend ต้องปฏิเสธคำขอด้วย `400 Bad Request` พร้อมข้อความแจ้งข้อผิดพลาดอย่างชัดเจน เพื่อป้องกันการปิดงานโดยไร้ผู้รับผิดชอบหรือไร้หลักฐานการทำงานจริง
+* **BR-11 (Concurrency Conflict Guard):** การอัปเดตสถานะตั๋วหรือบันทึก Actions Taken ต้องส่ง `expectedUpdatedAt` ล่าสุดมาตรวจสอบ หากข้อมูลในฐานข้อมูลเปลี่ยนไปแล้ว ระบบต้องปฏิเสธด้วย `409 Conflict`
 
-### หมวด Dashboard Calculations
-* **BR-12 (Requester Dashboard Metrics):**
+### หมวด Dashboard Calculations & Time Boundaries
+* **BR-12 (Requester Dashboard Metrics & Boundaries):**
+  - **Business Time Zone:** ใช้เขตเวลา `Asia/Bangkok (UTC+7)` และใช้ช่วงเวลาตัดรอบวัน `00:00:00 - 23:59:59`
   - `totalOpen`: นับตั๋วของ Requester ที่มีสถานะอยู่ในกลุ่ม `[NEW, OPEN, IN_PROGRESS, WAITING_FOR_REQUESTER]`
-  - `waitingForRequester`: นับตั๋วของ Requester ที่มีสถานะเป็น `WAITING_FOR_REQUESTER`
-  - `recentlyResolved`: นับตั๋วของ Requester ที่มีสถานะเป็น `RESOLVED` และได้รับการอัปเดตภายใน 30 วันที่ผ่านมา
-  - `totalClosed`: นับตั๋วของ Requester ที่มีสถานะเป็น `CLOSED`
+  - `inProgress`: นับตั๋วของ Requester ที่มีสถานะเป็น `IN_PROGRESS`
+  - `waitingForRequester`: นับตั๋วของ Requester ที่มีสถานะเป็น `WAITING_FOR_REQUESTER` (ตั๋วที่ต้องการการตอบกลับจากผู้แจ้ง)
+  - `recentlyResolved`: นับตั๋วของ Requester ที่มีสถานะเป็น `RESOLVED` ภายในช่วง 30 วันย้อนหลัง
+  - `closed`: นับตั๋วของ Requester ที่มีสถานะเป็น `CLOSED`
   - `recentTickets`: รายการตั๋ว 5 ใบของ Requester ที่มี `updatedAt` ล่าสุด เรียงจากใหม่ไปเก่า
-* **BR-13 (IT Staff Dashboard Metrics):**
-  - `unassigned`: นับตั๋วทั้งหมดในระบบที่ยังไม่มีเจ้าของ (`ownerId = null`) และสถานะยังไม่สิ้นสุด (`status NOT IN [RESOLVED, CLOSED, CANCELLED]`)
+* **BR-13 (IT Staff Dashboard Metrics & Boundaries):**
+  - **Business Time Zone:** ใช้เขตเวลา `Asia/Bangkok (UTC+7)` และช่วงเวลาตัดรอบวัน `00:00:00 - 23:59:59`
+  - `unassigned`: นับตั๋วทั้งหมดในระบบที่ยังไม่มีเจ้าของ (`ownerId = null`) และสถานะยังไม่สิ้นสุด (`status NOT IN [RESOLVED, CLOSED, CANCELLED]`) ถือเป็นตัวชี้วัดสำคัญลำดับแรกของคิวงาน
   - `myAssigned`: นับตั๋วที่ตนเองเป็นเจ้าของ (`ownerId = currentUser.id`) และสถานะยังไม่สิ้นสุด
+  - `new`: นับตั๋วที่มีสถานะเป็น `NEW`
+  - `open`: นับตั๋วที่มีสถานะเป็น `OPEN`
+  - `inProgress`: นับตั๋วที่มีสถานะเป็น `IN_PROGRESS`
+  - `waitingForRequester`: นับตั๋วที่มีสถานะเป็น `WAITING_FOR_REQUESTER`
   - `byStatus`: จำนวนตั๋วแยกตามแต่ละสถานะทั้ง 8 สถานะ
   - `byPriority`: จำนวนตั๋วแยกตามระดับ IT Priority (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`)
+  - `trends`: ข้อมูลเปรียบเทียบสถิติเทียบกับวันก่อนหน้า (Yesterday vs Today) เช่น `+2`, `-1`, `0`
   - `recentTickets`: รายการตั๋ว 5-10 ใบล่าสุดในระบบที่มีการอัปเดต
 * **BR-14 (Administrator Dashboard Metrics):**
   - นำเสนอข้อมูลเหมือน IT Staff Dashboard และเพิ่มสถิติผู้ใช้งาน: จำนวนผู้ใช้ทั้งหมด, จำนวนผู้ใช้ที่ Active, จำนวนผู้ใช้แยกตามบทบาท
@@ -146,11 +158,11 @@
 
 1. **IT Staff Dashboard (Screen 1):**
    - **Header & Action Bar:** ข้อความต้อนรับตามชื่อเจ้าหน้าที่, ปุ่ม Refresh ข้อมูล, และปุ่ม Quick Actions (Create Ticket, My Queue, Search)
-   - **Metric Cards Row:** การ์ดแสดงผลตัวเลขพร้อมไอคอนและข้อความเปรียบเทียบ (New, Open, In Progress, Waiting for Requester, My Assigned) ทุกการ์ดคลิกได้เพื่อ Drill-down ไปยังคิวงานที่ฟิลเตอร์แล้ว
+   - **Metric Cards Row:** การ์ดแสดงผลตัวเลข 6 ใบ (Unassigned Tickets, New, Open, In Progress, Waiting for Requester, My Assigned) พร้อม Trend Indicators และลิงก์ Drill-down ไปยัง Central Queue ที่ฟิลเตอร์ตรงกัน
    - **Main Content Grid:** ฝั่งซ้ายแสดงตารางตั๋วล่าสุด (Recent Tickets) พร้อม Status Badge, วันที่, และลิงก์เปิดดูรายละเอียด; ฝั่งขวาแสดง Quick Actions และสถิติย่อตาม Priority
 2. **Requester Dashboard (Screen 2):**
    - **Welcome Banner:** ทักทายผู้ใช้พร้อมสรุปสถานะตั๋วของตนเอง
-   - **Metric Cards:** สรุป 4 กล่อง (My Open Tickets, In Progress, Resolved, Closed) แต่ละกล่องมีปุ่ม "View All" เพื่อ Drill-down ไปยังหน้า My Tickets
+   - **Metric Cards Row:** สรุป 5 กล่องสถิติ (My Open Tickets, In Progress, Waiting for Requester, Recently Resolved, Closed) พร้อมปุ่ม "View All" เพื่อ Drill-down ไปยังหน้า My Tickets ตาม Filter
    - **My Recent Tickets:** รายการตั๋วล่าสุด 5 รายการ พร้อมสถานะและวันที่
    - **Quick Actions:** ปุ่ม "Create Ticket" และปุ่ม "View My Tickets"
 3. **Actions Taken Section บน Ticket Detail:**
@@ -253,11 +265,12 @@ model ActionTaken {
 * **AC-06 (Permitted Ticket Status Transition):** Given ตั๋วอยู่ในสถานะ `NEW` และผู้ใช้คือ IT Staff When ส่งคำขอเปลี่ยนสถานะเป็น `IN_PROGRESS` Then สถานะตั๋วจะเปลี่ยนเป็น `IN_PROGRESS` สำเร็จ พร้อมอัปเดตเวลา `updatedAt`
 * **AC-07 (Forbidden Ticket Status Transition):** Given ตั๋วอยู่ในสถานะ `NEW` และผู้ใช้คือ IT Staff When ส่งคำขอข้ามขั้นเปลี่ยนเป็น `CLOSED` Then เซิร์ฟเวอร์ต้องปฏิเสธด้วย `400 Bad Request`
 * **AC-08 (Resolution Gate Enforcement):** Given Requester กดระบุว่า "Problem Appears Resolved" When ตรวจสอบสถานะตั๋วในฐานข้อมูล Then ฟิลด์ `resolvedIndicated` ต้องเป็น `true` แต่ `status` ของตั๋วต้อง**ไม่เปลี่ยนเป็น `RESOLVED`**
-* **AC-09 (Official Resolution by Staff):** Given ตั๋วที่มี `resolvedIndicated = true` และอยู่ในสถานะ `IN_PROGRESS` When IT Staff ตรวจสอบความถูกต้องและส่งคำขอเปลี่ยนสถานะเป็น `RESOLVED` Then ตั๋วจะเปลี่ยนสถานะเป็น `RESOLVED` อย่างเป็นทางการ
-* **AC-10 (Requester Dashboard Data Accuracy):** Given ผู้ใช้ล็อกอินด้วยบทบาท Requester When เรียกใช้งาน `GET /api/dashboard/requester` Then ผลลัพธ์ตัวเลขสถิติและรายการตั๋วล่าสุดต้องตรงกับตั๋วที่ผู้ใช้นั้นเป็นเจ้าของในฐานข้อมูล 100%
-* **AC-11 (IT Staff Dashboard Operational Metrics):** Given ผู้ใช้ล็อกอินด้วยบทบาท IT Staff When เรียกใช้งาน `GET /api/dashboard/staff` Then ผลลัพธ์ตัวเลขสถิติ (ตั๋วไม่มีเจ้าของ, ตั๋วตนเอง, ตั๋วตาม Priority/Status) ต้องตรงกับข้อมูลจริงในฐานข้อมูล
+* **AC-09 (Official Resolution by Staff with Prerequisites):** Given ตั๋วที่มี `resolvedIndicated = true` อยู่ในสถานะ `IN_PROGRESS` มีการมอบหมาย Ticket Owner แล้ว (`ownerId != null`) และมีบันทึก Actions Taken อย่างน้อย 1 รายการ (`actionsTaken.length >= 1`) When IT Staff ตรวจสอบความถูกต้องและส่งคำขอเปลี่ยนสถานะเป็น `RESOLVED` Then ตั๋วจะเปลี่ยนสถานะเป็น `RESOLVED` อย่างเป็นทางการ
+* **AC-10 (Requester Dashboard Data Accuracy):** Given ผู้ใช้ล็อกอินด้วยบทบาท Requester When เรียกใช้งาน `GET /api/dashboard/requester` Then ผลลัพธ์ตัวเลขสถิติ (รวมถึง `waitingForRequester`) และรายการตั๋วล่าสุดต้องตรงกับตั๋วที่ผู้ใช้นั้นเป็นเจ้าของในฐานข้อมูล 100%
+* **AC-11 (IT Staff Dashboard Operational Metrics):** Given ผู้ใช้ล็อกอินด้วยบทบาท IT Staff When เรียกใช้งาน `GET /api/dashboard/staff` Then ผลลัพธ์ตัวเลขสถิติ (ตั๋วไม่มีเจ้าของ `unassigned`, ตั๋วตนเอง `myAssigned`, ตั๋วตาม Priority/Status, และแนวโน้ม `trends`) ต้องตรงกับข้อมูลจริงในฐานข้อมูล
 * **AC-12 (Concurrency Conflict Handling):** Given สองผู้ใช้เปิดหน้าตั๋วเดียวกันพร้อมกัน When ผู้ใช้แรกบันทึกข้อมูลสำเร็จ และผู้ใช้ที่สองพยายามบันทึกข้อมูลทับด้วย Timestamp เดิม Then ผู้ใช้ที่สองต้องได้รับการแจ้งเตือน `409 Conflict` และข้อมูลไม่ถูกเขียนทับ
 * **AC-13 (Zero Regression Verification):** Given การทดสอบระบบเต็มรูปแบบ When รันชุดทดสอบทั้งหมดของโปรเจกต์ (Lab 1 ถึง Lab 4) Then ทุกชุดทดสอบต้องผ่านเขียว 100% ปราศจากความล้มเหลว
+* **AC-14 (Resolution Prerequisites Rejection):** Given ตั๋วที่ยังไม่มีผู้รับผิดชอบ (`ownerId = null`) หรือยังไม่มีบันทึก Actions Taken ใดๆ (`actionsTaken.length == 0`) When มีการส่งคำขอเปลี่ยนสถานะตั๋วเป็น `RESOLVED` Then เซิร์ฟเวอร์ต้องปฏิเสธด้วย `400 Bad Request` พร้อมแจ้งว่าต้องมี Ticket Owner และ Actions Taken ก่อนเสมอ
 
 ---
 
