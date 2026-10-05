@@ -457,4 +457,15 @@ body {
   animation: zen-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   background-color: #E2E8F0;
   border-radius: var(--radius-sm);
-}
+}
+
+/* Actions Taken Responsive Rules (Screen 3) */
+@media (max-width: 767px) {
+  .actions-taken-desktop-table {
+    display: none !important;
+  }
+  .actions-taken-mobile-cards {
+    display: flex !important;
+  }
+}
+
