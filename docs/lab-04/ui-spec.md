@@ -59,9 +59,9 @@
 | +---------------------------------------------------------+ +-----------------------------------+ |
 | | My Recent Tickets                              View all | | Quick Actions                     | |
 | |---------------------------------------------------------| |-----------------------------------| |
-| | TKT-2026-001234  Laptop battery drain  [In Prog]  09:14 | | [+] Create Ticket                 | |
-| | TKT-2026-001230  Printer offline       [Open]     08:12 | | [Q] Search Tickets                | |
-| | TKT-2026-001228  Outlook freezing      [Open]     May 6 | | [=] My Queue                      | |
+| | TKT-2026-001234  Laptop battery drain  [In Prog]  09:14 | | [Q] Search Tickets                | |
+| | TKT-2026-001230  Printer offline       [Open]     08:12 | | [=] My Queue                      | |
+| | TKT-2026-001228  Outlook freezing      [Open]     May 6 | | [!] View Unassigned               | |
 | | TKT-2026-001223  Phone not ringing     [Open]     May 5 | |-----------------------------------| |
 | | TKT-2026-001115  VPN disconnects       [Resolv]   May 4 | | Priority Distribution             | |
 | |                                                         | | Critical: 3  High: 8              | |
@@ -69,6 +69,8 @@
 | +---------------------------------------------------------+ +-----------------------------------+ |
 +---------------------------------------------------------------------------------------------------+
 ```
+
+*(หมายเหตุสำคัญ: เจ้าหน้าที่ IT Staff และ Administrator ไม่มีสิทธิ์สร้างตั๋ว — บนหน้าจอ IT Staff Dashboard จะไม่มีปุ่ม [+] Create Ticket เด็ดขาด โดยสิทธิ์การสร้างตั๋วสงวนไว้เฉพาะบทบาท Requester เท่านั้น)*
 
 * **Interactive Drill-down:**
   - คลิกการ์ด `Unassigned` $\to$ นำทางไปยัง `/tickets?assigned=unassigned` (แสดงเฉพาะตั๋วที่ยังไม่มีผู้รับผิดชอบ)

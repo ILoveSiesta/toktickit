@@ -157,9 +157,9 @@
 ส่วนต่อประสานผู้ใช้ได้รับการขยายตามแบบแผน **Zen Green Design System**:
 
 1. **IT Staff Dashboard (Screen 1):**
-   - **Header & Action Bar:** ข้อความต้อนรับตามชื่อเจ้าหน้าที่, ปุ่ม Refresh ข้อมูล, และปุ่ม Quick Actions (Create Ticket, My Queue, Search)
+   - **Header & Action Bar:** ข้อความต้อนรับตามชื่อเจ้าหน้าที่, ปุ่ม Refresh ข้อมูล, และปุ่ม Quick Actions (Search Tickets, My Queue) *(หมายเหตุ: เจ้าหน้าที่ IT Staff และ Admin ไม่มีสิทธิ์สร้างตั๋ว สิทธิ์การสร้างตั๋วสงวนไว้เฉพาะบทบาท Requester เท่านั้น)*
    - **Metric Cards Row:** การ์ดแสดงผลตัวเลข 6 ใบ (Unassigned Tickets, New, Open, In Progress, Waiting for Requester, My Assigned) พร้อม Trend Indicators และลิงก์ Drill-down ไปยัง Central Queue ที่ฟิลเตอร์ตรงกัน
-   - **Main Content Grid:** ฝั่งซ้ายแสดงตารางตั๋วล่าสุด (Recent Tickets) พร้อม Status Badge, วันที่, และลิงก์เปิดดูรายละเอียด; ฝั่งขวาแสดง Quick Actions และสถิติย่อตาม Priority
+   - **Main Content Grid:** ฝั่งซ้ายแสดงตารางตั๋วล่าสุด (Recent Tickets) พร้อม Status Badge, วันที่, และลิงก์เปิดดูรายละเอียด; ฝั่งขวาแสดง Quick Actions (Search Tickets, My Queue, View Unassigned) และสถิติย่อตาม Priority
 2. **Requester Dashboard (Screen 2):**
    - **Welcome Banner:** ทักทายผู้ใช้พร้อมสรุปสถานะตั๋วของตนเอง
    - **Metric Cards Row:** สรุป 5 กล่องสถิติ (My Open Tickets, In Progress, Waiting for Requester, Recently Resolved, Closed) พร้อมปุ่ม "View All" เพื่อ Drill-down ไปยังหน้า My Tickets ตาม Filter
