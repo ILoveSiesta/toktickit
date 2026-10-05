@@ -292,9 +292,76 @@ async function main() {
         });
       }
     }
+
+    // 6. Seed Actions Taken for tickets (Lab 4)
+    if (t.ticketNumber === "TKT-2026-000101") {
+      const existingActions = await prisma.actionTaken.count({ where: { ticketId: ticket.id } });
+      if (existingActions === 0) {
+        await prisma.actionTaken.createMany({
+          data: [
+            {
+              ticketId: ticket.id,
+              actionDateTime: new Date("2026-10-04T09:30:00Z"),
+              actionDescription: "Inspected battery performance report and uninstalled recent faulty ACPI driver.",
+              result: "Battery discharge rate decreased slightly; needs monitoring.",
+              performedById: staffAlexId,
+              followUpRequired: true,
+              followUpNote: "Check battery health percentage after 24 hours of standard usage.",
+              attachmentNotes: "battery_report_oct4.txt",
+            },
+            {
+              ticketId: ticket.id,
+              actionDateTime: new Date("2026-10-04T14:15:00Z"),
+              actionDescription: "Assisted with running manufacturer hardware diagnostics utility on laptop.",
+              result: "Battery cells reported healthy; BIOS power management update recommended.",
+              performedById: staffLisaId, // Different staff from ticket owner (BR-02)
+              followUpRequired: false,
+              followUpNote: null,
+              attachmentNotes: "hw_diag_results.pdf",
+            },
+          ],
+        });
+      }
+    } else if (t.ticketNumber === "TKT-2026-000102") {
+      const existingActions = await prisma.actionTaken.count({ where: { ticketId: ticket.id } });
+      if (existingActions === 0) {
+        await prisma.actionTaken.createMany({
+          data: [
+            {
+              ticketId: ticket.id,
+              actionDateTime: new Date("2026-10-04T11:00:00Z"),
+              actionDescription: "Reset VPN profile credentials in Active Directory and verified LDAP sync.",
+              result: "Profile sync completed, instructed user to re-attempt authentication.",
+              performedById: staffLisaId,
+              followUpRequired: true,
+              followUpNote: "Confirm user login success from external IP address.",
+              attachmentNotes: null,
+            },
+          ],
+        });
+      }
+    } else if (t.ticketNumber === "TKT-2026-000104") {
+      const existingActions = await prisma.actionTaken.count({ where: { ticketId: ticket.id } });
+      if (existingActions === 0) {
+        await prisma.actionTaken.createMany({
+          data: [
+            {
+              ticketId: ticket.id,
+              actionDateTime: new Date("2026-10-03T16:45:00Z"),
+              actionDescription: "Restarted print spooler service and updated network IP configuration on printer.",
+              result: "Test page printed successfully across all workstations on 3rd floor.",
+              performedById: staffAlexId,
+              followUpRequired: false,
+              followUpNote: null,
+              attachmentNotes: null,
+            },
+          ],
+        });
+      }
+    }
   }
 
-  console.log("Lab 3 Seeding completed successfully.");
+  console.log("Lab 4 Seeding completed successfully.");
 }
 
 main()
