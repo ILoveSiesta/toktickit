@@ -50,6 +50,7 @@ model User {
   assignedTickets  Ticket[]       @relation("TicketOwner")
   comments         Comment[]
   internalNotes    InternalNote[]
+  actionsTaken     ActionTaken[]  @relation("StaffActionsTaken")
 
   @@map("users")
 }
@@ -102,6 +103,7 @@ model Ticket {
   attachments   Attachment[]
   comments      Comment[]
   internalNotes InternalNote[]
+  actionsTaken  ActionTaken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -156,3 +158,26 @@ model InternalNote {
   @@index([ticketId, createdAt(sort: Asc)])
   @@map("internal_notes")
 }
+
+model ActionTaken {
+  id                Int      @id @default(autoincrement())
+  ticketId          Int
+  actionDateTime    DateTime @default(now())
+  actionDescription String   @db.Text
+  result            String   @db.Text
+  performedById     Int
+  followUpRequired  Boolean  @default(false)
+  followUpNote      String?  @db.Text
+  attachmentNotes   String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  ticket      Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  performedBy User   @relation("StaffActionsTaken", fields: [performedById], references: [id])
+
+  @@index([ticketId])
+  @@index([performedById])
+  @@index([actionDateTime])
+  @@map("actions_taken")
+}
+

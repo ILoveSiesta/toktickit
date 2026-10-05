@@ -12,6 +12,7 @@ import { authRouter } from "./routes/auth.js";
 import { staffRouter } from "./routes/staff.js";
 import { commentsNotesRouter } from "./routes/commentsNotes.js";
 import { adminRouter } from "./routes/admin.js";
+import { actionsTakenRouter } from "./routes/actionsTaken.js";
 import { authenticate, requireRole, enforcePasswordChanged } from "./middleware/auth.js";
 import { verifyToken } from "./utils/jwt.js";
 
@@ -50,6 +51,9 @@ app.use("/api/staff", staffRouter);
 
 // Comments & Notes Routes (Lab 3 Issue 4)
 app.use("/api", commentsNotesRouter);
+
+// Actions Taken Routes (Lab 4 Issue 2)
+app.use("/api", actionsTakenRouter);
 
 // Administrator Routes (Lab 3 Issue 5)
 app.use("/api/admin", adminRouter);
