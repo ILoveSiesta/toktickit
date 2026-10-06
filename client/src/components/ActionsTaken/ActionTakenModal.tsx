@@ -78,7 +78,7 @@ export const ActionTakenModal: React.FC<ActionTakenModalProps> = ({
 
   if (!isOpen) return null;
 
-  const isUserInactive = currentUser && (currentUser as any).isActive === false;
+  const isUserInactive = Boolean(currentUser && (currentUser as any).isActive === false);
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
