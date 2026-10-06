@@ -13,6 +13,7 @@ import { staffRouter } from "./routes/staff.js";
 import { commentsNotesRouter } from "./routes/commentsNotes.js";
 import { adminRouter } from "./routes/admin.js";
 import { actionsTakenRouter } from "./routes/actionsTaken.js";
+import { ticketsRouter } from "./routes/tickets.js";
 import { authenticate, requireRole, enforcePasswordChanged } from "./middleware/auth.js";
 import { verifyToken } from "./utils/jwt.js";
 
@@ -54,6 +55,9 @@ app.use("/api", commentsNotesRouter);
 
 // Actions Taken Routes (Lab 4 Issue 2)
 app.use("/api", actionsTakenRouter);
+
+// Ticket Workflow & Lifecycle Routes (Lab 4 Issue 4)
+app.use("/api", ticketsRouter);
 
 // Administrator Routes (Lab 3 Issue 5)
 app.use("/api/admin", adminRouter);

@@ -491,6 +491,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       {/* Requester Resolution Indication Banner (API-17 / UI-04) */}
       {ticket.resolvedIndicated && (
         <div
+          data-testid="resolution-advisory-banner"
+          role="status"
           style={{
             background: "#E0F2FE",
             border: "1px solid #7DD3FC",

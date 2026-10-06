@@ -586,6 +586,21 @@ staffRouter.patch("/tickets/:id/status", async (req: Request, res: Response) => 
       });
     }
 
+    // Optimistic Concurrency Check (Stale Update)
+    if (req.body.expectedUpdatedAt) {
+      const expectedTime = new Date(req.body.expectedUpdatedAt).getTime();
+      const actualTime = new Date(ticket.updatedAt).getTime();
+      if (actualTime > expectedTime) {
+        return res.status(409).json({
+          success: false,
+          error: {
+            code: "STALE_UPDATE_CONFLICT",
+            message: "The ticket has been modified by another user. Please refresh and try again.",
+          },
+        });
+      }
+    }
+
     const currentStatus = ticket.currentStatus;
     const targetStatus = upperStatus as TicketStatus;
 
