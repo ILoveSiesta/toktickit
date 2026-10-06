@@ -13,6 +13,8 @@ import { Login } from "./components/Login.js";
 import { ChangePassword } from "./components/ChangePassword.js";
 import { StaffTicketQueue } from "./components/StaffTicketQueue.js";
 import { UserManagement } from "./components/UserManagement.js";
+import { RequesterDashboard } from "./components/Dashboards/RequesterDashboard.js";
+import { StaffDashboard } from "./components/Dashboards/StaffDashboard.js";
 import "./theme.css";
 
 function TicketDetailWrapper() {
@@ -74,7 +76,9 @@ function ProtectedLayout() {
     navigate("/login");
   };
 
-  const currentTab = location.pathname.includes("create")
+  const currentTab = location.pathname.includes("dashboard")
+    ? "dashboard"
+    : location.pathname.includes("create")
     ? "create-ticket"
     : location.pathname.includes("queue")
     ? "queue"
@@ -87,7 +91,8 @@ function ProtectedLayout() {
       <AppHeader
         currentTab={currentTab}
         onSelectTab={(tab) => {
-          if (tab === "create-ticket") navigate("/tickets/create");
+          if (tab === "dashboard") navigate("/dashboard");
+          else if (tab === "create-ticket") navigate("/tickets/create");
           else if (tab === "queue") navigate("/queue");
           else if (tab === "admin-users") navigate("/admin/users");
           else navigate("/tickets");
@@ -218,13 +223,36 @@ function RootRedirect() {
   return <Navigate to="/tickets" replace />;
 }
 
+function DashboardRoute() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  if (user?.role === "IT_STAFF" || user?.role === "ADMINISTRATOR") {
+    return (
+      <StaffDashboard
+        onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+        onNavigateQueue={(path) => navigate(path || "/queue")}
+      />
+    );
+  }
+
+  return (
+    <RequesterDashboard
+      onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+      onNavigateCreate={() => navigate("/tickets/create")}
+      onNavigateTickets={(path) => navigate(path || "/tickets")}
+    />
+  );
+}
+
 function RequesterOnlyRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+  const location = useLocation();
   if (user?.role && user.role !== "REQUESTER") {
-    if (user.role === "ADMINISTRATOR") {
+    if (user.role === "ADMINISTRATOR" && !location.search) {
       return <Navigate to="/admin/users" replace />;
     }
-    return <Navigate to="/queue" replace />;
+    return <Navigate to={`/queue${location.search}`} replace />;
   }
   return <>{children}</>;
 }
@@ -270,6 +298,7 @@ function MainApp() {
       <Route path="/change-password" element={<ChangePasswordRoute />} />
       <Route element={<ProtectedLayout />}>
         <Route path="/" element={<RootRedirect />} />
+        <Route path="/dashboard" element={<DashboardRoute />} />
         <Route
           path="/queue"
           element={
@@ -280,6 +309,17 @@ function MainApp() {
         />
         <Route
           path="/tickets"
+          element={
+            <RequesterOnlyRoute>
+              <MyTickets
+                onSelectTicket={(ticketId) => navigate(`/tickets/${ticketId}`)}
+                onNavigateCreate={() => navigate("/tickets/create")}
+              />
+            </RequesterOnlyRoute>
+          }
+        />
+        <Route
+          path="/my-tickets"
           element={
             <RequesterOnlyRoute>
               <MyTickets
