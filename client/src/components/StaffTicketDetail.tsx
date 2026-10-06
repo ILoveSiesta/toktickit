@@ -21,6 +21,7 @@ import {
   PERMITTED_STATUS_TRANSITIONS,
   Role,
 } from "../types/index.js";
+import { ActionsTakenSection } from "./ActionsTaken/index.js";
 
 interface StaffTicketDetailProps {
   ticketId: number;
@@ -908,6 +909,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           </div>
         )}
       </div>
+
+      {/* ZONE: ACTIONS TAKEN (Lab 4 Screen 3) */}
+      <ActionsTakenSection
+        ticketId={ticketId}
+        currentUser={user}
+        isReadOnly={false}
+      />
 
       {/* ZONE 2: COMMUNICATION & COLLABORATION TABS */}
       <div

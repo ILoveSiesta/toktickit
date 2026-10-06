@@ -15,6 +15,9 @@ import {
   AdminUser,
   CreateAdminUserPayload,
   UpdateAdminUserPayload,
+  ActionTaken,
+  CreateActionTakenPayload,
+  UpdateActionTakenPayload,
 } from "./types/index.js";
 
 const rawUrl = import.meta.env.VITE_API_URL || "/api";
@@ -631,4 +634,59 @@ export async function resetAdminUserPassword(
   }
   return data.data;
 }
+
+export async function fetchActionsTaken(ticketId: number): Promise<ActionTaken[]> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/actions-taken`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to load actions taken (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data || [];
+}
+
+export async function createActionTaken(
+  ticketId: number,
+  payload: CreateActionTakenPayload
+): Promise<ActionTaken> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/actions-taken`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to record action taken (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
+export async function updateActionTaken(
+  ticketId: number,
+  actionId: number,
+  payload: UpdateActionTakenPayload
+): Promise<ActionTaken> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/actions-taken/${actionId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to update action taken (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
+
 

@@ -10,6 +10,7 @@ import {
   postPublicComment,
   indicateProblemResolved,
 } from "../api.js";
+import { ActionsTakenSection } from "./ActionsTaken/index.js";
 
 interface RequesterTicketDetailProps {
   ticketId: number;
@@ -696,6 +697,13 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
           )}
         </div>
       </div>
+
+      {/* Actions Taken Section (Lab 4 Screen 3 - Read-Only for Requester) */}
+      <ActionsTakenSection
+        ticketId={ticketId}
+        currentUser={user}
+        isReadOnly={true}
+      />
 
       {/* Public Comments Section (UI Spec 3.2 / UI-08) */}
       <div className="zen-card" data-testid="public-comments-section" style={{ marginBottom: "var(--space-xl)" }}>
