@@ -476,11 +476,18 @@ export async function updateTicketPriority(ticketId: number, itPriority: Priorit
   return data.data;
 }
 
-export async function updateTicketStatus(ticketId: number, status: TicketStatus): Promise<any> {
-  const res = await fetchWithInterceptor(`${API_BASE}/staff/tickets/${ticketId}/status`, {
+export async function updateTicketStatus(
+  ticketId: number,
+  status: TicketStatus,
+  expectedUpdatedAt?: string
+): Promise<any> {
+  const res = await fetchWithInterceptor(`${API_BASE}/tickets/${ticketId}/status`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({
+      status,
+      ...(expectedUpdatedAt ? { expectedUpdatedAt } : {}),
+    }),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok || !data.success) {
