@@ -549,19 +549,21 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    alignItems: "center",
+                    alignItems: "flex-start",
+                    flexWrap: "wrap",
                     padding: "var(--space-sm) var(--space-md)",
                     borderRadius: "var(--radius-sm)",
                     backgroundColor: "#F9FAFB",
                     border: "1px solid var(--color-border)",
                     cursor: "pointer",
                     transition: "background-color 0.15s ease",
+                    gap: "var(--space-xs)",
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F3F4F6")}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#F9FAFB")}
                 >
-                  <div style={{ minWidth: 0, flex: 1, marginRight: "var(--space-md)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)", marginBottom: 2 }}>
+                  <div style={{ minWidth: 0, flex: "1 1 200px" }}>
+                    <div style={{ marginBottom: 2 }}>
                       <span
                         style={{
                           fontSize: "0.85rem",
@@ -571,16 +573,6 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
                       >
                         {ticket.ticketNumber}
                       </span>
-                      {ticket.ownerName && (
-                        <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
-                          • {ticket.ownerName}
-                        </span>
-                      )}
-                      {!ticket.ownerName && (
-                        <span style={{ fontSize: "0.75rem", color: "#DC2626", fontWeight: 600 }}>
-                          • Unassigned
-                        </span>
-                      )}
                     </div>
                     <div
                       style={{
@@ -597,35 +589,74 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", flexShrink: 0 }}>
-                    <span
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      gap: "6px",
+                      flexShrink: 0,
+                      marginLeft: "auto",
+                    }}
+                  >
+                    {/* Top Right: Assigned Info */}
+                    <div style={{ fontSize: "0.75rem", lineHeight: 1.2 }}>
+                      {ticket.ownerName ? (
+                        <span style={{ color: "var(--color-text-muted)", fontWeight: 500 }}>
+                          • {ticket.ownerName}
+                        </span>
+                      ) : (
+                        <span style={{ color: "#DC2626", fontWeight: 600 }}>
+                          • Unassigned
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Bottom Right: Priority, Status, Date (shifted slightly down) */}
+                    <div
                       style={{
-                        fontSize: "0.7rem",
-                        fontWeight: 700,
-                        padding: "2px 6px",
-                        borderRadius: "10px",
-                        ...getPriorityBadgeStyle(ticket.itPriority || ticket.priority || "MEDIUM"),
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        flexWrap: "wrap",
+                        justifyContent: "flex-end",
                       }}
                     >
-                      {ticket.itPriority || ticket.priority || "MED"}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                        padding: "2px 8px",
-                        borderRadius: "12px",
-                        ...getStatusBadgeStyle(ticket.status),
-                      }}
-                    >
-                      {ticket.status.replace(/_/g, " ")}
-                    </span>
-                    <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", whiteSpace: "nowrap" }}>
-                      {new Date(ticket.updatedAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
+                      <span
+                        style={{
+                          fontSize: "0.7rem",
+                          fontWeight: 700,
+                          padding: "2px 6px",
+                          borderRadius: "10px",
+                          ...getPriorityBadgeStyle(ticket.itPriority || ticket.priority || "MEDIUM"),
+                        }}
+                      >
+                        {ticket.itPriority || ticket.priority || "MED"}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          padding: "2px 8px",
+                          borderRadius: "12px",
+                          ...getStatusBadgeStyle(ticket.status),
+                        }}
+                      >
+                        {ticket.status.replace(/_/g, " ")}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "var(--color-text-muted)",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {new Date(ticket.updatedAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}

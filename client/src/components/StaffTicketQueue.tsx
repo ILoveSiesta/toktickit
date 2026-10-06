@@ -15,7 +15,8 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
   } catch {}
 
   const initialStatus = searchParams?.get("status") || "";
-  const initialAssigned = searchParams?.get("assigned") || "all";
+  const rawAssigned = searchParams?.get("assigned");
+  const initialAssigned = rawAssigned === "me" ? "mine" : rawAssigned || "all";
 
   const [tickets, setTickets] = useState<StaffTicketQueueItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -50,7 +51,7 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
       const s = searchParams.get("status");
       const a = searchParams.get("assigned");
       if (s !== null) setStatus(s);
-      if (a !== null) setAssigned(a);
+      if (a !== null) setAssigned(a === "me" ? "mine" : a);
       if (s || (a && a !== "all") || searchParams.get("focus") === "search") {
         setShowFilters(true);
       }
