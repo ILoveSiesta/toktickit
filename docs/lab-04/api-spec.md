@@ -367,7 +367,7 @@
 * `POST /api/auth/logout` (Logout)
 * `GET /api/auth/me` (Current user info)
 * `POST /api/auth/change-password` (Change password)
-* `GET /api/tickets` (Queue list with search, filter, pagination)
+* `GET /api/tickets` หรือ `GET /api/staff/queue` (Central ticket queue with search, filter, pagination; รองรับตัวกรอง `assigned=all|unassigned|mine|me|<userId>`)
 * `POST /api/tickets` (Create ticket - Requester only)
 * `GET /api/tickets/:id` (Ticket detail)
 * `PATCH /api/tickets/:id` (Update ticket metadata, priority, assignment)

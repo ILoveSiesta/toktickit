@@ -158,8 +158,8 @@
 
 1. **IT Staff Dashboard (Screen 1):**
    - **Header & Action Bar:** ข้อความต้อนรับตามชื่อเจ้าหน้าที่, ปุ่ม Refresh ข้อมูล, และปุ่ม Quick Actions (Search Tickets, My Queue) *(หมายเหตุ: เจ้าหน้าที่ IT Staff และ Admin ไม่มีสิทธิ์สร้างตั๋ว สิทธิ์การสร้างตั๋วสงวนไว้เฉพาะบทบาท Requester เท่านั้น)*
-   - **Metric Cards Row:** การ์ดแสดงผลตัวเลข 6 ใบ (Unassigned Tickets, New, Open, In Progress, Waiting for Requester, My Assigned) พร้อม Trend Indicators และลิงก์ Drill-down ไปยัง Central Queue ที่ฟิลเตอร์ตรงกัน
-   - **Main Content Grid:** ฝั่งซ้ายแสดงตารางตั๋วล่าสุด (Recent Tickets) พร้อม Status Badge, วันที่, และลิงก์เปิดดูรายละเอียด; ฝั่งขวาแสดง Quick Actions (Search Tickets, My Queue, View Unassigned) และสถิติย่อตาม Priority
+   - **Metric Cards Row:** การ์ดแสดงผลตัวเลข 6 ใบ (Unassigned Tickets, New, Open, In Progress, Waiting for Requester, My Assigned) พร้อม Trend Indicators และลิงก์ Drill-down ไปยัง Central Queue ที่ฟิลเตอร์ตรงกัน (โดยการ์ด My Assigned เชื่อมต่อไปยัง `/tickets?assigned=mine` ซึ่งระบบรองรับทั้ง `assigned=mine` และ alias `assigned=me`)
+   - **Main Content Grid:** ฝั่งซ้ายแสดงตารางตั๋วล่าสุด (Recent Tickets) โดยจัดวางชื่อผู้รับผิดชอบ (`• {ownerName}` หรือ `• Unassigned` สีแดง) ชิดขวาบนเสมอ และขยับ IT Priority Badge, Status Badge, วันที่ ลงมาด้านล่างเล็กน้อย จัด Layout เป็น 2 คอลัมน์พร้อม Responsive Wrap เพื่อป้องกันการทับซ้อนและไม่ล้นกรอบ; ฝั่งขวาแสดง Quick Actions (Search Tickets, My Queue, View Unassigned) และสถิติย่อตาม Priority
 2. **Requester Dashboard (Screen 2):**
    - **Welcome Banner:** ทักทายผู้ใช้พร้อมสรุปสถานะตั๋วของตนเอง
    - **Metric Cards Row:** สรุป 5 กล่องสถิติ (My Open Tickets, In Progress, Waiting for Requester, Recently Resolved, Closed) พร้อมปุ่ม "View All" เพื่อ Drill-down ไปยังหน้า My Tickets ตาม Filter
@@ -176,7 +176,7 @@
 5. **Screen States & UX Safety:**
    - **Loading State:** แสดง Skeleton Placeholder และ Spinner เขียว Zen Green
    - **Empty State:** เมื่อสถิติเป็น 0 หรือไม่มีข้อมูลตั๋ว จะแสดงภาพประกอบข้อความ *"No tickets found matching this criteria"* อย่างเป็นมิตร
-   - **Responsive Breakpoints:** รองรับ Desktop (1280px+), Tablet (768px - 1024px), และ Mobile (375px - 767px) โดยปรับการ์ด Metric จาก 5 คอลัมน์เป็น 2 คอลัมน์บน Tablet และ 1 คอลัมน์บน Mobile
+   - **Responsive Breakpoints:** รองรับ Desktop (1280px+), Tablet (768px - 1024px), และ Mobile (375px - 767px) โดยปรับการ์ด Metric จาก 5-6 คอลัมน์เป็น 2 คอลัมน์บน Tablet และ 1 คอลัมน์บน Mobile รวมถึงแถวตั๋วใน Recent Tickets มีการ wrap และ text-overflow เพื่อไม่ให้ป้ายสถานะหรือข้อความซ้อนทับหรือล้นขอบจอ
 
 ---
 
