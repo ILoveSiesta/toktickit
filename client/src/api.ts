@@ -18,6 +18,8 @@ import {
   ActionTaken,
   CreateActionTakenPayload,
   UpdateActionTakenPayload,
+  RequesterDashboardData,
+  StaffDashboardData,
 } from "./types/index.js";
 
 const rawUrl = import.meta.env.VITE_API_URL || "/api";
@@ -166,6 +168,7 @@ export async function fetchTickets(
     requestedPriority?: string;
     itPriority?: string;
     currentStatus?: string;
+    recent?: string | boolean;
     sortBy?: string;
     sortOrder?: string;
     page?: number;
@@ -185,6 +188,7 @@ export async function fetchTickets(
   if (params.requestedPriority) query.set("requestedPriority", params.requestedPriority);
   if (params.itPriority) query.set("itPriority", params.itPriority);
   if (params.currentStatus) query.set("currentStatus", params.currentStatus);
+  if (params.recent) query.set("recent", String(params.recent));
   if (params.sortBy) query.set("sortBy", params.sortBy);
   if (params.sortOrder) query.set("sortOrder", params.sortOrder);
   if (params.page) query.set("page", String(params.page));
@@ -696,4 +700,34 @@ export async function updateActionTaken(
   return data.data;
 }
 
+/**
+ * Fetch Requester Dashboard data (Lab 4 Issue 5)
+ */
+export async function fetchRequesterDashboard(): Promise<RequesterDashboardData> {
+  const res = await fetchWithInterceptor(`${API_BASE}/dashboard/requester`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to fetch requester dashboard (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}
 
+/**
+ * Fetch Staff / Admin Dashboard operational data (Lab 4 Issue 5)
+ */
+export async function fetchStaffDashboard(): Promise<StaffDashboardData> {
+  const res = await fetchWithInterceptor(`${API_BASE}/dashboard/staff`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) {
+    const errorMsg = data?.error?.message || `Failed to fetch staff dashboard (HTTP ${res.status})`;
+    const err: any = new Error(errorMsg);
+    err.code = data?.error?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data.data;
+}

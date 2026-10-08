@@ -78,7 +78,11 @@
   - คลิกการ์ด `Open` $\to$ นำทางไปยัง `/tickets?status=OPEN`
   - คลิกการ์ด `In Progress` $\to$ นำทางไปยัง `/tickets?status=IN_PROGRESS`
   - คลิกการ์ด `Waiting Req` $\to$ นำทางไปยัง `/tickets?status=WAITING_FOR_REQUESTER`
-  - คลิกการ์ด `My Assigned` $\to$ นำทางไปยัง `/tickets?assigned=me`
+  - คลิกการ์ด `My Assigned` $\to$ นำทางไปยัง `/tickets?assigned=mine` (รองรับทั้ง `assigned=mine` และ alias `assigned=me`)
+
+* **Recent Tickets Row Layout & Responsiveness:**
+  - จัดการแสดงผลแถวตั๋วแบ่งเป็น 2 ฝั่งอย่างเป็นระเบียบ: ฝั่งซ้ายแสดง Ticket Number และ Summary; ฝั่งขวาบนแสดงชื่อผู้รับผิดชอบ (`• {ownerName}` หรือ `• Unassigned` สีแดง) ชิดขวาเสมอ และขยับ IT Priority Badge, Status Badge, และ Date ลงมาด้านล่างของชื่อผู้รับผิดชอบเล็กน้อย
+  - ป้องกันข้อความซ้อนทับหรือล้นขอบจอด้วย `flex-wrap: wrap` และ Text Ellipsis ทำให้แสดงผลได้อย่างสวยงามบนทุกความละเอียดหน้าจอ (Desktop, Tablet, Mobile)
 
 ---
 

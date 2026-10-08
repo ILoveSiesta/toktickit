@@ -154,7 +154,7 @@ staffRouter.get("/tickets", async (req: Request, res: Response) => {
       const assignedVal = String(assigned).toLowerCase();
       if (assignedVal === "unassigned") {
         where.ticketOwnerId = null;
-      } else if (assignedVal === "mine") {
+      } else if (assignedVal === "mine" || assignedVal === "me") {
         where.ticketOwnerId = currentUser.id;
       } else {
         const staffUserId = Number(assigned);
@@ -163,7 +163,7 @@ staffRouter.get("/tickets", async (req: Request, res: Response) => {
             success: false,
             error: {
               code: "INVALID_QUERY_PARAMETER",
-              message: "Assigned filter must be 'all', 'unassigned', 'mine', or a valid numeric User ID",
+              message: "Assigned filter must be 'all', 'unassigned', 'mine', 'me', or a valid numeric User ID",
             },
           });
         }
