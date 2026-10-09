@@ -244,6 +244,7 @@ async function main() {
         ticketOwnerId: t.ticketOwnerId,
         categoryId: t.categoryId,
         relatedSystemId: t.relatedSystemId,
+        resolvedIndicated: false,
       },
       create: {
         ticketNumber: t.ticketNumber,

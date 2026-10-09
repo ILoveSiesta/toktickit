@@ -116,7 +116,7 @@ test.describe("IT Staff Ticket Queue & Triage Flow (E2E-03)", () => {
     await page.screenshot({ path: path.join(detailScreenshotsDir, "03-status-transition.png"), fullPage: true });
 
     // 9. Test Invalid Transition Error Callout Banner
-    await page.route("**/api/staff/tickets/*/status", async (route) => {
+    await page.route("**/status", async (route) => {
       await route.fulfill({
         status: 400,
         contentType: "application/json",
@@ -136,7 +136,7 @@ test.describe("IT Staff Ticket Queue & Triage Flow (E2E-03)", () => {
     await page.screenshot({ path: path.join(detailScreenshotsDir, "04-invalid-transition-error.png"), fullPage: true });
 
     // Clean up intercept route
-    await page.unroute("**/api/staff/tickets/*/status");
+    await page.unroute("**/status");
 
     // 10. Test Public Comments Tab
     const publicTabBtn = page.getByTestId("public-comments-tab");

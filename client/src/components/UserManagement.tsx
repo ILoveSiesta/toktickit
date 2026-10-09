@@ -42,6 +42,7 @@ export const UserManagement: React.FC = () => {
   // Reset Password Modal State
   const [resetTargetUser, setResetTargetUser] = useState<AdminUser | null>(null);
   const [newInitialPassword, setNewInitialPassword] = useState<string>("");
+  const [showResetPassword, setShowResetPassword] = useState<boolean>(false);
   const [resetError, setResetError] = useState<string | null>(null);
   const [isSubmittingReset, setIsSubmittingReset] = useState<boolean>(false);
 
@@ -239,6 +240,7 @@ export const UserManagement: React.FC = () => {
       await resetAdminUserPassword(resetTargetUser.id, newInitialPassword);
       setResetTargetUser(null);
       setNewInitialPassword("");
+      setShowResetPassword(false);
       showSuccess(`Initial password reset successfully for ${resetTargetUser.name}.`);
     } catch (err: any) {
       setResetError(err.message || "Failed to reset password.");
@@ -1276,6 +1278,7 @@ export const UserManagement: React.FC = () => {
                     onClick={() => {
                       setResetTargetUser(editingUser);
                       setNewInitialPassword("");
+                      setShowResetPassword(false);
                       setResetError(null);
                     }}
                     className="zen-btn zen-btn-secondary"
@@ -1363,17 +1366,41 @@ export const UserManagement: React.FC = () => {
                 >
                   New Initial Password *
                 </label>
-                <input
-                  id="new-initial-pass"
-                  type="password"
-                  data-testid="new-initial-password-input"
-                  value={newInitialPassword}
-                  onChange={(e) => setNewInitialPassword(e.target.value)}
-                  placeholder="At least 8 characters"
-                  className="zen-input"
-                  style={{ width: "100%" }}
-                  required
-                />
+                <div style={{ position: "relative" }}>
+                  <input
+                    id="new-initial-pass"
+                    type={showResetPassword ? "text" : "password"}
+                    data-testid="new-initial-password-input"
+                    value={newInitialPassword}
+                    onChange={(e) => setNewInitialPassword(e.target.value)}
+                    placeholder="At least 8 characters"
+                    className="zen-input"
+                    style={{ width: "100%", paddingRight: "40px" }}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowResetPassword(!showResetPassword)}
+                    aria-label={showResetPassword ? "Hide password" : "Show password"}
+                    style={{
+                      position: "absolute",
+                      right: "8px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "var(--color-text-muted)",
+                      fontSize: "1rem",
+                      padding: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {showResetPassword ? "👁️" : "👁️‍🗨️"}
+                  </button>
+                </div>
               </div>
 
               <div
@@ -1386,7 +1413,10 @@ export const UserManagement: React.FC = () => {
                 <button
                   type="button"
                   data-testid="cancel-reset-password-btn"
-                  onClick={() => setResetTargetUser(null)}
+                  onClick={() => {
+                    setResetTargetUser(null);
+                    setShowResetPassword(false);
+                  }}
                   className="zen-btn zen-btn-secondary"
                   disabled={isSubmittingReset}
                 >
