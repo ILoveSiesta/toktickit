@@ -41,16 +41,8 @@ TokTickIT เป็นระบบจัดการและรับเรื�
 เริ่มต้นรัน PostgreSQL container หรือใช้งาน PostgreSQL instance ที่พร้อมใช้งาน
 
 ### 2. Environment Variables Configuration (`.env`)
-- **Server:** ตรวจสอบและกำหนดค่าใน `server/.env` (คัดลอกตัวอย่างจาก `server/.env.example`)
-  ```env
-  DATABASE_URL="postgresql://postgres:postgres@localhost:5432/toktickit?schema=public"
-  JWT_SECRET="toktickit_super_secret_jwt_key_2026"
-  PORT=3000
-  ```
-- **Client:** ตรวจสอบค่าใน `client/.env` (คัดลอกตัวอย่างจาก `client/.env.example`)
-  ```env
-  VITE_API_URL="http://localhost:3000/api"
-  ```
+- **Server:** สร้างไฟล์ `server/.env` โดยคัดลอกและปรับแก้จากไฟล์ `server/.env.example` (ห้าม Commit ไฟล์ .env ขึ้น Git เด็ดขาด)
+- **Client:** สร้างไฟล์ `client/.env` โดยคัดลอกและปรับแก้จากไฟล์ `client/.env.example`
 
 ### 3. Database Migration & Idempotent Seeding
 รันคำสั่งติดตั้ง Dependencies, Migration Schema และ Seed ข้อมูลตั้งต้นสำหรับ Lab 4:
