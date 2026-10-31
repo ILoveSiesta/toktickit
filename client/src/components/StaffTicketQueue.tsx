@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { fetchStaffTicketQueue, fetchCategories } from "../api.js";
 import { Category, StaffTicketQueueItem, StaffQueueResponse } from "../types/index.js";
 
@@ -7,6 +8,16 @@ interface StaffTicketQueueProps {
 }
 
 export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTicket }) => {
+  let searchParams: URLSearchParams | null = null;
+  try {
+    const [params] = useSearchParams();
+    searchParams = params;
+  } catch {}
+
+  const initialStatus = searchParams?.get("status") || "";
+  const rawAssigned = searchParams?.get("assigned");
+  const initialAssigned = rawAssigned === "me" ? "mine" : rawAssigned || "all";
+
   const [tickets, setTickets] = useState<StaffTicketQueueItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [pagination, setPagination] = useState<StaffQueueResponse["pagination"]>({
@@ -24,16 +35,28 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
   // Search & Filter state
   const [search, setSearch] = useState<string>("");
   const [category, setCategory] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
+  const [status, setStatus] = useState<string>(initialStatus);
   const [requestedPriority, setRequestedPriority] = useState<string>("");
   const [itPriority, setItPriority] = useState<string>("");
-  const [assigned, setAssigned] = useState<string>("all");
+  const [assigned, setAssigned] = useState<string>(initialAssigned);
   const [sortBy, setSortBy] = useState<string>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState<number>(1);
 
   // Filter toolbar collapse toggle
-  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState<boolean>(Boolean(initialStatus || initialAssigned !== "all"));
+
+  useEffect(() => {
+    if (searchParams) {
+      const s = searchParams.get("status");
+      const a = searchParams.get("assigned");
+      if (s !== null) setStatus(s);
+      if (a !== null) setAssigned(a === "me" ? "mine" : a);
+      if (s || (a && a !== "all") || searchParams.get("focus") === "search") {
+        setShowFilters(true);
+      }
+    }
+  }, [searchParams]);
 
   // Load categories on mount
   useEffect(() => {

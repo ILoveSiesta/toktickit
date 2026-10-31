@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.js";
 import { useRequester } from "../context/RequesterContext.js";
 import { fetchTickets, fetchCategories } from "../api.js";
@@ -14,6 +15,12 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigate
   let requesterContext: any = null;
   try {
     requesterContext = useRequester();
+  } catch {}
+
+  let searchParams: URLSearchParams | null = null;
+  try {
+    const [params] = useSearchParams();
+    searchParams = params;
   } catch {}
 
   const currentRequester = useMemo(() => {
@@ -33,9 +40,18 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigate
   const [categoryId, setCategoryId] = useState<string>("");
   const [requestedPriority, setRequestedPriority] = useState<string>("");
   const [itPriority, setItPriority] = useState<string>("");
-  const [currentStatus, setCurrentStatus] = useState<string>("");
+  const [currentStatus, setCurrentStatus] = useState<string>(searchParams?.get("status") || "");
+  const [isRecent, setIsRecent] = useState<boolean>(searchParams?.get("recent") === "true");
   const [sortBy, setSortBy] = useState<string>("createdAt");
   const [sortOrder, setSortOrder] = useState<string>("desc");
+
+  useEffect(() => {
+    if (searchParams) {
+      const s = searchParams.get("status");
+      if (s !== null) setCurrentStatus(s);
+      setIsRecent(searchParams.get("recent") === "true");
+    }
+  }, [searchParams]);
 
   // Load categories
   useEffect(() => {
@@ -59,6 +75,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onNavigate
           requestedPriority: requestedPriority || undefined,
           itPriority: itPriority || undefined,
           currentStatus: currentStatus || undefined,
+          recent: isRecent || undefined,
           sortBy,
           sortOrder,
           page,

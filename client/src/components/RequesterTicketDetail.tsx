@@ -9,7 +9,9 @@ import {
   fetchPublicComments,
   postPublicComment,
   indicateProblemResolved,
+  updateTicketStatus,
 } from "../api.js";
+import { ActionsTakenSection } from "./ActionsTaken/index.js";
 
 interface RequesterTicketDetailProps {
   ticketId: number;
@@ -37,6 +39,7 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
   const [commentLoading, setCommentLoading] = useState<boolean>(false);
   const [commentError, setCommentError] = useState<string | null>(null);
   const [resolveLoading, setResolveLoading] = useState<boolean>(false);
+  const [cancelLoading, setCancelLoading] = useState<boolean>(false);
 
   // Soft-remove modal state
   const [removingAttachment, setRemovingAttachment] = useState<any | null>(null);
@@ -171,6 +174,21 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
       alert(err.message || "Failed to indicate problem resolution.");
     } finally {
       setResolveLoading(false);
+    }
+  };
+
+  const handleCancelTicket = async () => {
+    if (!ticket || ticket.currentStatus !== "NEW" || cancelLoading) return;
+    const confirmCancel = window.confirm("Are you sure you want to cancel this ticket?");
+    if (!confirmCancel) return;
+    setCancelLoading(true);
+    try {
+      await updateTicketStatus(ticket.id, "CANCELLED" as any, ticket.updatedAt);
+      await loadTicket();
+    } catch (err: any) {
+      alert(err.message || "Failed to cancel ticket.");
+    } finally {
+      setCancelLoading(false);
     }
   };
 
@@ -370,6 +388,27 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
                 {resolveLoading ? "Submitting..." : "Problem Appears Resolved"}
               </button>
             )
+          )}
+
+          {ticket.currentStatus === "NEW" && (
+            <button
+              type="button"
+              data-testid="requester-cancel-ticket-btn"
+              onClick={handleCancelTicket}
+              disabled={cancelLoading}
+              className="zen-btn"
+              style={{
+                backgroundColor: "#FEF2F2",
+                color: "#991B1B",
+                border: "1.5px solid #FCA5A5",
+                fontWeight: 600,
+                fontSize: "0.875rem",
+                cursor: cancelLoading ? "not-allowed" : "pointer",
+                padding: "6px 12px",
+              }}
+            >
+              {cancelLoading ? "Cancelling..." : "Cancel Ticket"}
+            </button>
           )}
         </div>
 
@@ -696,6 +735,13 @@ export const RequesterTicketDetail: React.FC<RequesterTicketDetailProps> = ({ ti
           )}
         </div>
       </div>
+
+      {/* Actions Taken Section (Lab 4 Screen 3 - Read-Only for Requester) */}
+      <ActionsTakenSection
+        ticketId={ticketId}
+        currentUser={user}
+        isReadOnly={true}
+      />
 
       {/* Public Comments Section (UI Spec 3.2 / UI-08) */}
       <div className="zen-card" data-testid="public-comments-section" style={{ marginBottom: "var(--space-xl)" }}>

@@ -45,6 +45,7 @@ describe("UI-06, UI-07, UI-09: RequesterTicketDetail Component", () => {
     );
 
     vi.spyOn(api, "fetchTicketDetail").mockResolvedValue(mockTicketDetail);
+    vi.spyOn(api, "fetchActionsTaken").mockResolvedValue([]);
   });
 
   it("UI-06: renders ticket details in Read-only view and displays IT Priority badge", async () => {

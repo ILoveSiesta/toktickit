@@ -12,6 +12,9 @@ import { authRouter } from "./routes/auth.js";
 import { staffRouter } from "./routes/staff.js";
 import { commentsNotesRouter } from "./routes/commentsNotes.js";
 import { adminRouter } from "./routes/admin.js";
+import { actionsTakenRouter } from "./routes/actionsTaken.js";
+import { ticketsRouter } from "./routes/tickets.js";
+import { dashboardRouter } from "./routes/dashboard.js";
 import { authenticate, requireRole, enforcePasswordChanged } from "./middleware/auth.js";
 import { verifyToken } from "./utils/jwt.js";
 
@@ -51,8 +54,17 @@ app.use("/api/staff", staffRouter);
 // Comments & Notes Routes (Lab 3 Issue 4)
 app.use("/api", commentsNotesRouter);
 
+// Actions Taken Routes (Lab 4 Issue 2)
+app.use("/api", actionsTakenRouter);
+
+// Ticket Workflow & Lifecycle Routes (Lab 4 Issue 4)
+app.use("/api", ticketsRouter);
+
 // Administrator Routes (Lab 3 Issue 5)
 app.use("/api/admin", adminRouter);
+
+// Role-Appropriate Operational Dashboard Routes (Lab 4 Issue 5)
+app.use("/api", dashboardRouter);
 
 // GET /api/requesters - List active development requesters
 app.get("/api/requesters", async (_req: Request, res: Response) => {
@@ -525,7 +537,17 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
 
     const statusFilter = (status || currentStatus) as string | undefined;
     if (statusFilter && typeof statusFilter === "string") {
-      where.currentStatus = statusFilter.toUpperCase() as any;
+      const upperStatus = statusFilter.toUpperCase();
+      if (upperStatus === "OPEN_GROUP") {
+        where.currentStatus = { in: ["NEW", "OPEN", "IN_PROGRESS", "WAITING_FOR_REQUESTER"] };
+      } else {
+        where.currentStatus = upperStatus as any;
+      }
+    }
+
+    if (req.query.recent === "true") {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000);
+      where.updatedAt = { gte: thirtyDaysAgo };
     }
 
     // Build Order By with Secondary Sort for Deterministic Pagination

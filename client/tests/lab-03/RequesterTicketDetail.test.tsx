@@ -60,6 +60,7 @@ describe("UI-08: Requester Ticket Detail Enhancements & Isolation", () => {
     vi.restoreAllMocks();
     vi.spyOn(api, "fetchTicketDetail").mockResolvedValue(mockTicketData);
     vi.spyOn(api, "fetchPublicComments").mockResolvedValue(mockComments);
+    vi.spyOn(api, "fetchActionsTaken").mockResolvedValue([]);
     vi.spyOn(api, "indicateProblemResolved").mockResolvedValue({ id: 201, resolvedIndicated: true });
     vi.spyOn(api, "postPublicComment").mockResolvedValue({
       id: 3,

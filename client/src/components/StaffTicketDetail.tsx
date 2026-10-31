@@ -21,6 +21,7 @@ import {
   PERMITTED_STATUS_TRANSITIONS,
   Role,
 } from "../types/index.js";
+import { ActionsTakenSection } from "./ActionsTaken/index.js";
 
 interface StaffTicketDetailProps {
   ticketId: number;
@@ -490,6 +491,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       {/* Requester Resolution Indication Banner (API-17 / UI-04) */}
       {ticket.resolvedIndicated && (
         <div
+          data-testid="resolution-advisory-banner"
+          role="status"
           style={{
             background: "#E0F2FE",
             border: "1px solid #7DD3FC",
@@ -908,6 +911,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           </div>
         )}
       </div>
+
+      {/* ZONE: ACTIONS TAKEN (Lab 4 Screen 3) */}
+      <ActionsTakenSection
+        ticketId={ticketId}
+        currentUser={user}
+        isReadOnly={false}
+      />
 
       {/* ZONE 2: COMMUNICATION & COLLABORATION TABS */}
       <div

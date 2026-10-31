@@ -3,8 +3,8 @@ import { useAuth } from "../context/AuthContext.js";
 import { useRequester } from "../context/RequesterContext.js";
 
 interface AppHeaderProps {
-  currentTab?: "my-tickets" | "create-ticket" | "queue" | "admin-users";
-  onSelectTab?: (tab: "my-tickets" | "create-ticket" | "queue" | "admin-users") => void;
+  currentTab?: "my-tickets" | "create-ticket" | "queue" | "admin-users" | "dashboard";
+  onSelectTab?: (tab: "my-tickets" | "create-ticket" | "queue" | "admin-users" | "dashboard") => void;
   onChangeRequester?: () => void;
   onLogout?: () => void;
   userRole?: "REQUESTER" | "IT_STAFF" | "ADMINISTRATOR";
@@ -105,10 +105,30 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </div>
 
           <nav style={{ display: "flex", gap: "var(--space-xs)", flexWrap: "wrap" }}>
+            {/* Common Dashboard Nav Link with Active Indicator */}
+            <button
+              type="button"
+              data-testid="dashboard-nav"
+              onClick={() => onSelectTab && onSelectTab("dashboard")}
+              style={{
+                background: currentTab === "dashboard" ? "var(--color-secondary-green)" : "transparent",
+                color: "#FFFFFF",
+                border: "none",
+                padding: "6px 10px",
+                borderRadius: "var(--radius-sm)",
+                fontWeight: currentTab === "dashboard" ? 600 : 500,
+                fontSize: "var(--font-size-body)",
+                cursor: "pointer",
+              }}
+            >
+              📊 Dashboard
+            </button>
+
             {userRole === "REQUESTER" && (
               <>
                 <button
                   type="button"
+                  data-testid="my-tickets-nav"
                   onClick={() => onSelectTab && onSelectTab("my-tickets")}
                   style={{
                     background: currentTab === "my-tickets" ? "var(--color-secondary-green)" : "transparent",
@@ -116,7 +136,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     border: "none",
                     padding: "6px 10px",
                     borderRadius: "var(--radius-sm)",
-                    fontWeight: 500,
+                    fontWeight: currentTab === "my-tickets" ? 600 : 500,
                     fontSize: "var(--font-size-body)",
                     cursor: "pointer",
                   }}
@@ -125,6 +145,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 </button>
                 <button
                   type="button"
+                  data-testid="create-ticket-nav"
                   onClick={() => onSelectTab && onSelectTab("create-ticket")}
                   style={{
                     background: currentTab === "create-ticket" ? "var(--color-secondary-green)" : "transparent",
@@ -132,7 +153,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     border: "none",
                     padding: "6px 10px",
                     borderRadius: "var(--radius-sm)",
-                    fontWeight: 500,
+                    fontWeight: currentTab === "create-ticket" ? 600 : 500,
                     fontSize: "var(--font-size-body)",
                     cursor: "pointer",
                   }}
@@ -145,6 +166,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             {userRole === "IT_STAFF" && (
               <button
                 type="button"
+                data-testid="staff-queue-nav"
                 onClick={() => onSelectTab && onSelectTab("queue")}
                 style={{
                   background: currentTab === "queue" ? "var(--color-secondary-green)" : "transparent",
@@ -152,7 +174,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   border: "none",
                   padding: "6px 10px",
                   borderRadius: "var(--radius-sm)",
-                  fontWeight: 500,
+                  fontWeight: currentTab === "queue" ? 600 : 500,
                   fontSize: "var(--font-size-body)",
                   cursor: "pointer",
                 }}
@@ -165,6 +187,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               <>
                 <button
                   type="button"
+                  data-testid="staff-queue-nav"
                   onClick={() => onSelectTab && onSelectTab("queue")}
                   style={{
                     background: currentTab === "queue" ? "var(--color-secondary-green)" : "transparent",
@@ -172,7 +195,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     border: "none",
                     padding: "6px 10px",
                     borderRadius: "var(--radius-sm)",
-                    fontWeight: 500,
+                    fontWeight: currentTab === "queue" ? 600 : 500,
                     fontSize: "var(--font-size-body)",
                     cursor: "pointer",
                   }}
@@ -189,7 +212,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     border: "none",
                     padding: "6px 10px",
                     borderRadius: "var(--radius-sm)",
-                    fontWeight: 500,
+                    fontWeight: currentTab === "admin-users" ? 600 : 500,
                     fontSize: "var(--font-size-body)",
                     cursor: "pointer",
                   }}

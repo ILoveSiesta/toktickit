@@ -196,4 +196,126 @@ export interface UpdateAdminUserPayload {
   isActive?: boolean;
 }
 
+export interface ActionTaken {
+  id: number;
+  ticketId: number;
+  actionDateTime: string;
+  actionDescription: string;
+  result: string;
+  performedById: number;
+  performedBy: {
+    id: number;
+    name: string;
+    email: string;
+    role: Role;
+  };
+  followUpRequired: boolean;
+  followUpNote: string | null;
+  attachmentNotes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateActionTakenPayload {
+  actionDescription: string;
+  result: string;
+  followUpRequired?: boolean;
+  followUpNote?: string;
+  attachmentNotes?: string;
+  actionDateTime?: string;
+}
+
+export interface UpdateActionTakenPayload {
+  actionDescription?: string;
+  result?: string;
+  followUpRequired?: boolean;
+  followUpNote?: string;
+  attachmentNotes?: string;
+  actionDateTime?: string;
+  expectedUpdatedAt?: string;
+}
+
+// Lab 4 Issue 5: Dashboard Types
+export interface RequesterDashboardSummary {
+  totalOpen: number;
+  inProgress: number;
+  waitingForRequester: number;
+  recentlyResolved: number;
+  closed: number;
+}
+
+export interface RequesterRecentTicket {
+  id: number;
+  ticketNumber: string;
+  summary: string;
+  status: TicketStatus;
+  priority: PriorityLevel;
+  itPriority?: PriorityLevel | null;
+  requestedPriority?: PriorityLevel | null;
+  updatedAt: string;
+  createdAt?: string;
+}
+
+export interface RequesterDashboardData {
+  summary: RequesterDashboardSummary;
+  recentTickets: RequesterRecentTicket[];
+}
+
+export interface StaffDashboardSummary {
+  unassigned: number;
+  new: number;
+  open: number;
+  inProgress: number;
+  waitingForRequester: number;
+  myAssigned: number;
+  resolved: number;
+  closed: number;
+}
+
+export interface StaffDashboardTrends {
+  unassigned: string;
+  new: string;
+  open: string;
+  inProgress: string;
+  waitingForRequester: string;
+  myAssigned: string;
+}
+
+export interface PriorityDistribution {
+  CRITICAL: number;
+  HIGH: number;
+  MEDIUM: number;
+  LOW: number;
+}
+
+export interface StaffRecentTicket {
+  id: number;
+  ticketNumber: string;
+  summary: string;
+  status: TicketStatus;
+  itPriority: PriorityLevel;
+  priority?: PriorityLevel;
+  ownerId: number | null;
+  ownerName: string | null;
+  updatedAt: string;
+  createdAt?: string;
+}
+
+export interface AdminUserSummary {
+  totalUsers: number;
+  activeUsers: number;
+  requestersCount: number;
+  staffCount: number;
+  adminCount: number;
+}
+
+export interface StaffDashboardData {
+  summary: StaffDashboardSummary;
+  trends: StaffDashboardTrends;
+  byPriority: PriorityDistribution;
+  recentTickets: StaffRecentTicket[];
+  adminSummary?: AdminUserSummary;
+}
+
+
 

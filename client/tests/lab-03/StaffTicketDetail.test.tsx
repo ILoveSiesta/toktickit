@@ -71,6 +71,7 @@ describe("UI-04 & UI-05: StaffTicketDetail Component Tests", () => {
     vi.spyOn(api, "fetchStaffAssignees").mockResolvedValue(mockAssignees);
     vi.spyOn(api, "fetchPublicComments").mockResolvedValue(mockComments);
     vi.spyOn(api, "fetchInternalNotes").mockResolvedValue(mockNotes);
+    vi.spyOn(api, "fetchActionsTaken").mockResolvedValue([]);
     vi.spyOn(api, "updateTicketAssignment").mockResolvedValue({
       id: 101,
       ticketOwnerId: 3,

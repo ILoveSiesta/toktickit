@@ -154,7 +154,7 @@ staffRouter.get("/tickets", async (req: Request, res: Response) => {
       const assignedVal = String(assigned).toLowerCase();
       if (assignedVal === "unassigned") {
         where.ticketOwnerId = null;
-      } else if (assignedVal === "mine") {
+      } else if (assignedVal === "mine" || assignedVal === "me") {
         where.ticketOwnerId = currentUser.id;
       } else {
         const staffUserId = Number(assigned);
@@ -163,7 +163,7 @@ staffRouter.get("/tickets", async (req: Request, res: Response) => {
             success: false,
             error: {
               code: "INVALID_QUERY_PARAMETER",
-              message: "Assigned filter must be 'all', 'unassigned', 'mine', or a valid numeric User ID",
+              message: "Assigned filter must be 'all', 'unassigned', 'mine', 'me', or a valid numeric User ID",
             },
           });
         }
@@ -584,6 +584,21 @@ staffRouter.patch("/tickets/:id/status", async (req: Request, res: Response) => 
         success: false,
         error: { code: "NOT_FOUND", message: "Ticket not found" },
       });
+    }
+
+    // Optimistic Concurrency Check (Stale Update)
+    if (req.body.expectedUpdatedAt) {
+      const expectedTime = new Date(req.body.expectedUpdatedAt).getTime();
+      const actualTime = new Date(ticket.updatedAt).getTime();
+      if (actualTime > expectedTime) {
+        return res.status(409).json({
+          success: false,
+          error: {
+            code: "STALE_UPDATE_CONFLICT",
+            message: "The ticket has been modified by another user. Please refresh and try again.",
+          },
+        });
+      }
     }
 
     const currentStatus = ticket.currentStatus;
